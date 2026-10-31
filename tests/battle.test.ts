@@ -171,7 +171,12 @@ describe('taistelu', () => {
   });
 
   it('varas nappaa juoman lyönnin sijaan', () => {
-    const battle = createBattle(fighter(30, 7, 2), fighter(30, 5, 0), { potion: 2 }, 0.35);
+    const battle = createBattle(
+      fighter(30, 7, 2),
+      fighter(30, 5, 0),
+      { potion: 2 },
+      { stealChance: 0.35 },
+    );
     const events = takeTurn(battle, { kind: 'defend' }, sequence(0.1), rules);
     expect(events[1]).toEqual({ kind: 'steal', itemId: 'potion' });
     expect(battle.inventory['potion']).toBe(1);
@@ -180,14 +185,24 @@ describe('taistelu', () => {
   });
 
   it('varas lyö, jos arpa ei osu tai varastettavaa ei ole', () => {
-    const battle = createBattle(fighter(30, 7, 2), fighter(30, 5, 0), { potion: 1 }, 0.35);
+    const battle = createBattle(
+      fighter(30, 7, 2),
+      fighter(30, 5, 0),
+      { potion: 1 },
+      { stealChance: 0.35 },
+    );
     expect(takeTurn(battle, { kind: 'defend' }, middle, rules)[1]?.kind).toBe('hit');
-    const empty = createBattle(fighter(30, 7, 2), fighter(30, 5, 0), {}, 1);
+    const empty = createBattle(fighter(30, 7, 2), fighter(30, 5, 0), {}, { stealChance: 1 });
     expect(takeTurn(empty, { kind: 'defend' }, middle, rules)[1]?.kind).toBe('hit');
   });
 
   it('varastetut esineet saa takaisin', () => {
-    const battle = createBattle(fighter(30, 7, 2), fighter(30, 5, 0), { potion: 1 }, 1);
+    const battle = createBattle(
+      fighter(30, 7, 2),
+      fighter(30, 5, 0),
+      { potion: 1 },
+      { stealChance: 1 },
+    );
     takeTurn(battle, { kind: 'defend' }, middle, rules);
     expect(battle.inventory['potion']).toBe(0);
     expect(recoverStolen(battle)).toEqual([{ id: 'potion', count: 1 }]);

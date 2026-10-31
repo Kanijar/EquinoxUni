@@ -86,6 +86,10 @@ export const TEXT = {
     potions: (count: number): string => `Juomat ${count}`,
     /** Viholliset, joita ei ole vielä voitettu kertaakaan (voitetut palaavat kartalle). */
     enemiesLeft: (count: number): string => `Voittamatta ${count}`,
+    /** Loppubossin peikkolaskuri (data/boss.ts). */
+    trolls: (count: number, needed: number): string => `Peikot ${count}/${needed}`,
+    /** Herännyt loppuboss odottaa kartalla. */
+    bossAwake: (boss: string): string => `${boss} odottaa!`,
     /** Montako ihmistä pelaa juuri nyt (pelaaja itse mukaan lukien). */
     players: (count: number): string => `Pelaajia nyt: ${count}`,
   },
@@ -125,6 +129,8 @@ export const TEXT = {
   battle: {
     appears: (enemy: string): string => `${enemy} hyökkää kimppuusi!`,
     ambush: (enemy: string): string => `Väijytys! ${enemy} hyppää esiin puiden takaa!`,
+    /** Loppuboss taistelun alussa. */
+    bossAppears: (enemy: string): string => `${enemy} nousee eteesi! Maa tärisee!`,
     choose: 'Mitä teet?',
     attack: 'HYÖKKÄÄ',
     defend: 'PUOLUSTA',
@@ -142,6 +148,19 @@ export const TEXT = {
     enemyHit: (enemy: string, damage: number): string => `${enemy} löi sinua: -${damage}.`,
     enemyHitDefended: (enemy: string, damage: number): string =>
       `Torjuit iskun! ${enemy} teki vain ${damage}.`,
+    /** Loppubossin voimaisku valmistellaan edellisellä vuorolla. */
+    charge: (enemy: string): string => `${enemy} nostaa nuijansa! PUOLUSTA nyt!`,
+    heavyHit: (enemy: string, damage: number): string =>
+      `VOIMAISKU! ${enemy} murskasi: -${damage}.`,
+    heavyHitDefended: (enemy: string, damage: number): string =>
+      `Torjuit voimaiskun! ${enemy} teki vain ${damage}.`,
+    /** Loppubossin erikoisliike: lumimyrsky. */
+    storm: (enemy: string, damage: number): string =>
+      `${enemy} puhalsi lumimyrskyn! Menetit ${damage}.`,
+    stormDefended: (enemy: string, damage: number): string =>
+      `${enemy} puhalsi lumimyrskyn! Kilpi suojasi: -${damage}.`,
+    stormExtinguished: ' Liekit sammuivat!',
+    chargePopup: 'VAROITUS!',
     crit: 'KRIITTINEN OSUMA! ',
     critPopup: 'KRIITTINEN OSUMA!',
     defending: 'Nostit kilven ja valmistaudut torjumaan.',
@@ -150,6 +169,7 @@ export const TEXT = {
     fleeFail: 'Pako epäonnistui!',
     won: (enemy: string, xp: number): string => `Voitit: ${enemy}! Sait ${xp} KP.`,
     drop: (item: string): string => `Löysit: ${item}.`,
+    dropMany: (item: string, count: number): string => `Löysit: ${item} ×${count}.`,
     stole: (enemy: string, item: string): string => `${enemy} nappasi sinulta: ${item}!`,
     recovered: (item: string, count: number): string => `Sait takaisin: ${item} ×${count}.`,
     levelUp: (level: number): string => `Nousit tasolle ${level}! Elämä palautui.`,
@@ -173,12 +193,28 @@ export const TEXT = {
   spellButtons: {
     fireball: 'TULIPALLO',
   },
-  gameOver: {
-    title: 'Hävisit!',
-    next: 'Kosketa palataksesi alkuruutuun',
+  /** Loppuboss (data/boss.ts): peikkolaskuri, herääminen ja voitto. */
+  boss: {
+    progress: (count: number, needed: number): string =>
+      `Tunturipeikkoja voitettu ${count}/${needed}.`,
+    awakenedBattle: (boss: string): string => `Maa jyrisee... ${boss} heräsi!`,
+    /** Kartalla, kun boss on juuri herännyt. */
+    awakenedMap: (boss: string): string =>
+      `${boss} heräsi!\nSe odottaa tuntureilla Kilpisjärven lähellä.`,
+    defeatedBattle: (boss: string): string => `${boss} kaatui!`,
   },
+  /** Voittoruutu: loppuboss voitettu tai jokainen vihollinen voitettu. Peli jatkuu. */
   victory: {
-    title: 'Suomi on pelastettu!',
-    next: 'Kosketa palataksesi alkuruutuun',
+    bossTitle: 'VOITIT LOPPUBOSSIN!',
+    bossText: (boss: string): string => `${boss} on kukistettu. Lappi on vapaa!`,
+    completeTitle: 'Suomi on pelastettu!',
+    completeText: 'Voitit jokaisen vihollisen ainakin kerran.',
+    bossWaiting: (boss: string): string => `Mutta ${boss} odottaa vielä Lapissa...`,
+    bossHint: (count: number, needed: number): string =>
+      `Voita tunturipeikkoja (${count}/${needed}), niin jokin herää Lapissa...`,
+    stats: (level: number, xp: number): string => `Taso ${level}   KP ${xp}`,
+    next: 'Kosketa jatkaaksesi seikkailua',
+    /** Kartalle palatessa. */
+    continues: 'Seikkailu jatkuu!',
   },
 } as const;

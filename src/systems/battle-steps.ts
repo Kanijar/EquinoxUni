@@ -3,10 +3,7 @@ import { BATTLE_VIEW } from '../config/game-config';
 import { getItem } from '../data';
 import { TEXT } from '../i18n/fi';
 import type { BattleEvent } from '../logic/battle';
-import type { VictoryReward } from '../logic/game-state';
-import { xpToNextLevel } from '../logic/progression';
 import type { BattleView } from '../ui/battle-view';
-import { playSound } from './sound-fx';
 
 // Muuttaa taistelun tapahtumat näytettäviksi askeliksi (teksti + animaatio)
 // ja näyttää ne yksi kerrallaan.
@@ -45,46 +42,14 @@ export function eventStep(event: BattleEvent, view: BattleView, enemyName: strin
         text: event.success ? TEXT.battle.fleeOk : TEXT.battle.fleeFail,
         effect: () => view.playFlee(event.success),
       };
+    case 'charge':
+      return { text: TEXT.battle.charge(enemyName), effect: () => view.playCharge() };
+    case 'special':
+      return {
+        text: stormText(event, enemyName),
+        effect: () => view.playStorm(event),
+      };
   }
-}
-
-/** Voiton jälkeiset viestit. KP-palkki täyttyy samalla, kun voittoviesti näkyy. */
-export function victorySteps(
-  reward: VictoryReward,
-  enemyName: string,
-  view: BattleView,
-): BattleStep[] {
-  const steps: BattleStep[] = [
-    {
-      text: TEXT.battle.won(enemyName, reward.xp),
-      effect: () => {
-        view.updateXp(reward.totalXp);
-        view.playVictory();
-        playSound('victory');
-      },
-    },
-  ];
-  for (const stack of reward.recovered ?? []) {
-    steps.push({ text: TEXT.battle.recovered(getItem(stack.id).name, stack.count) });
-  }
-  if (reward.drop) {
-    steps.push({ text: TEXT.battle.drop(getItem(reward.drop).name) });
-  }
-  if (reward.leveledUp) {
-    steps.push({
-      text: TEXT.battle.levelUp(reward.level),
-      effect: () => {
-        view.playLevelUp();
-        playSound('level-up');
-      },
-    });
-  }
-  if (reward.skillPoints > 0) {
-    steps.push({ text: TEXT.battle.skillPoints(reward.skillPoints) });
-  }
-  const missing = xpToNextLevel(reward.totalXp);
-  steps.push({ text: missing === null ? TEXT.battle.maxLevel : TEXT.battle.xpToNext(missing) });
-  return steps;
 }
 
 /** Näyttää askeleet järjestyksessä ja kutsuu lopuksi done(). */
@@ -109,6 +74,10 @@ function hitText(event: Extract<BattleEvent, { kind: 'hit' }>, enemyName: string
   if (event.attacker === 'player') {
     return crit + TEXT.battle.playerHit(enemyName, event.damage);
   }
+  if (event.heavy) {
+    const heavy = event.defended ? TEXT.battle.heavyHitDefended : TEXT.battle.heavyHit;
+    return crit + heavy(enemyName, event.damage);
+  }
   const text = event.defended
     ? TEXT.battle.enemyHitDefended(enemyName, event.damage)
     : TEXT.battle.enemyHit(enemyName, event.damage);
@@ -118,4 +87,9 @@ function hitText(event: Extract<BattleEvent, { kind: 'hit' }>, enemyName: string
 function spellText(event: Extract<BattleEvent, { kind: 'spell' }>, enemyName: string): string {
   const crit = event.crit ? TEXT.battle.crit : '';
   return crit + TEXT.battle.spellHit(TEXT.spells[event.spellId], enemyName, event.damage);
+}
+
+function stormText(event: Extract<BattleEvent, { kind: 'special' }>, enemyName: string): string {
+  const storm = event.defended ? TEXT.battle.stormDefended : TEXT.battle.storm;
+  return storm(enemyName, event.damage) + (event.extinguished ? TEXT.battle.stormExtinguished : '');
 }

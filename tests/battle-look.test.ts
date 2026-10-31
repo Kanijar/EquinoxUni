@@ -4,7 +4,7 @@ import { PARTICLE_BURSTS } from '../src/data/battle-effects';
 import { ACTION_BUTTON, BATTLE_STAGE } from '../src/config/battle-config';
 import { getSprite, TERRAINS } from '../src/data';
 import type { TerrainId } from '../src/data/types';
-import { backdropForTerrain, hpTier, wipeOrder } from '../src/logic/battle-look';
+import { backdropForBattle, backdropForTerrain, hpTier, wipeOrder } from '../src/logic/battle-look';
 import { createSeededRng, randomInt } from '../src/logic/seeded-random';
 
 // Taistelunäkymän ulkoasun säännöt: tausta maaston mukaan, elämäpalkin väri,
@@ -23,6 +23,12 @@ describe('taistelun tausta', () => {
   it('tuntematon maasto antaa oletustaustan', () => {
     expect(backdropForTerrain(undefined).id).toBe('field');
     expect(backdropForTerrain('suo' as TerrainId).id).toBe('field');
+  });
+
+  it('vihollisen oma tausta voittaa maaston (loppuboss tunturin huipulla)', () => {
+    expect(backdropForBattle('forest', { backdrop: 'summit' }).id).toBe('summit');
+    expect(backdropForBattle('forest', {}).id).toBe('forest');
+    expect(BATTLE_BACKDROPS.summit.aurora?.length).toBeGreaterThan(0);
   });
 
   it('jokaisella maastolla on tausta', () => {

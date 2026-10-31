@@ -51,4 +51,23 @@ export const ENEMIES: readonly EnemyDef[] = [
     xp: 10,
     stealChance: 0.35,
   },
+  {
+    // Loppuboss: ei ole kartalla alussa, vaan herää Lappiin, kun tunturipeikkoja on
+    // voitettu tarpeeksi (data/boss.ts). Voitettu Peikkokuningas ei palaa.
+    id: 'troll-king',
+    name: 'Peikkokuningas',
+    sprite: 'troll-king',
+    stats: { maxHp: 160, attack: 18, defense: 6, speed: 30 },
+    aggroRange: 50,
+    xp: 800,
+    drop: 'potion',
+    dropCount: 5,
+    critChance: 0.1,
+    // Tasapaino (simuloitu): järkevillä kykypisteillä voitettavissa noin tasolla 14–15,
+    // tulivoimaan panostaneena jo vähän aiemmin. Tunturipeikko on helppo jo tasolla 8.
+    // Voimaisku (×3) valmistellaan edellisellä vuorolla (PUOLUSTA puolittaa sen),
+    // lumimyrsky ohittaa puolustuksen ja sammuttaa tulipallon liekit.
+    moves: { chargeChance: 0.25, chargeMultiplier: 3, specialChance: 0.2, specialPower: 10 },
+    backdrop: 'summit',
+  },
 ];

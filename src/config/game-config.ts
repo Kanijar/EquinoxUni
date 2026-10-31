@@ -32,6 +32,8 @@ export const COLORS = {
   critText: '#ffd23f',
   /** Loitsun osuman ja palamisen välähdys sekä palamisen vahinkoteksti. */
   spellFlash: 0xff7a1a,
+  /** Loppubossin lumimyrsky osuu pelaajaan. */
+  stormFlash: 0x9fd0ff,
   burnText: '#ff9a3c',
 } as const;
 
@@ -48,7 +50,7 @@ export const SCENES = {
   menu: 'menu',
   world: 'world',
   battle: 'battle',
-  gameOver: 'game-over',
+  victory: 'victory',
   skills: 'skills',
   settings: 'settings',
   saves: 'saves',
@@ -162,6 +164,29 @@ export const WORLD_VIEW = {
   skillButton: { width: 150, height: 40, margin: 6 },
   /** Paikkakunnassa näkyvä TALLENNA-nappi KYKYPISTEET-napin yläpuolella. */
   saveButton: { width: 150, height: 40, gap: 6 },
+  /** Loppuboss kartalla: sykkivä punainen hehku jalkojen alla ja kameran tärähdys herätessä. */
+  bossAura: { radius: 18, color: 0xff3c3c, alpha: 0.35, pulseScale: 1.4, pulseMs: 700 },
+  bossAwakenShake: { ms: 600, intensity: 0.012 },
+  /** Ruudun reunan nuoli, joka osoittaa kohti loppubossia, kun se ei näy ruudulla. */
+  bossPointer: { size: 9, margin: 22, color: 0xff3c3c, alpha: 0.9, pulseMs: 500 },
+} as const;
+
+/** Voittoruutu (loppuboss tai läpäisy). Peli jatkuu kosketuksella. */
+export const VICTORY_VIEW = {
+  titleY: 44,
+  textY: 82,
+  hintY: 104,
+  statsY: 128,
+  heroY: 236,
+  heroScale: 5,
+  hopPx: 14,
+  hopMs: 320,
+  nextY: 256,
+  /** Kultaiset tähdet tuikkivat taustalla. */
+  stars: { count: 24, size: 3, minMs: 400, maxMs: 1200, color: 0xffd23f },
+  /** Kosketus hyväksytään vasta tämän jälkeen, ettei taistelun napautus ohita ruutua. */
+  inputDelayMs: 800,
+  background: 0x0b1230,
 } as const;
 
 /** Kykypistenäkymän asetukset. Viisi riviä, VALMIS-nappi oikeassa yläkulmassa. */

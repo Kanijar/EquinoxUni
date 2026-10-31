@@ -7,8 +7,11 @@ import {
   SPRITES,
   TERRAINS,
   TOWNS,
+  getEnemy,
   getSprite,
 } from '../src/data';
+import { BATTLE_BACKDROPS } from '../src/data/battle-backdrops';
+import { FINAL_BOSS } from '../src/data/boss';
 import { PLAYER } from '../src/data/player';
 import { BATTLE_RULES, PROGRESSION, RESPAWN_RULES } from '../src/data/rules';
 import { SOUNDS } from '../src/data/sounds';
@@ -148,6 +151,29 @@ describe('sisältödata', () => {
       for (const note of sound.notes) {
         expect(note.freq).toBeGreaterThan(20);
         expect(note.ms).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('loppuboss viittaa olemassa oleviin vihollisiin ja sen sprite on iso (24x24)', () => {
+    expect(ids(ENEMIES)).toContain(FINAL_BOSS.enemy);
+    expect(ids(ENEMIES)).toContain(FINAL_BOSS.unlockEnemy);
+    expect(FINAL_BOSS.unlockCount).toBeGreaterThan(0);
+    const sprite = getSprite(getEnemy(FINAL_BOSS.enemy).sprite);
+    expect(sprite.rows.length).toBe(24);
+    expect(sprite.rows.every((row) => row.length === 24)).toBe(true);
+  });
+
+  it('erikoisliikkeiden todennäköisyydet ovat järkeviä', () => {
+    for (const enemy of ENEMIES) {
+      if (enemy.moves) {
+        const { chargeChance, specialChance, chargeMultiplier, specialPower } = enemy.moves;
+        expect(chargeChance + specialChance).toBeLessThan(1);
+        expect(chargeMultiplier).toBeGreaterThan(1);
+        expect(specialPower).toBeGreaterThan(0);
+      }
+      if (enemy.backdrop) {
+        expect(BATTLE_BACKDROPS[enemy.backdrop]).toBeDefined();
       }
     }
   });

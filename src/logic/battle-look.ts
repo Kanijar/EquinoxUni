@@ -1,5 +1,5 @@
 import { BACKDROP_BY_TERRAIN, BATTLE_BACKDROPS, DEFAULT_BACKDROP } from '../data/battle-backdrops';
-import type { BattleBackdropDef, TerrainId } from '../data/types';
+import type { BattleBackdropDef, EnemyDef, TerrainId } from '../data/types';
 import { tileNoise } from './world-grid';
 
 // Taistelunäkymän ulkoasun säännöt, jotka voi testata ilman Phaseria:
@@ -10,6 +10,14 @@ import { tileNoise } from './world-grid';
 export function backdropForTerrain(terrain: TerrainId | undefined): BattleBackdropDef {
   const id = terrain === undefined ? DEFAULT_BACKDROP : BACKDROP_BY_TERRAIN[terrain];
   return BATTLE_BACKDROPS[id] ?? BATTLE_BACKDROPS[DEFAULT_BACKDROP];
+}
+
+/** Taistelun tausta: vihollisen oma tausta (esim. loppuboss), muuten maaston mukaan. */
+export function backdropForBattle(
+  terrain: TerrainId | undefined,
+  enemy: Pick<EnemyDef, 'backdrop'>,
+): BattleBackdropDef {
+  return enemy.backdrop ? BATTLE_BACKDROPS[enemy.backdrop] : backdropForTerrain(terrain);
 }
 
 export type HpTier = 'high' | 'mid' | 'low';

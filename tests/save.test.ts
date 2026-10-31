@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { SAVE_SLOT_COUNT, SAVE_VERSION } from '../src/config/persistence';
 import { MAP_ENEMIES, WORLD } from '../src/data';
+import { FINAL_BOSS } from '../src/data/boss';
 import { PLAYER } from '../src/data/player';
 import { createNewGame, playerStats, type GameState } from '../src/logic/game-state';
 import { MemoryStore, type KeyValueStore } from '../src/logic/key-value-store';
@@ -22,6 +23,7 @@ function playedGame(): GameState {
   state.hp = 20;
   state.lastTown = 'tampere';
   state.eyeColor = 'black';
+  state.bossProgress = 2;
   return state;
 }
 
@@ -84,6 +86,41 @@ describe('tallennusmuoto', () => {
     const state = decodeSave(JSON.stringify(old))?.state;
     expect(state?.eyeColor).toBe(PLAYER.eyeColor);
     expect(state?.xp).toBe(40);
+  });
+
+  it('versio 3: peikkolaskuri alkaa jo voitetuista tunturipeikoista', () => {
+    const trolls = MAP_ENEMIES.flatMap((spawn, index) => (spawn.enemy === 'troll' ? [index] : []));
+    const raw = JSON.parse(encodeSave(playedGame(), meta)) as Record<string, unknown>;
+    const oldState = raw['state'] as Record<string, unknown>;
+    delete oldState['bossProgress'];
+    delete oldState['bossDefeated'];
+    delete oldState['completed'];
+    oldState['defeated'] = [0, ...trolls.slice(0, 2)];
+    oldState['respawning'] = [];
+    const state = decodeSave(JSON.stringify({ ...raw, version: 3, state: oldState }))?.state;
+    expect(state?.bossProgress).toBe(2);
+    expect(state?.bossDefeated).toBe(false);
+    expect(state?.completed).toBe(false);
+  });
+
+  it('loppubossin tila tallentuu, virheelliset arvot korjataan', () => {
+    const won = playedGame();
+    won.bossProgress = FINAL_BOSS.unlockCount;
+    won.bossDefeated = true;
+    won.completed = true;
+    expect(decodeSave(encodeSave(won, meta))?.state).toEqual(won);
+    const raw = JSON.parse(encodeSave(playedGame(), meta)) as { state: Record<string, unknown> };
+    raw.state['bossProgress'] = 999;
+    raw.state['bossDefeated'] = 'kyllä';
+    raw.state['completed'] = 1;
+    const state = decodeSave(JSON.stringify(raw))?.state;
+    expect(state?.bossProgress).toBe(FINAL_BOSS.unlockCount);
+    expect(state?.bossDefeated).toBe(false);
+    expect(state?.completed).toBe(false);
+    raw.state['bossProgress'] = -3;
+    raw.state['bossDefeated'] = true;
+    // Voitettu boss tarkoittaa, että laskuri on täynnä.
+    expect(decodeSave(JSON.stringify(raw))?.state.bossProgress).toBe(FINAL_BOSS.unlockCount);
   });
 
   it('silmien väri tallentuu, tuntematon väri vaihtuu oletusväriksi', () => {

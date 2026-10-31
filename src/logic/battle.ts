@@ -1,14 +1,15 @@
 import { getItem, getSpell } from '../data';
 import { BATTLE_RULES } from '../data/rules';
-import type { BattleRules, EnemyDef, ItemStack, SpellId } from '../data/types';
-import { applyDamage, calculateDamage, heal, isDefeated, type Fighter } from './combat';
+import type { BattleRules, EnemyDef, EnemyMovesDef, ItemStack, SpellId } from '../data/types';
+import { applyDamage, heal, isDefeated, type Fighter } from './combat';
+import { rollDamage, type Rng } from './damage-roll';
+import { enemyAct } from './enemy-turn';
 import { castSpell, type Burn } from './magic';
 
 // Vuoropohjainen taistelu. Pelaaja valitsee toiminnon, sitten vihollinen vastaa.
 // Puhdasta logiikkaa: palauttaa tapahtumat, jotka taistelunäkymä näyttää järjestyksessä.
 
-/** Satunnaislukufunktio 0..1. Peli käyttää Math.random, testit omaa. */
-export type Rng = () => number;
+export { rollDamage, type Rng };
 
 export type BattleAction =
   | { readonly kind: 'attack' }
@@ -26,6 +27,8 @@ export type BattleEvent =
       readonly damage: number;
       readonly crit: boolean;
       readonly defended: boolean;
+      /** Valmisteltu voimaisku (logic/enemy-turn.ts). */
+      readonly heavy?: boolean;
     }
   | {
       readonly kind: 'spell';
@@ -38,7 +41,17 @@ export type BattleEvent =
   | { readonly kind: 'defend' }
   | { readonly kind: 'heal'; readonly itemId: string; readonly amount: number }
   | { readonly kind: 'steal'; readonly itemId: string }
-  | { readonly kind: 'flee'; readonly success: boolean };
+  | { readonly kind: 'flee'; readonly success: boolean }
+  /** Vihollinen valmistelee voimaiskua: seuraavalla vuorolla se lyö kovaa. */
+  | { readonly kind: 'charge' }
+  /** Vihollisen erikoisliike (lumimyrsky): ohittaa puolustuksen ja sammuttaa liekit. */
+  | {
+      readonly kind: 'special';
+      readonly damage: number;
+      readonly defended: boolean;
+      /** true, jos myrsky sammutti tulipallon liekit. */
+      readonly extinguished: boolean;
+    };
 
 export type BattleOutcome = 'ongoing' | 'won' | 'lost' | 'fled';
 
@@ -51,23 +64,37 @@ export interface Battle {
   readonly enemyStealChance: number;
   /** Vihollisen varastamat esineet. Pelaaja saa ne takaisin voittaessaan. */
   readonly stolen: Record<string, number>;
+  /** Vihollisen erikoisliikkeet (loppuboss), tai null = vain tavallinen lyönti. */
+  readonly enemyMoves: EnemyMovesDef | null;
+  /** Vihollinen on valmistellut voimaiskun, joka tulee sen seuraavalla vuorolla. */
+  enemyCharging: boolean;
   /** Vihollisen palaminen tulipallon jäljiltä, tai null (logic/magic.ts). */
   enemyBurn: Burn | null;
   outcome: BattleOutcome;
+}
+
+/** Vihollisen erityistaidot taistelussa (data/enemies.ts). Puuttuva = ei taitoa. */
+export interface EnemyTraits {
+  /** Todennäköisyys varastaa esine lyönnin sijaan (ryöstäjä). */
+  readonly stealChance?: number;
+  /** Erikoisliikkeet (loppuboss). */
+  readonly moves?: EnemyMovesDef;
 }
 
 export function createBattle(
   player: Fighter,
   enemy: Fighter,
   inventory: Record<string, number>,
-  enemyStealChance = 0,
+  traits: EnemyTraits = {},
 ): Battle {
   return {
     player,
     enemy,
     inventory,
-    enemyStealChance,
+    enemyStealChance: traits.stealChance ?? 0,
     stolen: {},
+    enemyMoves: traits.moves ?? null,
+    enemyCharging: false,
     enemyBurn: null,
     outcome: 'ongoing',
   };
@@ -103,20 +130,6 @@ export function takeTurn(
     events.push(enemyAct(battle, action.kind === 'defend', rng, rules));
   }
   return events;
-}
-
-/** Vahinko satunnaisvaihtelun ja kriittisen osuman kanssa. Aina vähintään 1. */
-export function rollDamage(
-  attacker: Fighter,
-  target: Fighter,
-  rng: Rng,
-  rules: BattleRules = BATTLE_RULES,
-): { readonly damage: number; readonly crit: boolean } {
-  const base = calculateDamage(attacker.attack, target.defense);
-  const variance = 1 + (rng() * 2 - 1) * rules.damageVariance;
-  const crit = rng() < (attacker.critChance ?? rules.critChance);
-  const damage = Math.max(1, Math.round(base * variance * (crit ? rules.critMultiplier : 1)));
-  return { damage, crit };
 }
 
 function playerAct(
@@ -167,37 +180,6 @@ function useItem(battle: Battle, itemId: string): BattleEvent {
   battle.inventory[itemId] = (battle.inventory[itemId] ?? 0) - 1;
   const amount = item.kind === 'heal' ? heal(battle.player, item.value) : 0;
   return { kind: 'heal', itemId, amount };
-}
-
-function enemyAct(battle: Battle, defended: boolean, rng: Rng, rules: BattleRules): BattleEvent {
-  const theft = trySteal(battle, rng);
-  if (theft) {
-    return theft;
-  }
-  const roll = rollDamage(battle.enemy, battle.player, rng, rules);
-  const damage = defended
-    ? Math.max(1, Math.round(roll.damage * rules.defendMultiplier))
-    : roll.damage;
-  applyDamage(battle.player, damage);
-  if (isDefeated(battle.player)) {
-    battle.outcome = 'lost';
-  }
-  return { kind: 'hit', attacker: 'enemy', damage, crit: roll.crit, defended };
-}
-
-/** Vihollinen yrittää varastaa ensimmäisen esineen, jota pelaajalla on. */
-function trySteal(battle: Battle, rng: Rng): BattleEvent | null {
-  if (battle.enemyStealChance <= 0) {
-    return null;
-  }
-  const found = Object.entries(battle.inventory).find(([, count]) => count > 0);
-  if (!found || rng() >= battle.enemyStealChance) {
-    return null;
-  }
-  const [itemId] = found;
-  battle.inventory[itemId] = (battle.inventory[itemId] ?? 0) - 1;
-  battle.stolen[itemId] = (battle.stolen[itemId] ?? 0) + 1;
-  return { kind: 'steal', itemId };
 }
 
 /** Siirtää varastetut esineet takaisin pelaajalle. Palauttaa palautetut esineet. */

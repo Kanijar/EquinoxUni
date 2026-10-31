@@ -1,20 +1,27 @@
 import type Phaser from 'phaser';
 import { WORLD_VIEW } from '../config/game-config';
 import { getEnemy, MAP_ENEMIES, WORLD } from '../data';
+import { FINAL_BOSS } from '../data/boss';
 import { Enemy } from '../entities/enemy';
+import { isBossOnMap } from '../logic/boss';
 import type { GameState } from '../logic/game-state';
 import { geoToTile } from '../logic/geo';
 import { isFarEnough, isRespawning, tickRespawns } from '../logic/respawn';
 import type { Vec2 } from '../logic/vector';
+import { BossAura } from '../ui/boss-aura';
 import { tileToWorld } from './world-map';
 
 // Kartan viholliset: luo kartalla olevat viholliset, palauttaa voitetut viholliset
 // paikoilleen palautusajan jälkeen (logic/respawn.ts) ja kertoo, kun joku koskettaa pelaajaa.
+// Herännyt loppuboss (logic/boss.ts) on kartalla omalla paikallaan, kunnes se voitetaan.
 
 export class MapEncounters {
   private readonly enemies: Enemy[] = [];
   /** Vihollisten alkuperäiset paikat pikseleinä, samassa järjestyksessä kuin MAP_ENEMIES. */
   private readonly spawnPoints: readonly Vec2[];
+  /** Loppuboss kartalla, tai null (ei vielä herännyt tai jo voitettu). */
+  readonly boss: Enemy | null;
+  private readonly bossAura: BossAura | null = null;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -27,6 +34,10 @@ export class MapEncounters {
         this.spawn(index);
       }
     });
+    this.boss = isBossOnMap(state) ? this.spawnBoss() : null;
+    if (this.boss) {
+      this.bossAura = new BossAura(scene, this.boss.sprite);
+    }
   }
 
   /**
@@ -35,6 +46,7 @@ export class MapEncounters {
    */
   update(playerPosition: Vec2, active: boolean, elapsedMs: number): Enemy | null {
     this.respawn(playerPosition, elapsedMs);
+    this.bossAura?.update();
     let touching: Enemy | null = null;
     for (const enemy of this.enemies) {
       if (enemy.update(playerPosition, active) && !touching) {
@@ -53,6 +65,14 @@ export class MapEncounters {
     if (sprites.length > 0) {
       this.scene.tweens.add({ targets: sprites, alpha: 1, duration: WORLD_VIEW.respawnFadeMs });
     }
+  }
+
+  private spawnBoss(): Enemy {
+    const point = tileToWorld(geoToTile(FINAL_BOSS, WORLD.projection));
+    const boss = new Enemy(this.scene, point, getEnemy(FINAL_BOSS.enemy), null);
+    this.scene.physics.add.collider(boss.sprite, this.layer);
+    this.enemies.push(boss);
+    return boss;
   }
 
   private spawn(index: number): Enemy | null {

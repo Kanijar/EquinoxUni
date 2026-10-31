@@ -21,6 +21,9 @@ export function paintBackdrop(
 ): void {
   const rng = createSeededRng(SEED + def.id.length * 31 + def.sky.length);
   paintBands(ctx, def.sky, { y: 0, height: size.horizon, width: size.width, grow: false });
+  if (def.aurora) {
+    paintAurora(ctx, def.aurora, size, rng);
+  }
   paintSun(ctx, def.sun);
   paintHills(ctx, def, size, rng);
   const groundHeight = size.height - size.horizon;
@@ -70,6 +73,31 @@ function paintBands(
     }
     y = end;
   });
+}
+
+/** Revontulten verhoja: kevyesti läpikuultavia aaltoilevia pystyraitoja taivaalla. */
+const AURORA = { alpha: 0.35, top: 6, length: 34, wave: 9, period: 0.05, flicker: 0.11 } as const;
+
+function paintAurora(
+  ctx: CanvasRenderingContext2D,
+  colors: readonly string[],
+  size: BackdropSize,
+  rng: () => number,
+): void {
+  ctx.globalAlpha = AURORA.alpha;
+  colors.forEach((color, band) => {
+    const phase = rng() * Math.PI * 2;
+    const offset = band * AURORA.wave;
+    ctx.fillStyle = color;
+    for (let x = 0; x < size.width; x++) {
+      const y = AURORA.top + offset + Math.round(Math.sin(x * AURORA.period + phase) * AURORA.wave);
+      const length = Math.round(
+        AURORA.length * (0.5 + 0.5 * Math.abs(Math.sin(x * AURORA.flicker + phase))),
+      );
+      ctx.fillRect(x, Math.max(0, y), 1, length);
+    }
+  });
+  ctx.globalAlpha = 1;
 }
 
 function paintSun(ctx: CanvasRenderingContext2D, sun: BattleBackdropDef['sun']): void {

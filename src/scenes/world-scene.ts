@@ -3,7 +3,9 @@ import { SCENES, WORLD_VIEW } from '../config/game-config';
 import { WORLD } from '../data';
 import { Player } from '../entities/player';
 import { healItemCount } from '../logic/battle';
+import { bossHudText } from '../logic/boss';
 import {
+  celebrateCompletion,
   createNewGame,
   enemiesToBeat,
   playerSprite,
@@ -23,15 +25,18 @@ import { TEXT } from '../i18n/fi';
 import { Hud } from '../ui/hud';
 import { coverScreen, revealScreen } from '../ui/screen-wipe';
 import { addPlayerCountLabel } from '../ui/player-count-label';
+import { BossPointer } from '../ui/boss-pointer';
 import { SaveButton } from '../ui/save-button';
 import { SkillButton } from '../ui/skill-button';
 import { Toast } from '../ui/toast';
 import type { BattleSceneData } from './battle-scene';
 import type { SavesSceneData } from './saves-scene';
 import type { SkillsSceneData } from './skills-scene';
+import type { VictorySceneData } from './victory-scene';
 
 // Suomen kartta. Pelaaja kulkee virtuaalitikulla, lepää paikkakunnissa ja
-// joutuu taisteluun, kun vihollinen saa hänet kiinni. Paikkakunnassa voi jakaa
+// joutuu taisteluun, kun vihollinen saa hänet kiinni. Herännyt loppuboss odottaa
+// Lapissa, ja ruudun reunan nuoli näyttää suunnan. Paikkakunnassa voi jakaa
 // kykypisteet KYKYPISTEET-napista ja tallentaa pelin TALLENNA-napista.
 // Tämä scene vain kokoaa osat.
 
@@ -43,6 +48,8 @@ export interface WorldSceneData {
   readonly message?: string;
   /** true = tultiin taistelusta: kartta paljastuu pikseliruutujen alta. */
   readonly fromBattle?: boolean;
+  /** true = loppuboss heräsi juuri: maa tärisee ja boss karjaisee. */
+  readonly bossAwakened?: boolean;
 }
 
 export class WorldScene extends Phaser.Scene {
@@ -56,6 +63,7 @@ export class WorldScene extends Phaser.Scene {
   private skillButton!: SkillButton;
   private saveButton!: SaveButton;
   private toast!: Toast;
+  private bossPointer: BossPointer | null = null;
   private encountersFrom = 0;
   /** Taistelu on alkamassa: kartta pysähtyy siirtymäefektin ajaksi. */
   private leaving = false;
@@ -87,6 +95,13 @@ export class WorldScene extends Phaser.Scene {
     this.skillButton = new SkillButton(this, () => this.openSkills());
     this.saveButton = new SaveButton(this, () => this.openSaves());
     this.toast = new Toast(this);
+    const boss = this.encounters.boss;
+    this.bossPointer = boss ? new BossPointer(this, boss.sprite) : null;
+    if (data.bossAwakened) {
+      const { ms, intensity } = WORLD_VIEW.bossAwakenShake;
+      this.cameras.main.shake(ms, intensity);
+      playSound('roar');
+    }
     this.encountersFrom = this.time.now + (data.graceMs ?? WORLD_VIEW.graceMs.start);
     const message = isNewGame ? TEXT.world.intro : data.message;
     if (message) {
@@ -109,8 +124,11 @@ export class WorldScene extends Phaser.Scene {
       this.rest(arrived.id, arrived.nameAt);
     }
     this.updateHud();
-    if (enemiesToBeat(this.state) === 0) {
-      this.scene.start(SCENES.gameOver, { won: true });
+    this.bossPointer?.update();
+    if (celebrateCompletion(this.state)) {
+      // Läpäisy: voittoruutu kerran, sitten peli jatkuu kartalla.
+      const victory: VictorySceneData = { state: this.state, kind: 'complete' };
+      this.scene.start(SCENES.victory, victory);
       return;
     }
     const active = time >= this.encountersFrom;
@@ -166,6 +184,7 @@ export class WorldScene extends Phaser.Scene {
       potions: healItemCount(this.state.inventory),
       enemiesLeft: enemiesToBeat(this.state),
       townName: this.towns.town?.name ?? '',
+      bossText: bossHudText(this.state),
     });
     const inTown = this.towns.town !== undefined;
     this.skillButton.update(inTown, unspentSkillPoints(this.state));

@@ -140,6 +140,24 @@ export const SOUNDS = {
       { freq: 420, ms: 90 },
     ],
   },
+  /** Loppubossin karjaisu: matala, jyrisevä (voimaiskun valmistelu, bossin herääminen). */
+  roar: {
+    wave: 'sawtooth',
+    gain: 0.3,
+    notes: [
+      { freq: 90, ms: 180, slideTo: 140 },
+      { freq: 140, ms: 320, slideTo: 55 },
+    ],
+  },
+  /** Lumimyrsky: suhiseva liuku alas. */
+  storm: {
+    wave: 'triangle',
+    gain: 0.22,
+    notes: [
+      { freq: 1200, ms: 160, slideTo: 500 },
+      { freq: 900, ms: 260, slideTo: 200 },
+    ],
+  },
 } as const satisfies Record<string, SoundDef>;
 
 /** Äänen tunniste, esim. playSound('hit'). Kirjoitusvirhe huomataan jo käännöksessä. */
