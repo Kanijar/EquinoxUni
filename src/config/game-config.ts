@@ -52,7 +52,7 @@ export const WORLD_VIEW = {
   /** Etäisyys pikseleinä, jolla vihollinen "osuu" pelaajaan ja taistelu alkaa. */
   encounterRange: 12,
   /** Aika, jonka viholliset odottavat ennen kuin ne voivat aloittaa taistelun. */
-  graceMs: { start: 1000, afterBattle: 1000, afterFlee: 2500 },
+  graceMs: { start: 1000, afterBattle: 1000, afterFlee: 2500, afterRevive: 3000 },
   /** Ilmoitusten näkymisaika. */
   toastMs: 2500,
   /** Paikkakunnassa näkyvä KYKYPISTEET-nappi oikeassa alakulmassa. */

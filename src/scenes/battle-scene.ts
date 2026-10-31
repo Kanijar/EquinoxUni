@@ -4,7 +4,9 @@ import { getEnemy } from '../data';
 import { PLAYER } from '../data/player';
 import { createBattle, enemyFighter } from '../logic/battle';
 import { playerFighter, type GameState } from '../logic/game-state';
+import { reviveAtLastTown } from '../logic/town-visits';
 import { BattleDirector, type FinishedOutcome } from '../systems/battle-director';
+import { TEXT } from '../i18n/fi';
 import { BattleView } from '../ui/battle-view';
 import type { WorldSceneData } from './world-scene';
 
@@ -46,12 +48,23 @@ export class BattleScene extends Phaser.Scene {
 
   private end(state: GameState, outcome: FinishedOutcome): void {
     if (outcome === 'lost') {
-      this.scene.start(SCENES.gameOver, { won: false });
+      this.revive(state);
       return;
     }
     const graceMs =
       outcome === 'fled' ? WORLD_VIEW.graceMs.afterFlee : WORLD_VIEW.graceMs.afterBattle;
     const next: WorldSceneData = { state, graceMs };
+    this.scene.start(SCENES.world, next);
+  }
+
+  /** Kaatunut sankari herää viimeisimmässä paikkakunnassa, jossa hän kävi. */
+  private revive(state: GameState): void {
+    const town = reviveAtLastTown(state);
+    const next: WorldSceneData = {
+      state,
+      graceMs: WORLD_VIEW.graceMs.afterRevive,
+      message: TEXT.world.revived(town.nameAt),
+    };
     this.scene.start(SCENES.world, next);
   }
 }

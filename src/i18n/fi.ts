@@ -19,6 +19,7 @@ export const TEXT = {
   world: {
     intro: 'Seikkailu alkaa Valkeakoskelta!',
     rest: (townAt: string): string => `Lepäsit ${townAt}. Elämä palautui!`,
+    revived: (townAt: string): string => `Kaaduit... heräsit ${townAt}. Elämä palautui!`,
     skillPointsWaiting: (points: number): string =>
       `Sinulla on ${points} kykypistettä. Paina KYKYPISTEET.`,
   },
