@@ -38,14 +38,18 @@ export interface GameState {
   readonly defeated: number[];
 }
 
-export function createNewGame(): GameState {
+/**
+ * Uusi peli Valkeakoskelta. startXp antaa kokemusta heti alkuun (esim. alkuruudun
+ * salaisuus, logic/menu-secret.ts): taso ja kykypisteet lasketaan kokemuksesta.
+ */
+export function createNewGame(startXp = 0): GameState {
   const inventory: Record<string, number> = {};
   for (const stack of PLAYER.startItems) {
     inventory[stack.id] = (inventory[stack.id] ?? 0) + stack.count;
   }
   return {
     hp: PLAYER.stats.maxHp,
-    xp: 0,
+    xp: Math.max(0, Math.floor(startXp)),
     skills: noSkillPoints(),
     inventory,
     position: null,
