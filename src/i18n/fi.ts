@@ -1,8 +1,11 @@
+import { GAME_INFO } from '../data/game-info';
+
 // Kaikki pelaajalle näkyvät tekstit. Älä kirjoita tekstejä suoraan koodiin,
 // vaan lisää ne tänne ja käytä muodossa TEXT.menu.start.
 
 export const TEXT = {
-  gameTitle: 'Väinön seikkailu',
+  /** Pelin nimi. Vaihda se tiedostossa data/game-info.ts, ei tässä. */
+  gameTitle: GAME_INFO.name,
   menu: {
     start: 'Aloita peli',
     hint: 'Kosketa aloittaaksesi',
