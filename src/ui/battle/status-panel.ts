@@ -59,7 +59,7 @@ export class StatusPanel {
         height: BATTLE_PANEL.xpBarHeight,
         originX: 0,
         depth: PANEL_DEPTH + 1,
-        label: (p) => `${TEXT.hud.level(p.level)}  ${TEXT.hud.xp(p.xp, p.nextLevelXp)}`,
+        label: (p) => TEXT.hud.levelAndXp(p.level, p.xp, p.nextLevelXp),
       });
     }
   }

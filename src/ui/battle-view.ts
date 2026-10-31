@@ -1,5 +1,5 @@
 import type Phaser from 'phaser';
-import { BATTLE_STAGE, DAMAGE_NUMBERS } from '../config/battle-config';
+import { BATTLE_CAMERA, BATTLE_STAGE, DAMAGE_NUMBERS } from '../config/battle-config';
 import { BATTLE_VIEW, COLORS } from '../config/game-config';
 import { getSprite } from '../data';
 import type { BattleBackdropDef } from '../data/types';
@@ -217,11 +217,14 @@ export class BattleView {
     });
   }
 
+  /** Voittoteksti ja sankarin hyppy, kun vihollinen on ensin ehtinyt hajota pölyksi. */
   playVictory(): void {
     const player = this.fighters.player;
-    player.cheer();
-    showBanner(this.scene, TEXT.battle.victoryBanner, COLORS.critText);
-    this.particles.burst('victory', player.center.x, player.center.y);
+    this.scene.time.delayedCall(BATTLE_CAMERA.victoryDelayMs, () => {
+      player.cheer();
+      showBanner(this.scene, TEXT.battle.victoryBanner, COLORS.critText);
+      this.particles.burst('victory', player.center.x, player.center.y);
+    });
   }
 
   playLevelUp(): void {
@@ -247,7 +250,16 @@ function numberSpot(center: { x: number; y: number }): { x: number; y: number } 
   return { x: center.x, y: center.y + DAMAGE_NUMBERS.offsetY };
 }
 
+/** Tätä tummemmat värit (esim. mustat silmät) jätetään pölystä pois, ettei se näytä liasta. */
+const MIN_DUST_BRIGHTNESS = 60;
+
 /** Spriten paletin värit numeroina (vihollisen kuolinpöly on vihollisen väristä). */
 function paletteColors(spriteKey: string): number[] {
-  return Object.values(getSprite(spriteKey).palette).map((hex) => parseInt(hex.slice(1), 16));
+  const colors = Object.values(getSprite(spriteKey).palette).map((hex) =>
+    parseInt(hex.slice(1), 16),
+  );
+  const bright = colors.filter(
+    (c) => Math.max(c >> 16, (c >> 8) & 0xff, c & 0xff) >= MIN_DUST_BRIGHTNESS,
+  );
+  return bright.length > 0 ? bright : colors;
 }

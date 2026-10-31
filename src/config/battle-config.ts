@@ -144,6 +144,8 @@ export const BATTLE_CAMERA = {
   hitShakeMs: 90,
   hitShakeIntensity: 0.004,
   bannerMs: 1400,
+  /** VOITTO!-teksti odottaa, että vihollinen ehtii vilkkua ja hajota. */
+  victoryDelayMs: 480,
   bannerY: 104,
 } as const;
 
