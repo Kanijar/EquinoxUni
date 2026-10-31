@@ -28,6 +28,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          # Pelaajalaskurin osoite (julkinen, ei salaisuus): repon Settings → Secrets and variables
+          # → Actions → Variables → PRESENCE_URL. Jos sitä ei ole, laskuri on piilossa.
+          VITE_PRESENCE_URL: ${{ vars.PRESENCE_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

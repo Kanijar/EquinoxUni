@@ -22,3 +22,4 @@ npm run check   # tarkistukset ennen kuin muutos on valmis
 
 - Ohjeet tekoälylle (ja ihmisille): [CLAUDE.md](CLAUDE.md)
 - Arkkitehtuuri ja suunnitelma: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- Pelaajalaskurin pystytys: [docs/PELAAJALASKURI.md](docs/PELAAJALASKURI.md)

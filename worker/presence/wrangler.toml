@@ -1,0 +1,19 @@
+# Pelaajalaskurin palvelin Cloudflaressa (ks. docs/PELAAJALASKURI.md).
+# Julkaistaan GitHub Actionsilla (.github/workflows/presence-worker.yml) tai komennolla
+# `npx wrangler deploy` tässä kansiossa.
+name = "equinox-presence"
+main = "src/index.ts"
+compatibility_date = "2025-12-01"
+
+[vars]
+# Sivut, joilta laskuriin saa liittyä (pilkulla erotettuna). Lisää tähän oma osoite tarvittaessa.
+ALLOWED_ORIGINS = "https://kanijar.github.io,http://localhost:5173"
+
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "PresenceRoom"
+
+# Ilmaisversiossa Durable Object -luokan pitää käyttää SQLite-tallennusta.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["PresenceRoom"]

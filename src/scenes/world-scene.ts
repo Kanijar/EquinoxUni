@@ -18,6 +18,7 @@ import { placeTownMarkers, TownTracker } from '../systems/town-markers';
 import { buildWorldMap, getWorldGrid, tileToWorld } from '../systems/world-map';
 import { TEXT } from '../i18n/fi';
 import { Hud } from '../ui/hud';
+import { addPlayerCountLabel } from '../ui/player-count-label';
 import { SaveButton } from '../ui/save-button';
 import { SkillButton } from '../ui/skill-button';
 import { Toast } from '../ui/toast';
@@ -70,6 +71,7 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player.sprite, true);
     this.controls = new Controls(this);
     this.hud = new Hud(this);
+    addPlayerCountLabel(this);
     this.skillButton = new SkillButton(this, () => this.openSkills());
     this.saveButton = new SaveButton(this, () => this.openSaves());
     this.toast = new Toast(this);

@@ -7,7 +7,7 @@ import tseslint from 'typescript-eslint';
 
 const noPhaser = {
   name: 'phaser',
-  message: 'logic/ ja data/ ovat puhdasta TypeScriptiä ilman Phaseria (testattavuus).',
+  message: 'logic/, data/ ja net/ ovat puhdasta TypeScriptiä ilman Phaseria (testattavuus).',
 };
 
 export default tseslint.config(
@@ -33,8 +33,8 @@ export default tseslint.config(
     },
   },
   {
-    // Puhdas pelilogiikka ja sisältödata: ei Phaseria, ei selainta.
-    files: ['src/logic/**/*.ts', 'src/data/**/*.ts'],
+    // Puhdas pelilogiikka, sisältödata ja verkkoyhteydet: ei Phaseria.
+    files: ['src/logic/**/*.ts', 'src/data/**/*.ts', 'src/net/**/*.ts'],
     rules: {
       'no-restricted-imports': ['error', { paths: [noPhaser] }],
     },

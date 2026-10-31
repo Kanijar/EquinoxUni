@@ -81,6 +81,8 @@ export const TEXT = {
       nextLevelXp === null ? `KP ${xp} (huipputaso)` : `KP ${xp}/${nextLevelXp}`,
     potions: (count: number): string => `Juomat ${count}`,
     enemiesLeft: (count: number): string => `Vihollisia ${count}`,
+    /** Montako ihmistä pelaa juuri nyt (pelaaja itse mukaan lukien). */
+    players: (count: number): string => `Pelaajia nyt: ${count}`,
   },
   world: {
     intro: 'Seikkailu alkaa Valkeakoskelta!',
