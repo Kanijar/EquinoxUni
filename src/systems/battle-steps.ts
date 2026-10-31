@@ -18,7 +18,10 @@ export interface BattleStep {
 export function eventStep(event: BattleEvent, view: BattleView, enemyName: string): BattleStep {
   switch (event.kind) {
     case 'hit':
-      return { text: hitText(event, enemyName), effect: () => view.playHit(event.attacker) };
+      return {
+        text: hitText(event, enemyName),
+        effect: () => view.playHit(event.attacker, event.crit),
+      };
     case 'defend':
       return { text: TEXT.battle.defending };
     case 'heal':

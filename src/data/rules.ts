@@ -5,8 +5,8 @@ import type { BattleRules, Progression } from './types';
 
 export const BATTLE_RULES: BattleRules = {
   damageVariance: 0.2,
-  critChance: 0.1,
-  critMultiplier: 1.5,
+  critChance: 0.08,
+  critMultiplier: 2,
   defendMultiplier: 0.5,
   fleeChance: 0.6,
 };

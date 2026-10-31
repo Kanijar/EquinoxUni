@@ -1,6 +1,6 @@
 import { getItem } from '../data';
 import { BATTLE_RULES } from '../data/rules';
-import type { BattleRules, ItemStack } from '../data/types';
+import type { BattleRules, EnemyDef, ItemStack } from '../data/types';
 import { applyDamage, calculateDamage, heal, isDefeated, type Fighter } from './combat';
 
 // Vuoropohjainen taistelu. Pelaaja valitsee toiminnon, sitten vihollinen vastaa.
@@ -53,6 +53,13 @@ export function createBattle(
   return { player, enemy, inventory, enemyStealChance, stolen: {}, outcome: 'ongoing' };
 }
 
+/** Vihollisen taistelija täydellä elämällä. Mukana vihollisen oma kriittisen osuman mahdollisuus. */
+export function enemyFighter(enemy: EnemyDef): Fighter {
+  const { maxHp, attack, defense } = enemy.stats;
+  const fighter: Fighter = { hp: maxHp, maxHp, attack, defense };
+  return enemy.critChance === undefined ? fighter : { ...fighter, critChance: enemy.critChance };
+}
+
 /** Voiko toiminnon valita juuri nyt (esim. esinettä pitää olla jäljellä). */
 export function canChoose(battle: Battle, action: BattleAction): boolean {
   if (battle.outcome !== 'ongoing') {
@@ -87,7 +94,7 @@ export function rollDamage(
 ): { readonly damage: number; readonly crit: boolean } {
   const base = calculateDamage(attacker.attack, target.defense);
   const variance = 1 + (rng() * 2 - 1) * rules.damageVariance;
-  const crit = rng() < rules.critChance;
+  const crit = rng() < (attacker.critChance ?? rules.critChance);
   const damage = Math.max(1, Math.round(base * variance * (crit ? rules.critMultiplier : 1)));
   return { damage, crit };
 }

@@ -10,7 +10,7 @@ import {
   getSprite,
 } from '../src/data';
 import { PLAYER } from '../src/data/player';
-import { PROGRESSION } from '../src/data/rules';
+import { BATTLE_RULES, PROGRESSION } from '../src/data/rules';
 import { ROADS } from '../src/data/towns';
 
 // Sisältötestit: varmistavat, että data/-kansion tiedostot ovat keskenään
@@ -89,6 +89,15 @@ describe('sisältödata', () => {
       expect(chance).toBeGreaterThanOrEqual(0);
       expect(chance).toBeLessThanOrEqual(1);
     }
+  });
+
+  it('kriittisen osuman todennäköisyys on välillä 0..1 ja osuma tekee lisävahinkoa', () => {
+    const chances = [BATTLE_RULES.critChance, ...ENEMIES.map((e) => e.critChance ?? 0)];
+    for (const chance of chances) {
+      expect(chance).toBeGreaterThanOrEqual(0);
+      expect(chance).toBeLessThanOrEqual(1);
+    }
+    expect(BATTLE_RULES.critMultiplier).toBeGreaterThan(1);
   });
 
   it('tiet yhdistävät olemassa olevia paikkakuntia', () => {

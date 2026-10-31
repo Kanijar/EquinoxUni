@@ -27,6 +27,8 @@ export const ENEMIES: readonly EnemyDef[] = [
     stats: { maxHp: 26, attack: 9, defense: 2, speed: 62 },
     aggroRange: 90,
     xp: 18,
+    // Terävät hampaat: susi lyö kriittisen osuman tavallista useammin.
+    critChance: 0.12,
   },
   {
     id: 'troll',

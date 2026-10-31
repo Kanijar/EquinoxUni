@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { SCENES, WORLD_VIEW } from '../config/game-config';
 import { getEnemy } from '../data';
 import { PLAYER } from '../data/player';
-import { createBattle } from '../logic/battle';
+import { createBattle, enemyFighter } from '../logic/battle';
 import { playerFighter, type GameState } from '../logic/game-state';
 import { BattleDirector, type FinishedOutcome } from '../systems/battle-director';
 import { BattleView } from '../ui/battle-view';
@@ -29,7 +29,7 @@ export class BattleScene extends Phaser.Scene {
     const enemy = getEnemy(data.enemyId);
     const battle = createBattle(
       playerFighter(data.state),
-      { hp: enemy.stats.maxHp, ...enemy.stats },
+      enemyFighter(enemy),
       data.state.inventory,
       enemy.stealChance,
     );
