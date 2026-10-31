@@ -1,7 +1,20 @@
 import Phaser from 'phaser';
-import { COLORS, FONT, GAME_HEIGHT, GAME_WIDTH, SCENES } from '../config/game-config';
+import { BUTTON, GAME_WIDTH, MENU_VIEW, SCENES } from '../config/game-config';
 import { TEXT } from '../i18n/fi';
 import { enterFullscreenLandscape } from '../systems/fullscreen';
+import { drawMenuBackdrop } from '../ui/menu-backdrop';
+import { TextButton } from '../ui/text-button';
+import { addTitle } from '../ui/title-text';
+import type { SavesSceneData } from './saves-scene';
+import type { WorldSceneData } from './world-scene';
+
+// Alkuruutu: PELAA aloittaa uuden pelin Valkeakoskelta, LATAA avaa tallennukset,
+// ASETUKSET avaa valon ja äänten säädöt ja LÄHDE lopettaa pelin.
+
+interface MenuEntry {
+  readonly label: string;
+  readonly onTap: () => void;
+}
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -9,26 +22,33 @@ export class MenuScene extends Phaser.Scene {
   }
 
   create(): void {
-    const cx = GAME_WIDTH / 2;
-    this.add
-      .text(cx, GAME_HEIGHT * 0.35, TEXT.gameTitle, {
-        fontFamily: FONT.family,
-        fontSize: FONT.large,
-        color: COLORS.text,
-      })
-      .setOrigin(0.5)
-      .setShadow(2, 2, COLORS.textShadow);
-    const hint = this.add
-      .text(cx, GAME_HEIGHT * 0.65, TEXT.menu.hint, {
-        fontFamily: FONT.family,
-        fontSize: FONT.medium,
-        color: COLORS.text,
-      })
-      .setOrigin(0.5);
-    this.tweens.add({ targets: hint, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
-    this.input.once(Phaser.Input.Events.POINTER_UP, () => {
-      enterFullscreenLandscape(this);
-      this.scene.start(SCENES.world, {});
+    drawMenuBackdrop(this);
+    addTitle(this, MENU_VIEW.titleY, TEXT.gameTitle);
+    const entries: MenuEntry[] = [
+      { label: TEXT.menu.play, onTap: () => this.play() },
+      { label: TEXT.menu.load, onTap: () => this.open(SCENES.saves, {} satisfies SavesSceneData) },
+      { label: TEXT.menu.settings, onTap: () => this.open(SCENES.settings, {}) },
+      { label: TEXT.menu.quit, onTap: () => this.scene.start(SCENES.exit) },
+    ];
+    entries.forEach((entry, index) => {
+      new TextButton(this, {
+        x: GAME_WIDTH / 2,
+        y: MENU_VIEW.firstButtonY + index * MENU_VIEW.buttonGap,
+        width: MENU_VIEW.buttonWidth,
+        height: BUTTON.height,
+        label: entry.label,
+        onTap: entry.onTap,
+      });
     });
+  }
+
+  private play(): void {
+    this.open(SCENES.world, {} satisfies WorldSceneData);
+  }
+
+  /** Koko näytön tila ja vaakasuunta pyydetään napautuksesta (selain vaatii kosketuksen). */
+  private open(key: string, data: object): void {
+    enterFullscreenLandscape(this);
+    this.scene.start(key, data);
   }
 }

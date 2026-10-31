@@ -11,6 +11,7 @@ import {
 } from '../src/data';
 import { PLAYER } from '../src/data/player';
 import { BATTLE_RULES, PROGRESSION } from '../src/data/rules';
+import { SOUNDS } from '../src/data/sounds';
 import { ROADS } from '../src/data/towns';
 
 // Sisältötestit: varmistavat, että data/-kansion tiedostot ovat keskenään
@@ -120,6 +121,18 @@ describe('sisältödata', () => {
     }
     for (const town of TOWNS) {
       expect(town.nameAt.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it('ääniefekteissä on kuultavat sävelet ja järkevä voimakkuus', () => {
+    for (const sound of Object.values(SOUNDS)) {
+      expect(sound.gain).toBeGreaterThan(0);
+      expect(sound.gain).toBeLessThanOrEqual(1);
+      expect(sound.notes.length).toBeGreaterThan(0);
+      for (const note of sound.notes) {
+        expect(note.freq).toBeGreaterThan(20);
+        expect(note.ms).toBeGreaterThan(0);
+      }
     }
   });
 });

@@ -184,3 +184,21 @@ export interface SkillDef {
   /** Paljonko arvo kasvaa jokaisesta kykyyn laitetusta pisteestä. */
   readonly perPoint: number;
 }
+
+/** Aaltomuoto koodilla tehdylle äänelle (pixelart-pelin "piippaukset"). */
+export type SoundWave = 'square' | 'triangle' | 'sawtooth' | 'sine';
+
+/** Yksi sävel: taajuus (Hz), kesto ja valinnainen liuku toiseen taajuuteen. */
+export interface SoundNote {
+  readonly freq: number;
+  readonly ms: number;
+  readonly slideTo?: number;
+}
+
+/** Koodilla tehty ääniefekti: sävelet soitetaan peräkkäin. */
+export interface SoundDef {
+  readonly wave: SoundWave;
+  /** Äänen voimakkuus 0..1 ennen pelaajan äänenvoimakkuusasetusta. */
+  readonly gain: number;
+  readonly notes: readonly SoundNote[];
+}

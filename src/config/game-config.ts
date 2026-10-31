@@ -24,6 +24,8 @@ export const COLORS = {
   battleGround: 0x4f8c34,
   battlePlatform: 0x3d6e28,
   hurt: 0xff4444,
+  slotPanel: 0x1c2438,
+  notice: '#ffe066',
   hitFlash: 0xffffff,
   /** Kriittisen osuman välähdys ja teksti. */
   critFlash: 0xffd23f,
@@ -45,6 +47,57 @@ export const SCENES = {
   battle: 'battle',
   gameOver: 'game-over',
   skills: 'skills',
+  settings: 'settings',
+  saves: 'saves',
+  exit: 'exit',
+} as const;
+
+/** Yleiset nappien mitat. Kosketusnapit vähintään 40 px korkeita (peukalolla painettava). */
+export const BUTTON = {
+  height: 40,
+  margin: 6,
+  /** Aika, jonka VARMA?-nappi odottaa toista painallusta. */
+  confirmMs: 3000,
+} as const;
+
+/** Alkuruudun (päävalikko) asetukset. */
+export const MENU_VIEW = {
+  titleY: 30,
+  firstButtonY: 78,
+  buttonGap: 44,
+  buttonWidth: 168,
+  /** Koristehahmot ja maa ruudun alareunassa (pixelart-skaalaus). */
+  heroX: 88,
+  enemyXs: [372, 428],
+  characterScale: 4,
+  groundScale: 2,
+  bobPx: 3,
+  bobMs: 600,
+} as const;
+
+/** Asetusnäkymän asetukset. */
+export const SETTINGS_VIEW = {
+  titleY: 24,
+  firstRowY: 84,
+  rowGap: 52,
+  labelX: 40,
+  lessX: 260,
+  moreX: 400,
+  stepButtonWidth: 48,
+  toggleWidth: 188,
+  backButtonWidth: 120,
+} as const;
+
+/** Tallennusnäkymän asetukset. */
+export const SAVES_VIEW = {
+  titleY: 18,
+  statusY: 42,
+  firstRowY: 82,
+  rowGap: 52,
+  rowHeight: 48,
+  textX: 16,
+  buttonWidths: { save: 96, load: 80, remove: 80 },
+  backButtonWidth: 120,
 } as const;
 
 /** Karttanäkymän asetukset. */
@@ -57,6 +110,8 @@ export const WORLD_VIEW = {
   toastMs: 2500,
   /** Paikkakunnassa näkyvä KYKYPISTEET-nappi oikeassa alakulmassa. */
   skillButton: { width: 150, height: 40, margin: 6 },
+  /** Paikkakunnassa näkyvä TALLENNA-nappi KYKYPISTEET-napin yläpuolella. */
+  saveButton: { width: 150, height: 40, gap: 6 },
 } as const;
 
 /** Kykypistenäkymän asetukset. */

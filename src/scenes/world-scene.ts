@@ -18,19 +18,24 @@ import { placeTownMarkers, TownTracker } from '../systems/town-markers';
 import { buildWorldMap, getWorldGrid, tileToWorld } from '../systems/world-map';
 import { TEXT } from '../i18n/fi';
 import { Hud } from '../ui/hud';
+import { SaveButton } from '../ui/save-button';
 import { SkillButton } from '../ui/skill-button';
 import { Toast } from '../ui/toast';
 import type { BattleSceneData } from './battle-scene';
+import type { SavesSceneData } from './saves-scene';
 import type { SkillsSceneData } from './skills-scene';
 
 // Suomen kartta. Pelaaja kulkee virtuaalitikulla, lepää paikkakunnissa ja
 // joutuu taisteluun, kun vihollinen saa hänet kiinni. Paikkakunnassa voi jakaa
-// kykypisteet KYKYPISTEET-napista. Tämä scene vain kokoaa osat.
+// kykypisteet KYKYPISTEET-napista ja tallentaa pelin TALLENNA-napista.
+// Tämä scene vain kokoaa osat.
 
 export interface WorldSceneData {
   readonly state?: GameState;
   /** Kuinka kauan viholliset odottavat ennen kuin voivat aloittaa taistelun. */
   readonly graceMs?: number;
+  /** Ilmoitus, joka näytetään heti (esim. "Peli ladattu!"). */
+  readonly notice?: string;
 }
 
 export class WorldScene extends Phaser.Scene {
@@ -42,6 +47,7 @@ export class WorldScene extends Phaser.Scene {
   private towns!: TownTracker;
   private hud!: Hud;
   private skillButton!: SkillButton;
+  private saveButton!: SaveButton;
   private toast!: Toast;
   private encountersFrom = 0;
 
@@ -65,10 +71,12 @@ export class WorldScene extends Phaser.Scene {
     this.controls = new Controls(this);
     this.hud = new Hud(this);
     this.skillButton = new SkillButton(this, () => this.openSkills());
+    this.saveButton = new SaveButton(this, () => this.openSaves());
     this.toast = new Toast(this);
     this.encountersFrom = this.time.now + (data.graceMs ?? WORLD_VIEW.graceMs.start);
-    if (isNewGame) {
-      this.toast.show(TEXT.world.intro);
+    const notice = data.notice ?? (isNewGame ? TEXT.world.intro : null);
+    if (notice) {
+      this.toast.show(notice);
     }
   }
 
@@ -110,6 +118,12 @@ export class WorldScene extends Phaser.Scene {
     this.scene.start(SCENES.skills, data);
   }
 
+  private openSaves(): void {
+    const place = this.towns.town?.name ?? '';
+    const data: SavesSceneData = { game: { state: this.state, place } };
+    this.scene.start(SCENES.saves, data);
+  }
+
   private startBattle(enemyId: string, mapEnemyIndex: number | null): void {
     const data: BattleSceneData = { state: this.state, enemyId, mapEnemyIndex };
     this.scene.start(SCENES.battle, data);
@@ -124,6 +138,8 @@ export class WorldScene extends Phaser.Scene {
       enemiesLeft: this.encounters.enemiesLeft,
       townName: this.towns.town?.name ?? '',
     });
-    this.skillButton.update(this.towns.town !== undefined, unspentSkillPoints(this.state));
+    const inTown = this.towns.town !== undefined;
+    this.skillButton.update(inTown, unspentSkillPoints(this.state));
+    this.saveButton.update(inTown);
   }
 }

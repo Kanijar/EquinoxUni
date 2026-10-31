@@ -1,12 +1,57 @@
 // Kaikki pelaajalle näkyvät tekstit. Älä kirjoita tekstejä suoraan koodiin,
-// vaan lisää ne tänne ja käytä muodossa TEXT.menu.start.
+// vaan lisää ne tänne ja käytä muodossa TEXT.menu.play.
+
+/** Tallennushetki muodossa "31.10. klo 14.05". */
+function formatTime(time: number): string {
+  const date = new Date(time);
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${date.getDate()}.${date.getMonth() + 1}. klo ${date.getHours()}.${minutes}`;
+}
 
 export const TEXT = {
   gameTitle: 'Väinön seikkailu',
   menu: {
-    start: 'Aloita peli',
-    hint: 'Kosketa aloittaaksesi',
-    rotate: 'Käännä puhelin vaakatasoon',
+    play: 'PELAA',
+    load: 'LATAA',
+    settings: 'ASETUKSET',
+    quit: 'LÄHDE',
+  },
+  settings: {
+    title: 'Asetukset',
+    brightness: 'Valo',
+    volume: 'Äänenvoimakkuus',
+    sound: 'Äänet',
+    percent: (value: number): string => `${value} %`,
+    soundOn: 'PÄÄLLÄ',
+    soundOff: 'POIS',
+    less: '-',
+    more: '+',
+    back: 'TAKAISIN',
+  },
+  saves: {
+    title: 'Tallennukset',
+    slot: (slot: number): string => `Paikka ${slot}`,
+    empty: 'Tyhjä',
+    broken: 'Tallennus on vioittunut.',
+    level: (level: number): string => `Taso ${level}`,
+    details: (place: string, savedAt: number): string => `${place}, ${formatTime(savedAt)}`,
+    save: 'TALLENNA',
+    load: 'LATAA',
+    remove: 'POISTA',
+    confirm: 'VARMA?',
+    back: 'TAKAISIN',
+    saved: (slot: number): string => `Peli tallennettu paikkaan ${slot}!`,
+    saveFailed: 'Tallennus epäonnistui. Selain ei sallinut tallentamista.',
+    removed: (slot: number): string => `Paikka ${slot} tyhjennetty.`,
+    loadFailed: 'Tallennusta ei voitu ladata.',
+    loaded: 'Peli ladattu!',
+    hintMenu: 'Tallenna pelin aikana paikkakunnassa TALLENNA-napista.',
+    hintGame: 'Tallennus säilyy tässä selaimessa.',
+  },
+  exit: {
+    title: 'Kiitos pelaamisesta!',
+    hint: 'Voit nyt sulkea selaimen välilehden.',
+    back: 'ALKURUUTUUN',
   },
   hud: {
     hp: (hp: number, max: number): string => `Elämä ${hp}/${max}`,
@@ -64,10 +109,10 @@ export const TEXT = {
   },
   gameOver: {
     title: 'Hävisit!',
-    retry: 'Yritä uudelleen',
+    next: 'Kosketa palataksesi alkuruutuun',
   },
   victory: {
     title: 'Suomi on pelastettu!',
-    next: 'Pelaa uudelleen',
+    next: 'Kosketa palataksesi alkuruutuun',
   },
 } as const;
