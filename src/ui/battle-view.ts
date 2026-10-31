@@ -67,16 +67,21 @@ export class BattleView {
 
   /** Hyökkääjä syöksähtää ja kohde välähtää. */
   playHit(attacker: Side): void {
-    const from = this.display(attacker);
+    this.playLunge(attacker);
     const target = this.display(attacker === 'player' ? 'enemy' : 'player');
-    const direction = attacker === 'player' ? 1 : -1;
+    flash(target.sprite, attacker === 'player' ? COLORS.hitFlash : COLORS.hurt, ANIM_MS * 2);
+  }
+
+  /** Hahmo syöksähtää vastustajaa kohti ja palaa paikalleen (esim. varastaessa). */
+  playLunge(side: Side): void {
+    const sprite = this.display(side).sprite;
+    const direction = side === 'player' ? 1 : -1;
     this.scene.tweens.add({
-      targets: from.sprite,
-      x: from.sprite.x + LUNGE_PX * direction,
+      targets: sprite,
+      x: sprite.x + LUNGE_PX * direction,
       duration: ANIM_MS,
       yoyo: true,
     });
-    flash(target.sprite, attacker === 'player' ? COLORS.hitFlash : COLORS.hurt, ANIM_MS * 2);
   }
 
   /** Voitettu vihollinen häviää näkyvistä. */

@@ -20,7 +20,8 @@ export interface BattleSetup {
   readonly state: GameState;
   readonly battle: Battle;
   readonly enemy: EnemyDef;
-  readonly mapEnemyIndex: number;
+  /** null = vihollinen hyökkäsi väijytyksestä eikä ollut kartalla. */
+  readonly mapEnemyIndex: number | null;
   readonly view: BattleView;
 }
 
@@ -37,7 +38,8 @@ export class BattleDirector {
   ) {
     this.menu = new BattleMenu(scene, (action) => this.choose(action));
     setup.view.updateHp(setup.battle);
-    setup.view.say(TEXT.battle.appears(setup.enemy.name));
+    const intro = setup.mapEnemyIndex === null ? TEXT.battle.ambush : TEXT.battle.appears;
+    setup.view.say(intro(setup.enemy.name));
     this.menu.refresh(setup.battle, true);
   }
 

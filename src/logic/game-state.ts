@@ -1,6 +1,6 @@
 import { PLAYER } from '../data/player';
-import type { CombatStats, EnemyDef } from '../data/types';
-import type { Battle } from './battle';
+import type { CombatStats, EnemyDef, ItemStack } from '../data/types';
+import { recoverStolen, type Battle } from './battle';
 import type { Fighter } from './combat';
 import { levelForXp, statsForLevel } from './progression';
 import type { Vec2 } from './vector';
@@ -51,17 +51,24 @@ export interface VictoryReward {
   readonly leveledUp: boolean;
   readonly level: number;
   readonly drop?: string;
+  /** Esineet, jotka vihollinen oli varastanut ja jotka saatiin takaisin. */
+  readonly recovered?: readonly ItemStack[];
 }
 
-/** Voitto karttavihollisesta: kokemus, mahdollinen esine ja tason nousu. */
+/**
+ * Voitto vihollisesta: kokemus, mahdollinen esine ja tason nousu.
+ * mapEnemyIndex on null, kun vihollinen ei ollut kartalla (esim. väijytys).
+ */
 export function grantVictory(
   state: GameState,
-  mapEnemyIndex: number,
+  mapEnemyIndex: number | null,
   enemy: EnemyDef,
 ): VictoryReward {
   const before = playerLevel(state);
   state.xp += enemy.xp;
-  state.defeated.push(mapEnemyIndex);
+  if (mapEnemyIndex !== null) {
+    state.defeated.push(mapEnemyIndex);
+  }
   if (enemy.drop) {
     state.inventory[enemy.drop] = (state.inventory[enemy.drop] ?? 0) + 1;
   }
@@ -76,14 +83,19 @@ export function grantVictory(
 
 /**
  * Tallentaa taistelun lopputuloksen peliin: elämä talteen ja voitosta palkinto.
- * Palauttaa palkinnon, jos taistelu voitettiin.
+ * Voitosta saa takaisin myös varastetut esineet. Palauttaa palkinnon, jos taistelu voitettiin.
  */
 export function applyBattleResult(
   state: GameState,
   battle: Battle,
-  mapEnemyIndex: number,
+  mapEnemyIndex: number | null,
   enemy: EnemyDef,
 ): VictoryReward | null {
   state.hp = Math.max(0, battle.player.hp);
-  return battle.outcome === 'won' ? grantVictory(state, mapEnemyIndex, enemy) : null;
+  if (battle.outcome !== 'won') {
+    return null;
+  }
+  const reward = grantVictory(state, mapEnemyIndex, enemy);
+  const recovered = recoverStolen(battle);
+  return recovered.length > 0 ? { ...reward, recovered } : reward;
 }

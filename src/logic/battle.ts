@@ -1,6 +1,6 @@
 import { getItem } from '../data';
 import { BATTLE_RULES } from '../data/rules';
-import type { BattleRules } from '../data/types';
+import type { BattleRules, ItemStack } from '../data/types';
 import { applyDamage, calculateDamage, heal, isDefeated, type Fighter } from './combat';
 
 // Vuoropohjainen taistelu. Pelaaja valitsee toiminnon, sitten vihollinen vastaa.
@@ -27,6 +27,7 @@ export type BattleEvent =
     }
   | { readonly kind: 'defend' }
   | { readonly kind: 'heal'; readonly itemId: string; readonly amount: number }
+  | { readonly kind: 'steal'; readonly itemId: string }
   | { readonly kind: 'flee'; readonly success: boolean };
 
 export type BattleOutcome = 'ongoing' | 'won' | 'lost' | 'fled';
@@ -36,6 +37,10 @@ export interface Battle {
   readonly enemy: Fighter;
   /** Esineiden määrät tunnisteittain. Taistelu vähentää käytetyt esineet tästä. */
   readonly inventory: Record<string, number>;
+  /** Todennäköisyys, jolla vihollinen varastaa esineen lyönnin sijaan (0 = ei koskaan). */
+  readonly enemyStealChance: number;
+  /** Vihollisen varastamat esineet. Pelaaja saa ne takaisin voittaessaan. */
+  readonly stolen: Record<string, number>;
   outcome: BattleOutcome;
 }
 
@@ -43,8 +48,9 @@ export function createBattle(
   player: Fighter,
   enemy: Fighter,
   inventory: Record<string, number>,
+  enemyStealChance = 0,
 ): Battle {
-  return { player, enemy, inventory, outcome: 'ongoing' };
+  return { player, enemy, inventory, enemyStealChance, stolen: {}, outcome: 'ongoing' };
 }
 
 /** Voiko toiminnon valita juuri nyt (esim. esinettä pitää olla jäljellä). */
@@ -123,6 +129,10 @@ function useItem(battle: Battle, itemId: string): BattleEvent {
 }
 
 function enemyAct(battle: Battle, defended: boolean, rng: Rng, rules: BattleRules): BattleEvent {
+  const theft = trySteal(battle, rng);
+  if (theft) {
+    return theft;
+  }
   const roll = rollDamage(battle.enemy, battle.player, rng, rules);
   const damage = defended
     ? Math.max(1, Math.round(roll.damage * rules.defendMultiplier))
@@ -132,6 +142,33 @@ function enemyAct(battle: Battle, defended: boolean, rng: Rng, rules: BattleRule
     battle.outcome = 'lost';
   }
   return { kind: 'hit', attacker: 'enemy', damage, crit: roll.crit, defended };
+}
+
+/** Vihollinen yrittää varastaa ensimmäisen esineen, jota pelaajalla on. */
+function trySteal(battle: Battle, rng: Rng): BattleEvent | null {
+  if (battle.enemyStealChance <= 0) {
+    return null;
+  }
+  const found = Object.entries(battle.inventory).find(([, count]) => count > 0);
+  if (!found || rng() >= battle.enemyStealChance) {
+    return null;
+  }
+  const [itemId] = found;
+  battle.inventory[itemId] = (battle.inventory[itemId] ?? 0) - 1;
+  battle.stolen[itemId] = (battle.stolen[itemId] ?? 0) + 1;
+  return { kind: 'steal', itemId };
+}
+
+/** Siirtää varastetut esineet takaisin pelaajalle. Palauttaa palautetut esineet. */
+export function recoverStolen(battle: Battle): ItemStack[] {
+  const recovered = Object.entries(battle.stolen)
+    .filter(([, count]) => count > 0)
+    .map(([id, count]) => ({ id, count }));
+  for (const { id, count } of recovered) {
+    battle.inventory[id] = (battle.inventory[id] ?? 0) + count;
+    battle.stolen[id] = 0;
+  }
+  return recovered;
 }
 
 /** Ensimmäinen parannusesine, jota on jäljellä, tai null. */
