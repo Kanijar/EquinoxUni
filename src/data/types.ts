@@ -220,8 +220,13 @@ export interface SpellDef {
   readonly power: number;
   /** Paljonko osuman vahinko kasvaa jokaisesta tulivoiman pisteestä. */
   readonly powerPerMagic: number;
-  /** Palamisen vahinko joka sekunti (MAGIC_RULES.burnTickMs). */
+  /** Palamisen vahinko (polttovoima) joka sekunti ilman tulivoimaa (MAGIC_RULES.burnTickMs). */
   readonly burnDamage: number;
+  /**
+   * Paljonko polttovoima kasvaa jokaisesta tulivoiman pisteestä. Saa olla desimaaliluku
+   * (esim. 0.5): murto-osat kertyvät ja vähennetään elämästä kokonaisina (logic/magic.ts).
+   */
+  readonly burnDamagePerMagic: number;
   /** Kuinka monta sekuntia vihollinen palaa ilman tulivoimaa. */
   readonly burnSeconds: number;
   /** Paljonko palamisaika pitenee jokaisesta tulivoiman pisteestä. */

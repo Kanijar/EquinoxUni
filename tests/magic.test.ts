@@ -5,7 +5,9 @@ import { MAGIC_RULES } from '../src/data/rules';
 import type { BattleRules, SpellDef } from '../src/data/types';
 import { createBattle, takeTurn, type Rng } from '../src/logic/battle';
 import type { Fighter } from '../src/logic/combat';
-import { burnSeconds, burnTick, castSpell, spellPower } from '../src/logic/magic';
+import { getSkill } from '../src/logic/skill-points';
+import { skillDetail } from '../src/ui/skill-detail';
+import { burnDamage, burnSeconds, burnTick, castSpell, spellPower } from '../src/logic/magic';
 
 // Maagian testit: tulipallon osuma, palaminen ja tulivoiman vaikutus.
 
@@ -21,6 +23,7 @@ const spell: SpellDef = {
   power: 1,
   powerPerMagic: 1,
   burnDamage: 1,
+  burnDamagePerMagic: 0.5,
   burnSeconds: 3,
   burnSecondsPerMagic: 1,
 };
@@ -41,16 +44,23 @@ describe('tulipallo', () => {
     const fireball = getSpell('fireball');
     expect(spellPower(fireball, 0)).toBe(1);
     expect(burnSeconds(fireball, 0)).toBe(3);
-    expect(fireball.burnDamage).toBe(1);
+    expect(burnDamage(fireball, 0)).toBe(1);
     expect(MAGIC_RULES.burnTickMs).toBe(1000);
   });
 
-  it('tulivoima kasvattaa osumaa ja palamisaikaa', () => {
+  it('tulivoima kasvattaa osumaa, palamisaikaa ja polttovoimaa', () => {
     expect(spellPower(spell, 2)).toBe(3);
     expect(burnSeconds(spell, 2)).toBe(5);
+    expect(burnDamage(spell, 2)).toBe(2);
     const { damage, burn } = castSpell(fighter(30, 4, 0, 2), spell, middle, rules);
     expect(damage).toBe(3);
-    expect(burn).toEqual({ damage: 1, secondsLeft: 5 });
+    expect(burn).toEqual({ damage: 2, secondsLeft: 5, carry: 0 });
+  });
+
+  it('jokainen Maagia-piste nostaa tulipallon polttovoimaa 0,5:llä', () => {
+    const fireball = getSpell('fireball');
+    expect(fireball.burnDamagePerMagic).toBe(0.5);
+    expect([0, 1, 2, 3].map((magic) => burnDamage(fireball, magic))).toEqual([1, 1.5, 2, 2.5]);
   });
 
   it('tulipallo voi olla kriittinen osuma tarkkuuden mukaan', () => {
@@ -71,7 +81,16 @@ describe('tulipallo', () => {
       burnSeconds: 3,
     });
     expect(battle.enemy.hp).toBe(19);
-    expect(battle.enemyBurn).toEqual({ damage: 1, secondsLeft: 3 });
+    expect(battle.enemyBurn).toEqual({ damage: 1, secondsLeft: 3, carry: 0 });
+  });
+});
+
+describe('kykypistenäkymän polttovoima', () => {
+  it('Maagia-rivi näyttää polttovoiman pilkulla ja kasvun pisteestä', () => {
+    const stats = { ...PLAYER.stats, magic: 1 };
+    expect(skillDetail(getSkill('magic'), stats)).toBe('polttovoima 1,5/s (+0,5)');
+    expect(skillDetail(getSkill('magic'), PLAYER.stats)).toBe('polttovoima 1/s (+0,5)');
+    expect(skillDetail(getSkill('attack'), stats)).toBeNull();
   });
 });
 
@@ -85,6 +104,23 @@ describe('palaminen', () => {
     expect(burnTick(battle)).toBeNull();
     expect(battle.enemy.hp).toBe(20 - 1 - 3);
     expect(battle.enemyBurn).toBeNull();
+  });
+
+  it('polttovoimalla 1,5 puolikkaat kertyvät: vihollinen menettää vuorotellen 1 ja 2', () => {
+    const battle = createBattle(fighter(30, 4, 2, 1), fighter(30, 5, 0), {});
+    takeTurn(battle, { kind: 'spell', spellId: 'fireball' }, middle, rules);
+    expect(battle.enemyBurn).toEqual({ damage: 1.5, secondsLeft: 4, carry: 0 });
+    const hpAfterHit = battle.enemy.hp;
+    const ticks = [1, 2, 3, 4].map(() => burnTick(battle)?.damage);
+    expect(ticks).toEqual([1, 2, 1, 2]);
+    expect(hpAfterHit - battle.enemy.hp).toBe(6);
+  });
+
+  it('desimaalinen polttovoima ei häviä pyöristysvirheisiin', () => {
+    const battle = createBattle(fighter(30, 4, 2), fighter(99, 5, 0), {});
+    battle.enemyBurn = { damage: 0.1, secondsLeft: 10, carry: 0 };
+    const total = Array.from({ length: 10 }, () => burnTick(battle)?.damage ?? 0);
+    expect(total.reduce((sum, damage) => sum + damage, 0)).toBe(1);
   });
 
   it('uusi tulipallo sytyttää palamisen alusta', () => {
@@ -109,7 +145,7 @@ describe('palaminen', () => {
   it('ilman tulipalloa mikään ei pala, ja palaminen loppuu kun taistelu on ohi', () => {
     const battle = createBattle(fighter(30, 4, 2), fighter(20, 5, 0), {});
     expect(burnTick(battle)).toBeNull();
-    battle.enemyBurn = { damage: 1, secondsLeft: 3 };
+    battle.enemyBurn = { damage: 1, secondsLeft: 3, carry: 0 };
     battle.outcome = 'fled';
     expect(burnTick(battle)).toBeNull();
     expect(battle.enemy.hp).toBe(20);

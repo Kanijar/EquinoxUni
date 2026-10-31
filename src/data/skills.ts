@@ -11,6 +11,7 @@ export const SKILLS: readonly SkillDef[] = [
   { id: 'vitality', stat: 'maxHp', perPoint: 5 },
   // Tarkkuus: +2 prosenttiyksikköä kriittiseen osumaan, enintään 40 %.
   { id: 'precision', stat: 'critPercent', perPoint: 2, max: 40 },
-  // Maagia: tulivoima kasvattaa tulipallon osumaa ja palamisaikaa (data/spells.ts).
+  // Maagia: tulivoima kasvattaa tulipallon osumaa, palamisaikaa ja polttovoimaa
+  // (paljonko kasvaa, on data/spells.ts:ssä).
   { id: 'magic', stat: 'magic', perPoint: 1 },
 ];

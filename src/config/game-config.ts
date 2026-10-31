@@ -130,6 +130,8 @@ export const SKILLS_VIEW = {
   nameX: 40,
   valueX: 190,
   perPointX: 210,
+  /** Kun rivillä on lisätieto (Maagia: polttovoima), kaksi pientä riviä näin paljon keskeltä. */
+  detailOffsetY: 6,
   addButtonX: 420,
   buttonHeight: 40,
   addButtonWidth: 56,

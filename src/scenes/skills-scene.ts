@@ -11,7 +11,6 @@ import {
   unspentSkillPoints,
   type GameState,
 } from '../logic/game-state';
-import { isSkillMaxed } from '../logic/skill-points';
 import { SkillRow } from '../ui/skill-row';
 import { TextButton } from '../ui/text-button';
 import type { WorldSceneData } from './world-scene';
@@ -87,8 +86,7 @@ export class SkillsScene extends Phaser.Scene {
     const stats = playerStats(this.state);
     this.pointsLeftText.setText(TEXT.skills.left(left));
     for (const { row, skill } of this.rows) {
-      const canAdd = canSpendSkillPoint(this.state, skill.id);
-      row.update(stats[skill.stat], canAdd, isSkillMaxed(skill, stats));
+      row.update(stats, canSpendSkillPoint(this.state, skill.id));
     }
   }
 

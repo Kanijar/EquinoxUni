@@ -4,15 +4,25 @@ import { applyDamage, isDefeated, type Fighter } from './combat';
 
 // Maagia: tulipallo osuu heti ja sytyttää vihollisen palamaan. Palava vihollinen
 // menettää elämää kerran sekunnissa (MAGIC_RULES.burnTickMs), kunnes palaminen loppuu.
-// Tulivoima (Maagia-kyky) kasvattaa osumaa ja palamisaikaa. Puolustus ei auta loitsua vastaan.
+// Tulivoima (Maagia-kyky) kasvattaa osumaa, palamisaikaa ja polttovoimaa (vahinko sekunnissa).
+// Puolustus ei auta loitsua vastaan.
+//
+// Polttovoima voi olla desimaaliluku (esim. 1,5), mutta elämät ovat kokonaislukuja.
+// Siksi murto-osat kertyvät: polttovoimalla 1,5 vihollinen menettää vuorotellen 1 ja 2
+// elämää (keskimäärin 1,5 sekunnissa). Palamisen lopussa jäänyt puolikas ei vahingoita.
 
 /** Satunnaislukufunktio 0..1. */
 type Rng = () => number;
 
-/** Palaminen: vahinko joka sekunti ja jäljellä olevat sekunnit. */
+/** Liukulukujen pyöristysvirheen vara, ettei esim. 0,999999… pyöristy alas nollaan. */
+const FRACTION_TOLERANCE = 1e-9;
+
+/** Palaminen: vahinko (polttovoima) joka sekunti, jäljellä olevat sekunnit ja kertynyt murto-osa. */
 export interface Burn {
   readonly damage: number;
   secondsLeft: number;
+  /** Vahingon murto-osa, jota ei ole vielä vähennetty elämästä (0..1). */
+  carry: number;
 }
 
 /** Yksi sekunti palamista: tehty vahinko ja jäljellä olevat sekunnit. */
@@ -31,6 +41,11 @@ export function burnSeconds(spell: SpellDef, magic: number): number {
   return spell.burnSeconds + Math.max(0, magic) * spell.burnSecondsPerMagic;
 }
 
+/** Polttovoima: paljonko palava vihollinen menettää elämää sekunnissa (voi olla desimaaliluku). */
+export function burnDamage(spell: SpellDef, magic: number): number {
+  return spell.burnDamage + Math.max(0, magic) * spell.burnDamagePerMagic;
+}
+
 /**
  * Loitsun osuma ja sen sytyttämä palaminen. Osuma voi olla kriittinen loitsijan
  * tarkkuuden mukaan. Osuman vahinko on aina vähintään 1.
@@ -46,7 +61,11 @@ export function castSpell(
   const crit = rng() < (caster.critChance ?? rules.critChance);
   const base = spellPower(spell, magic);
   const damage = Math.max(1, Math.round(base * variance * (crit ? rules.critMultiplier : 1)));
-  const burn = { damage: spell.burnDamage, secondsLeft: burnSeconds(spell, magic) };
+  const burn = {
+    damage: burnDamage(spell, magic),
+    secondsLeft: burnSeconds(spell, magic),
+    carry: 0,
+  };
   return { damage, crit, burn };
 }
 
@@ -61,7 +80,7 @@ export function burnTick(battle: Battle): BurnTick | null {
     return null;
   }
   burn.secondsLeft -= 1;
-  const damage = applyDamage(battle.enemy, burn.damage);
+  const damage = applyDamage(battle.enemy, wholeBurnDamage(burn));
   if (burn.secondsLeft <= 0) {
     battle.enemyBurn = null;
   }
@@ -69,4 +88,12 @@ export function burnTick(battle: Battle): BurnTick | null {
     battle.outcome = 'won';
   }
   return { damage, secondsLeft: burn.secondsLeft };
+}
+
+/** Tämän sekunnin vahinko kokonaislukuna. Murto-osa jää talteen seuraavaan sekuntiin. */
+function wholeBurnDamage(burn: Burn): number {
+  const total = burn.damage + burn.carry;
+  const whole = Math.floor(total + FRACTION_TOLERANCE);
+  burn.carry = Math.max(0, total - whole);
+  return whole;
 }

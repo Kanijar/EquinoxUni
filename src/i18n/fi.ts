@@ -16,6 +16,9 @@ const STAT_NAMES: Readonly<Record<SkillStat, string>> = {
 /** Prosentteina näytettävä arvo (kriittisen osuman mahdollisuus). */
 const isPercent = (stat: SkillStat): boolean => stat === 'critPercent';
 
+/** Desimaaliluku suomalaisittain pilkulla: 1.5 → "1,5". */
+const decimal = (value: number): string => String(value).replace('.', ',');
+
 /** Tallennushetki muodossa "31.10. klo 14.05". */
 function formatTime(time: number): string {
   const date = new Date(time);
@@ -102,6 +105,9 @@ export const TEXT = {
       isPercent(stat) ? `${value} %` : String(value),
     perPoint: (amount: number, stat: SkillStat): string =>
       `+${amount}${isPercent(stat) ? ' %' : ''} ${STAT_NAMES[stat]} / piste`,
+    /** Maagia-rivin lisätieto: tulipallon polttovoima nyt ja kasvu pisteestä. */
+    burnPower: (perSecond: number, perPoint: number): string =>
+      `polttovoima ${decimal(perSecond)}/s (+${decimal(perPoint)})`,
     add: '+',
     /** Kyky on ylärajallaan (esim. tarkkuus 40 %). */
     maxed: 'MAKS',
