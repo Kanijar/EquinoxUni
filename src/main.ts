@@ -4,6 +4,7 @@ import { BattleScene } from './scenes/battle-scene';
 import { BootScene } from './scenes/boot-scene';
 import { GameOverScene } from './scenes/game-over-scene';
 import { MenuScene } from './scenes/menu-scene';
+import { SkillsScene } from './scenes/skills-scene';
 import { WorldScene } from './scenes/world-scene';
 
 // Pelin käynnistys. Uusi scene: luo tiedosto scenes/-kansioon ja lisää se listaan.
@@ -24,5 +25,5 @@ new Phaser.Game({
     default: 'arcade',
     arcade: { debug: false },
   },
-  scene: [BootScene, MenuScene, WorldScene, BattleScene, GameOverScene],
+  scene: [BootScene, MenuScene, WorldScene, BattleScene, GameOverScene, SkillsScene],
 });

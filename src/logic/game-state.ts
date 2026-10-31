@@ -1,16 +1,25 @@
 import { PLAYER } from '../data/player';
-import type { CombatStats, EnemyDef, ItemStack } from '../data/types';
+import type { CombatStats, EnemyDef, ItemStack, SkillId } from '../data/types';
 import { recoverStolen, type Battle } from './battle';
 import type { Fighter } from './combat';
 import { levelForXp, statsForLevel } from './progression';
+import {
+  applySkillPoints,
+  noSkillPoints,
+  skillPointsEarned,
+  skillPointsLeft,
+  type SkillPoints,
+} from './skill-points';
 import type { Vec2 } from './vector';
 
 // Pelin eteneminen, joka säilyy kartan ja taistelun välillä:
-// elämä, kokemus, esineet, sijainti ja voitetut viholliset.
+// elämä, kokemus, kykypisteet, esineet, sijainti ja voitetut viholliset.
 
 export interface GameState {
   hp: number;
   xp: number;
+  /** Kuhunkin kykyyn käytetyt kykypisteet. Käyttämättömät: unspentSkillPoints(). */
+  readonly skills: SkillPoints;
   /** Esineiden määrät tunnisteittain. */
   readonly inventory: Record<string, number>;
   /** Sijainti kartalla pikseleinä. null = aloituspaikkakunta. */
@@ -24,7 +33,14 @@ export function createNewGame(): GameState {
   for (const stack of PLAYER.startItems) {
     inventory[stack.id] = (inventory[stack.id] ?? 0) + stack.count;
   }
-  return { hp: PLAYER.stats.maxHp, xp: 0, inventory, position: null, defeated: [] };
+  return {
+    hp: PLAYER.stats.maxHp,
+    xp: 0,
+    skills: noSkillPoints(),
+    inventory,
+    position: null,
+    defeated: [],
+  };
 }
 
 export function playerLevel(state: GameState): number {
@@ -32,7 +48,26 @@ export function playerLevel(state: GameState): number {
 }
 
 export function playerStats(state: GameState): CombatStats {
-  return statsForLevel(playerLevel(state));
+  return applySkillPoints(statsForLevel(playerLevel(state)), state.skills);
+}
+
+/** Kykypisteet, joita pelaaja ei ole vielä käyttänyt. */
+export function unspentSkillPoints(state: GameState): number {
+  return skillPointsLeft(playerLevel(state), state.skills);
+}
+
+/**
+ * Laittaa yhden kykypisteen kykyyn. Elinvoima nostaa myös nykyistä elämää saman verran.
+ * Palauttaa false, jos käyttämättömiä pisteitä ei ole.
+ */
+export function spendSkillPoint(state: GameState, id: SkillId): boolean {
+  if (unspentSkillPoints(state) <= 0) {
+    return false;
+  }
+  const maxHpBefore = playerStats(state).maxHp;
+  state.skills[id] += 1;
+  state.hp += playerStats(state).maxHp - maxHpBefore;
+  return true;
 }
 
 /** Taisteluhahmo pelaajan nykyisillä arvoilla. */
@@ -52,13 +87,15 @@ export interface VictoryReward {
   readonly totalXp: number;
   readonly leveledUp: boolean;
   readonly level: number;
+  /** Tason noususta saadut uudet kykypisteet (0, jos taso ei noussut). */
+  readonly skillPoints: number;
   readonly drop?: string;
   /** Esineet, jotka vihollinen oli varastanut ja jotka saatiin takaisin. */
   readonly recovered?: readonly ItemStack[];
 }
 
 /**
- * Voitto vihollisesta: kokemus, mahdollinen esine ja tason nousu.
+ * Voitto vihollisesta: kokemus, mahdollinen esine ja tason nousu (ja siitä kykypisteet).
  * mapEnemyIndex on null, kun vihollinen ei ollut kartalla (esim. väijytys).
  */
 export function grantVictory(
@@ -79,7 +116,8 @@ export function grantVictory(
   if (leveledUp) {
     restoreHp(state);
   }
-  const reward = { xp: enemy.xp, totalXp: state.xp, leveledUp, level };
+  const skillPoints = skillPointsEarned(level) - skillPointsEarned(before);
+  const reward = { xp: enemy.xp, totalXp: state.xp, leveledUp, level, skillPoints };
   return enemy.drop ? { ...reward, drop: enemy.drop } : reward;
 }
 
