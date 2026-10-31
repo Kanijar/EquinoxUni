@@ -9,14 +9,15 @@ import {
   grantVictory,
   playerFighter,
   playerLevel,
+  playerStats,
   restoreHp,
+  unspentSkillPoints,
 } from '../src/logic/game-state';
-import { levelForXp, statsForLevel, xpProgress, xpToNextLevel } from '../src/logic/progression';
+import { levelForXp, xpProgress, xpToNextLevel } from '../src/logic/progression';
 import type { Progression } from '../src/data/types';
 
 const progression: Progression = {
   xpForLevel: [0, 10, 30],
-  perLevel: { maxHp: 5, attack: 2, defense: 1 },
   skillPointsPerLevel: 3,
 };
 
@@ -56,16 +57,6 @@ describe('kokemustasot', () => {
       fraction: 1,
     });
   });
-
-  it('taso kasvattaa arvoja', () => {
-    const base = { maxHp: 20, attack: 5, defense: 1, speed: 50 };
-    expect(statsForLevel(3, base, progression)).toEqual({
-      maxHp: 30,
-      attack: 9,
-      defense: 3,
-      speed: 50,
-    });
-  });
 });
 
 describe('pelin tila', () => {
@@ -93,12 +84,19 @@ describe('pelin tila', () => {
     });
   });
 
-  it('tason noustessa elämä palautuu uuteen maksimiin', () => {
+  it('tason noustessa elämä palautuu täyteen', () => {
     const state = createNewGame();
     state.hp = 5;
     grantVictory(state, 0, getEnemy('hiisi'));
     expect(state.hp).toBe(playerFighter(state).maxHp);
-    expect(state.hp).toBeGreaterThan(PLAYER.stats.maxHp);
+  });
+
+  it('tason nousu antaa vain kykypisteet, ei suoraan lisää arvoja', () => {
+    const state = createNewGame();
+    grantVictory(state, 0, getEnemy('hiisi'));
+    expect(playerLevel(state)).toBe(2);
+    expect(playerStats(state)).toEqual(PLAYER.stats);
+    expect(unspentSkillPoints(state)).toBe(PROGRESSION.skillPointsPerLevel);
   });
 
   it('lepo palauttaa elämän', () => {

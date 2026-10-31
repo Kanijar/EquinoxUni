@@ -1,6 +1,6 @@
 import type { PlayerDef } from './types';
 
-// Pelaajan arvot tasolla 1. Tasot nostavat arvoja (progression.ts).
+// Pelaajan arvot pelin alussa. Arvot kasvavat vain kykypisteillä (skills.ts).
 export const PLAYER: PlayerDef = {
   name: 'Sankari',
   sprite: 'hero',

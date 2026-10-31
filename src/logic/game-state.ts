@@ -2,7 +2,7 @@ import { PLAYER } from '../data/player';
 import type { CombatStats, EnemyDef, ItemStack, SkillId } from '../data/types';
 import { recoverStolen, type Battle } from './battle';
 import type { Fighter } from './combat';
-import { levelForXp, statsForLevel } from './progression';
+import { levelForXp } from './progression';
 import {
   applySkillPoints,
   noSkillPoints,
@@ -48,7 +48,7 @@ export function playerLevel(state: GameState): number {
 }
 
 export function playerStats(state: GameState): CombatStats {
-  return applySkillPoints(statsForLevel(playerLevel(state)), state.skills);
+  return applySkillPoints(PLAYER.stats, state.skills);
 }
 
 /** Kykypisteet, joita pelaaja ei ole vielä käyttänyt. */
