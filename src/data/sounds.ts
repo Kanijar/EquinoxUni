@@ -50,6 +50,14 @@ export const SOUNDS = {
       { freq: 620, ms: 380, slideTo: 440 },
     ],
   },
+  splat: {
+    wave: 'square',
+    gain: 0.25,
+    notes: [
+      { freq: 260, ms: 60, slideTo: 90 },
+      { freq: 140, ms: 90, slideTo: 60 },
+    ],
+  },
   'wolf-magic': {
     wave: 'triangle',
     gain: 0.3,

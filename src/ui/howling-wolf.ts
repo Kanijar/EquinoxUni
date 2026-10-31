@@ -21,14 +21,14 @@ export function makeHowlingWolf(
     playSound('howl');
     howling?.stop();
     howling = howl(scene, wolf);
-    const centerY = wolf.y - wolf.displayHeight / 2;
+    const center = { x: wolf.x, y: wolf.y - wolf.displayHeight / 2 };
     if (awake) {
-      burstStars(scene, wolf.x, centerY, WOLF_MAGIC.starCountSmall);
+      burstStars(scene, center, WOLF_MAGIC.starCountSmall);
     } else {
       awake = true;
       playSound('wolf-magic');
       awakenSpiritWolf(scene, wolf, spiritSprite);
-      burstStars(scene, wolf.x, centerY, WOLF_MAGIC.starCount);
+      burstStars(scene, center, WOLF_MAGIC.starCount);
     }
     onTap();
   });

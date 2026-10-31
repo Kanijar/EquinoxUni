@@ -1,4 +1,6 @@
 import { ITEMS, MAP_ENEMIES, TOWNS, WORLD } from '../data';
+import { PLAYER } from '../data/player';
+import type { EyeColor } from '../data/types';
 import { SKILLS } from '../data/skills';
 import { playerStats, type GameState } from './game-state';
 import { mapEnemyRespawnMs, type RespawnTimer } from './respawn';
@@ -66,6 +68,13 @@ function readPosition(value: unknown): Vec2 | null | undefined {
 /** Tuntematon tai puuttuva paikkakunta = aloituspaikkakunta. */
 function readLastTown(value: unknown): string {
   return TOWNS.some((town) => town.id === value) ? (value as string) : WORLD.startTown;
+}
+
+/** Tuntematon tai puuttuva silmien väri = pelin oletusväri. */
+function readEyeColor(value: unknown): EyeColor {
+  return typeof value === 'string' && Object.keys(PLAYER.eyeSprites).includes(value)
+    ? (value as EyeColor)
+    : PLAYER.eyeColor;
 }
 
 function readDefeated(value: unknown): number[] | null {
@@ -136,6 +145,7 @@ export function readGameState(value: unknown): GameState | null {
     lastTown: readLastTown(value['lastTown']),
     defeated,
     respawning,
+    eyeColor: readEyeColor(value['eyeColor']),
   };
   // Elämä pysyy rajoissa: vähintään 1, enintään maksimielämä.
   state.hp = Math.min(Math.max(1, state.hp), playerStats(state).maxHp);

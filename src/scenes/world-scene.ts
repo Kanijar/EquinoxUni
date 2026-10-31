@@ -6,6 +6,7 @@ import { healItemCount } from '../logic/battle';
 import {
   createNewGame,
   enemiesToBeat,
+  playerSprite,
   playerStats,
   unspentSkillPoints,
   type GameState,
@@ -72,7 +73,8 @@ export class WorldScene extends Phaser.Scene {
     const built = buildWorldMap(this, getWorldGrid());
     placeTownMarkers(this);
     const start = this.state.position ?? tileToWorld(townTile(WORLD, lastVisitedTown(this.state)));
-    this.player = new Player(this, start, playerStats(this.state).speed);
+    const speed = playerStats(this.state).speed;
+    this.player = new Player(this, start, speed, playerSprite(this.state));
     this.physics.add.collider(this.player.sprite, built.layer);
     this.encounters = new MapEncounters(this, this.state, built.layer);
     this.ambushes = new AmbushWatch(getWorldGrid());

@@ -29,9 +29,15 @@ export interface ItemStack {
   readonly count: number;
 }
 
+/** Sankarin silmien väri. Uusi väri: lisää tähän ja PLAYER.eyeSprites-listaan (data/player.ts). */
+export type EyeColor = 'yellow' | 'black';
+
 export interface PlayerDef {
   readonly name: string;
-  readonly sprite: string;
+  /** Silmien väri pelin alussa. */
+  readonly eyeColor: EyeColor;
+  /** Sankarin sprite kullekin silmien värille (data/sprites-characters.ts). */
+  readonly eyeSprites: Readonly<Record<EyeColor, string>>;
   /** Arvot pelin alussa. Kasvavat vain kykypisteillä (data/skills.ts). */
   readonly stats: PlayerStats;
   /** Loitsu, joka on HYÖKKÄÄ-valikon TULIPALLO-napissa (data/spells.ts). */
@@ -183,6 +189,8 @@ export interface MenuSecretRules {
   readonly bonusItems: readonly ItemStack[];
   /** Sprite, joksi alkuruudun susi muuttuu napautuksesta (hehkuvat silmät). */
   readonly spiritSprite: string;
+  /** Silmien väri, joksi sankarin silmät muuttuvat, kun alkuruudun limaa napautetaan. */
+  readonly slimeEyeColor: EyeColor;
 }
 
 export interface MagicRules {

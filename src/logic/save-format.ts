@@ -1,4 +1,5 @@
 import { SAVE_VERSION } from '../config/persistence';
+import { PLAYER } from '../data/player';
 import type { GameState } from './game-state';
 import { parseJson } from './key-value-store';
 import { mapEnemyRespawnMs } from './respawn';
@@ -29,6 +30,7 @@ type RawSave = Record<string, unknown>;
  */
 export const SAVE_MIGRATIONS: Readonly<Record<number, (save: RawSave) => RawSave>> = {
   1: addRespawnTimers,
+  2: addEyeColor,
 };
 
 /**
@@ -45,6 +47,18 @@ function addRespawnTimers(save: RawSave): RawSave {
     .filter((index): index is number => typeof index === 'number')
     .map((index) => ({ index, msLeft: mapEnemyRespawnMs(index) }));
   return { ...save, state: { ...state, respawning } };
+}
+
+/**
+ * Versio 2 → 3. Vanhoissa tallennuksissa ei ole silmien väriä: sankari saa pelin
+ * oletusvärin (data/player.ts). Rikkinäiset arvot jätetään readGameState()-tarkistukselle.
+ */
+function addEyeColor(save: RawSave): RawSave {
+  const state = save['state'];
+  if (!isRecord(state)) {
+    return save;
+  }
+  return { ...save, state: { eyeColor: PLAYER.eyeColor, ...state } };
 }
 
 export function encodeSave(state: GameState, meta: SaveMeta): string {

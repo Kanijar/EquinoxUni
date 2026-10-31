@@ -1,12 +1,14 @@
 import Phaser from 'phaser';
 import { BUTTON, GAME_WIDTH, MENU_VIEW, SCENES } from '../config/game-config';
 import { TEXT } from '../i18n/fi';
+import { PLAYER } from '../data/player';
 import { MENU_SECRET } from '../data/rules';
-import { startFromMenu } from '../logic/menu-secret';
+import { NO_MENU_TAPS, startFromMenu, type MenuTaps } from '../logic/menu-secret';
 import { enterFullscreenLandscape } from '../systems/fullscreen';
 import { makeHowlingWolf } from '../ui/howling-wolf';
 import { drawMenuBackdrop } from '../ui/menu-backdrop';
 import { addPlayerCountLabel } from '../ui/player-count-label';
+import { makeSquishySlime } from '../ui/squishy-slime';
 import { TextButton } from '../ui/text-button';
 import { addTitle } from '../ui/title-text';
 import { addVersionLabel } from '../ui/version-label';
@@ -19,6 +21,7 @@ import type { WorldSceneData } from './world-scene';
 // Salaisuus: jos sutta napauttaa ennen PELAA-nappia, uusi peli alkaa kokemuspisteillä ja
 // lisäjuomilla (logic/menu-secret.ts). Alkuruudulla siitä ei kerrota: susi vain ulvahtaa
 // ja muuttuu hehkuvaksi henkisudeksi. Kartalla näkyy yllätysviesti.
+// Toinen salaisuus: liman napautus muuttaa sankarin silmät mustiksi heti ja uudessa pelissä.
 
 interface MenuEntry {
   readonly label: string;
@@ -26,18 +29,22 @@ interface MenuEntry {
 }
 
 export class MenuScene extends Phaser.Scene {
-  /** Napautettiinko sutta tällä alkuruudun käynnillä. */
-  private wolfTapped = false;
+  /** Mitä alkuruudulla on napautettu tällä käynnillä (salaisuudet). */
+  private taps: MenuTaps = NO_MENU_TAPS;
 
   constructor() {
     super(SCENES.menu);
   }
 
   create(): void {
-    this.wolfTapped = false;
-    const characters = drawMenuBackdrop(this);
-    makeHowlingWolf(this, characters.wolf, MENU_SECRET.spiritSprite, () => {
-      this.wolfTapped = true;
+    this.taps = NO_MENU_TAPS;
+    const { hero, slime, wolf } = drawMenuBackdrop(this);
+    makeHowlingWolf(this, wolf, MENU_SECRET.spiritSprite, () => {
+      this.taps = { ...this.taps, wolf: true };
+    });
+    makeSquishySlime(this, slime, () => {
+      this.taps = { ...this.taps, slime: true };
+      hero.setTexture(PLAYER.eyeSprites[MENU_SECRET.slimeEyeColor]);
     });
     addTitle(this, MENU_VIEW.titleY, TEXT.gameTitle);
     addVersionLabel(this);
@@ -61,7 +68,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private play(): void {
-    const start = startFromMenu(this.wolfTapped);
+    const start = startFromMenu(this.taps);
     this.open(SCENES.world, start satisfies WorldSceneData);
   }
 

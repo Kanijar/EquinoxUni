@@ -1,7 +1,7 @@
 import { MAP_ENEMIES } from '../data/map-enemies';
 import { PLAYER } from '../data/player';
 import { WORLD } from '../data/world';
-import type { EnemyDef, ItemStack, PlayerStats, SkillId } from '../data/types';
+import type { EnemyDef, EyeColor, ItemStack, PlayerStats, SkillId } from '../data/types';
 import { recoverStolen, type Battle } from './battle';
 import type { Fighter } from './combat';
 import { levelForXp } from './progression';
@@ -43,6 +43,8 @@ export interface GameState {
   readonly defeated: number[];
   /** Kartalta poissa olevat voitetut viholliset ja aika niiden paluuseen (logic/respawn.ts). */
   readonly respawning: RespawnTimer[];
+  /** Sankarin silmien väri (data/player.ts eyeSprites). Alkuruudun lima muuttaa sen. */
+  eyeColor: EyeColor;
 }
 
 /**
@@ -63,7 +65,13 @@ export function createNewGame(startXp = 0): GameState {
     lastTown: WORLD.startTown,
     defeated: [],
     respawning: [],
+    eyeColor: PLAYER.eyeColor,
   };
+}
+
+/** Sankarin sprite silmien värin mukaan (kartta ja taistelu). */
+export function playerSprite(state: GameState): string {
+  return PLAYER.eyeSprites[state.eyeColor];
 }
 
 /** Karttaviholliset, joita ei ole vielä voitettu kertaakaan. */
