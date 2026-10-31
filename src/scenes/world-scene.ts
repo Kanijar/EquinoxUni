@@ -3,13 +3,7 @@ import { SCENES, WORLD_VIEW } from '../config/game-config';
 import { getTown, WORLD } from '../data';
 import { Player } from '../entities/player';
 import { healItemCount } from '../logic/battle';
-import {
-  createNewGame,
-  playerLevel,
-  playerStats,
-  restoreHp,
-  type GameState,
-} from '../logic/game-state';
+import { createNewGame, playerStats, restoreHp, type GameState } from '../logic/game-state';
 import { townTile } from '../logic/world-grid';
 import { AmbushWatch } from '../systems/ambush-watch';
 import { Controls } from '../systems/controls';
@@ -102,7 +96,6 @@ export class WorldScene extends Phaser.Scene {
     this.hud.update({
       hp: this.state.hp,
       maxHp: playerStats(this.state).maxHp,
-      level: playerLevel(this.state),
       xp: this.state.xp,
       potions: healItemCount(this.state.inventory),
       enemiesLeft: this.encounters.enemiesLeft,

@@ -13,6 +13,8 @@ export const COLORS = {
   textShadow: '#000000',
   hpBar: 0xe0303a,
   hpBarBack: 0x3a1015,
+  xpBar: 0x3fa9f5,
+  xpBarBack: 0x10283d,
   uiFill: 0xffffff,
   panel: 0x10141f,
   panelBorder: 0xffffff,
@@ -59,4 +61,6 @@ export const BATTLE_VIEW = {
   buttonWidth: 104,
   buttonHeight: 40,
   margin: 6,
+  /** Kuinka kauan KP-palkin täyttyminen kestää voiton jälkeen. */
+  xpFillMs: 600,
 } as const;

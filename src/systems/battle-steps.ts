@@ -4,6 +4,7 @@ import { getItem } from '../data';
 import { TEXT } from '../i18n/fi';
 import type { BattleEvent } from '../logic/battle';
 import type { VictoryReward } from '../logic/game-state';
+import { xpToNextLevel } from '../logic/progression';
 import type { BattleView } from '../ui/battle-view';
 
 // Muuttaa taistelun tapahtumat näytettäviksi askeliksi (teksti + animaatio)
@@ -32,8 +33,15 @@ export function eventStep(event: BattleEvent, view: BattleView, enemyName: strin
   }
 }
 
-export function victorySteps(reward: VictoryReward, enemyName: string): BattleStep[] {
-  const steps: BattleStep[] = [{ text: TEXT.battle.won(enemyName, reward.xp) }];
+/** Voiton jälkeiset viestit. KP-palkki täyttyy samalla, kun voittoviesti näkyy. */
+export function victorySteps(
+  reward: VictoryReward,
+  enemyName: string,
+  view: BattleView,
+): BattleStep[] {
+  const steps: BattleStep[] = [
+    { text: TEXT.battle.won(enemyName, reward.xp), effect: () => view.updateXp(reward.totalXp) },
+  ];
   for (const stack of reward.recovered ?? []) {
     steps.push({ text: TEXT.battle.recovered(getItem(stack.id).name, stack.count) });
   }
@@ -43,6 +51,8 @@ export function victorySteps(reward: VictoryReward, enemyName: string): BattleSt
   if (reward.leveledUp) {
     steps.push({ text: TEXT.battle.levelUp(reward.level) });
   }
+  const missing = xpToNextLevel(reward.totalXp);
+  steps.push({ text: missing === null ? TEXT.battle.maxLevel : TEXT.battle.xpToNext(missing) });
   return steps;
 }
 

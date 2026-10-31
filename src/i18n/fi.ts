@@ -10,7 +10,9 @@ export const TEXT = {
   },
   hud: {
     hp: (hp: number, max: number): string => `Elämä ${hp}/${max}`,
-    level: (level: number, xp: number): string => `Taso ${level}  KP ${xp}`,
+    level: (level: number): string => `Taso ${level}`,
+    xp: (xp: number, nextLevelXp: number | null): string =>
+      nextLevelXp === null ? `KP ${xp} (huipputaso)` : `KP ${xp}/${nextLevelXp}`,
     potions: (count: number): string => `Juomat ${count}`,
     enemiesLeft: (count: number): string => `Vihollisia ${count}`,
   },
@@ -40,6 +42,8 @@ export const TEXT = {
     stole: (enemy: string, item: string): string => `${enemy} nappasi sinulta: ${item}!`,
     recovered: (item: string, count: number): string => `Sait takaisin: ${item} ×${count}.`,
     levelUp: (level: number): string => `Nousit tasolle ${level}! Elämä palautui.`,
+    xpToNext: (missing: number): string => `Seuraavaan tasoon tarvitset vielä ${missing} KP.`,
+    maxLevel: 'Olet huipputasolla!',
     lost: 'Kaaduit taistelussa...',
   },
   gameOver: {

@@ -48,6 +48,8 @@ export function restoreHp(state: GameState): void {
 
 export interface VictoryReward {
   readonly xp: number;
+  /** Pelaajan kokemuspisteet yhteensä voiton jälkeen. */
+  readonly totalXp: number;
   readonly leveledUp: boolean;
   readonly level: number;
   readonly drop?: string;
@@ -77,7 +79,7 @@ export function grantVictory(
   if (leveledUp) {
     restoreHp(state);
   }
-  const reward = { xp: enemy.xp, leveledUp, level };
+  const reward = { xp: enemy.xp, totalXp: state.xp, leveledUp, level };
   return enemy.drop ? { ...reward, drop: enemy.drop } : reward;
 }
 
