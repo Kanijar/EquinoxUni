@@ -1,6 +1,6 @@
 # Ohjeet Claudelle
 
-Tämä on pixelart 2D -seikkailu- ja taistelupeli Android-puhelimen selaimeen.
+Tämä on **Equinox Universe**, pixelart 2D -seikkailu- ja taistelupeli Android-puhelimen selaimeen.
 Pelaajat ovat 12–15-vuotiaita suomalaisia poikia. **Pelin kieli on suomi.**
 Ominaisuuspyynnöt tulevat usein pelin suunnittelijalta, joka on nuori: vastaa
 selkeästi suomeksi, kerro lopuksi lyhyesti mitä muutit ja miten sitä voi kokeilla.
@@ -45,6 +45,7 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
 | Taistelunäkymän ulkoasu ja napit      | `src/ui/battle-view.ts`, `src/ui/battle-menu.ts`                                                                        |
 | Liikkumisen ohjaus                    | `src/systems/controls.ts` (+ `src/ui/`)                                                                                 |
 | Ruudulla näkyvät tiedot kartalla      | `src/ui/hud.ts`                                                                                                         |
+| Pelin nimi (alkuruutu, otsikko, PWA)  | `src/data/game-info.ts` (ei muualle: muut paikat lukevat nimen sieltä)                                                  |
 | Tekstit pelaajalle                    | `src/i18n/fi.ts`                                                                                                        |
 | Ääniefektit                           | `src/data/sounds.ts`, soitto `playSound('id')` (`src/systems/sound-fx.ts`)                                              |
 | Asetukset (valo, äänet)               | `src/logic/settings.ts` + testi, näkymä `src/scenes/settings-scene.ts`, rajat `src/config/persistence.ts`               |

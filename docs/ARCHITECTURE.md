@@ -6,7 +6,8 @@ koodin siistinä, vaikka sitä kirjoittaisi pääosin tekoäly.
 
 ## 1. Tavoite
 
-- **Peli:** pixelart-tyylinen 2D-seikkailu- ja taistelupeli.
+- **Peli:** pixelart-tyylinen 2D-seikkailu- ja taistelupeli nimeltä **Equinox Universe**.
+  Nimi on määritelty vain tiedostossa `src/data/game-info.ts` (ks. luku 3).
 - **Pelaajat:** 12–15-vuotiaat suomalaiset pojat. Pelin kieli on suomi.
 - **Alusta:** Android-puhelimen verkkoselain (Chrome), vaakasuunta, kosketusohjaus.
   Asennus ei ole pakollista, mutta peli voidaan lisätä aloitusnäytölle (PWA).
@@ -34,14 +35,16 @@ tekoälyn on vaikeampi muokata editoritiedostoja), React (ei sovi pelisilmukkaan
 ## 3. Kansiorakenne
 
 ```
-index.html              Sivu, jolle peli piirretään (mobiiliasetukset)
-public/                 Staattiset tiedostot sellaisenaan (manifest, myöhemmin kuvat ja äänet)
+index.html              Sivu, jolle peli piirretään (mobiiliasetukset, otsikko %GAME_NAME%)
+vite.config.ts          Build-asetukset; kirjoittaa pelin nimen sivun otsikkoon ja PWA-manifestiin
+public/                 Staattiset tiedostot sellaisenaan (myöhemmin kuvat ja äänet)
 src/
   main.ts               Käynnistää Phaserin ja listaa scenet
   config/               Vakiot: resoluutio, ruutukoko, värit, fontit, scenejen nimet
   i18n/fi.ts            KAIKKI pelaajalle näkyvät tekstit
   data/                 Pelisisältö datana: viholliset, esineet, Suomen kartta, spritet
     types.ts            Sisällön tyypit (muokkaa ensin tätä, kun lisäät uuden kentän)
+    game-info.ts        Pelin nimi ja PWA-manifestin sisältö (nimen ainoa määrittelypaikka)
     index.ts            getEnemy(), getItem(), getTown() ... hakufunktiot
     finland.ts          Suomen rajat, järvet ja maastovyöhykkeet oikeina koordinaatteina
     towns.ts            Paikkakunnat ja tiet
@@ -75,10 +78,14 @@ scenes  →  systems / ui  →  entities  →  logic
   Ruutukoko 16 px, hahmot 16 × 16 px.
 - **Scenet:** `BootScene` (luo/lataa grafiikat, ottaa asetukset käyttöön) → `MenuScene`
   (alkuruutu: PELAA, LATAA, ASETUKSET, LÄHDE) → `WorldScene` (Suomen kartta) ⇄ `BattleScene`
-  (vuoropohjainen taistelu) → `GameOverScene` → alkuruutu. Paikkakunnassa `WorldScene` ⇄
-  `SkillsScene` (kykypisteiden jako) ja `WorldScene` ⇄ `SavesScene` (tallennus). Alkuruudusta
-  `SettingsScene` (valo ja äänet), `SavesScene` (lataus) ja `ExitScene` (LÄHDE).
-  Pelin tila (`logic/game-state.ts`: elämä, KP, kykypisteet, esineet, sijainti, voitetut viholliset) annetaan scenejen välillä `scene.start(key, data)` -datana.
+  (vuoropohjainen taistelu) → `GameOverScene` (kun kaikki viholliset on voitettu) → alkuruutu.
+  Paikkakunnassa `WorldScene` ⇄ `SkillsScene` (kykypisteiden jako) ja `WorldScene` ⇄
+  `SavesScene` (tallennus). Alkuruudusta `SettingsScene` (valo ja äänet), `SavesScene` (lataus)
+  ja `ExitScene` (LÄHDE).
+  Pelin tila (`logic/game-state.ts`: elämä, KP, kykypisteet, esineet, sijainti, viimeisin paikkakunta, voitetut viholliset) annetaan scenejen välillä `scene.start(key, data)` -datana.
+- **Kaatuminen:** taistelussa kaatunut sankari herää viimeisimmässä paikkakunnassa, jossa hän
+  kävi (`GameState.lastTown`, aluksi aloituspaikkakunta), täysin elämin. KP, kykypisteet, esineet
+  ja voitetut viholliset säilyvät. Säännöt `logic/town-visits.ts`.
 - **Suomen kartta:** `logic/world-grid.ts` rakentaa ruudukon `data/finland.ts`:n rajoista
   (oikeat koordinaatit, 1 ruutu = 8 km), järvistä ja maastovyöhykkeistä sekä vetää tiet
   paikkakuntien välille. `systems/world-map.ts` piirtää ruudukon Phaserin tilemapiksi, jossa meri

@@ -1,4 +1,4 @@
-import { ITEMS, MAP_ENEMIES } from '../data';
+import { ITEMS, MAP_ENEMIES, TOWNS, WORLD } from '../data';
 import { SKILLS } from '../data/skills';
 import { playerStats, type GameState } from './game-state';
 import { noSkillPoints, type SkillPoints } from './skill-points';
@@ -62,6 +62,11 @@ function readPosition(value: unknown): Vec2 | null | undefined {
   return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : undefined;
 }
 
+/** Tuntematon tai puuttuva paikkakunta = aloituspaikkakunta. */
+function readLastTown(value: unknown): string {
+  return TOWNS.some((town) => town.id === value) ? (value as string) : WORLD.startTown;
+}
+
 function readDefeated(value: unknown): number[] | null {
   if (!Array.isArray(value)) {
     return null;
@@ -90,6 +95,7 @@ export function readGameState(value: unknown): GameState | null {
     skills,
     inventory,
     position,
+    lastTown: readLastTown(value['lastTown']),
     defeated,
   };
   // Elämä pysyy rajoissa: vähintään 1, enintään maksimielämä.

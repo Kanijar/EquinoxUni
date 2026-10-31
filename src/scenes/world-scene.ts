@@ -1,15 +1,15 @@
 import Phaser from 'phaser';
 import { SCENES, WORLD_VIEW } from '../config/game-config';
-import { getTown, WORLD } from '../data';
+import { WORLD } from '../data';
 import { Player } from '../entities/player';
 import { healItemCount } from '../logic/battle';
 import {
   createNewGame,
   playerStats,
-  restoreHp,
   unspentSkillPoints,
   type GameState,
 } from '../logic/game-state';
+import { lastVisitedTown, visitTown } from '../logic/town-visits';
 import { townTile } from '../logic/world-grid';
 import { AmbushWatch } from '../systems/ambush-watch';
 import { Controls } from '../systems/controls';
@@ -34,8 +34,8 @@ export interface WorldSceneData {
   readonly state?: GameState;
   /** Kuinka kauan viholliset odottavat ennen kuin voivat aloittaa taistelun. */
   readonly graceMs?: number;
-  /** Ilmoitus, joka näytetään heti (esim. "Peli ladattu!"). */
-  readonly notice?: string;
+  /** Ilmoitus, joka näytetään kartalle palatessa (esim. kaatumisen tai latauksen jälkeen). */
+  readonly message?: string;
 }
 
 export class WorldScene extends Phaser.Scene {
@@ -57,10 +57,10 @@ export class WorldScene extends Phaser.Scene {
 
   create(data: WorldSceneData): void {
     this.state = data.state ?? createNewGame();
-    const isNewGame = this.state.position === null;
+    const isNewGame = this.state.position === null && data.message === undefined;
     const built = buildWorldMap(this, getWorldGrid());
     placeTownMarkers(this);
-    const start = this.state.position ?? tileToWorld(townTile(WORLD, getTown(WORLD.startTown)));
+    const start = this.state.position ?? tileToWorld(townTile(WORLD, lastVisitedTown(this.state)));
     this.player = new Player(this, start, playerStats(this.state).speed);
     this.physics.add.collider(this.player.sprite, built.layer);
     this.encounters = new MapEncounters(this, this.state, built.layer);
@@ -74,9 +74,9 @@ export class WorldScene extends Phaser.Scene {
     this.saveButton = new SaveButton(this, () => this.openSaves());
     this.toast = new Toast(this);
     this.encountersFrom = this.time.now + (data.graceMs ?? WORLD_VIEW.graceMs.start);
-    const notice = data.notice ?? (isNewGame ? TEXT.world.intro : null);
-    if (notice) {
-      this.toast.show(notice);
+    const message = isNewGame ? TEXT.world.intro : data.message;
+    if (message) {
+      this.toast.show(message);
     }
   }
 
@@ -86,7 +86,7 @@ export class WorldScene extends Phaser.Scene {
     this.state.position = position;
     const arrived = this.towns.update(position);
     if (arrived) {
-      this.rest(arrived.nameAt);
+      this.rest(arrived.id, arrived.nameAt);
     }
     this.updateHud();
     if (this.encounters.enemiesLeft === 0) {
@@ -105,9 +105,12 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  /** Paikkakuntaan saapuessa elämä palautuu, ja käyttämättömistä kykypisteistä muistutetaan. */
-  private rest(townAt: string): void {
-    restoreHp(this.state);
+  /**
+   * Paikkakuntaan saapuessa elämä palautuu ja paikkakunta muistetaan (siellä herätään
+   * kaatumisen jälkeen). Käyttämättömistä kykypisteistä muistutetaan.
+   */
+  private rest(townId: string, townAt: string): void {
+    visitTown(this.state, townId);
     const points = unspentSkillPoints(this.state);
     const reminder = points > 0 ? `\n${TEXT.world.skillPointsWaiting(points)}` : '';
     this.toast.show(TEXT.world.rest(townAt) + reminder);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SAVE_SLOT_COUNT, SAVE_VERSION } from '../src/config/persistence';
-import { MAP_ENEMIES } from '../src/data';
+import { MAP_ENEMIES, WORLD } from '../src/data';
 import { createNewGame, playerStats, type GameState } from '../src/logic/game-state';
 import { MemoryStore, type KeyValueStore } from '../src/logic/key-value-store';
 import { decodeSave, encodeSave, migrateSave } from '../src/logic/save-format';
@@ -17,6 +17,7 @@ function playedGame(): GameState {
   state.position = { x: 123.5, y: 456 };
   state.defeated.push(0, 3);
   state.hp = 20;
+  state.lastTown = 'tampere';
   return state;
 }
 
@@ -80,6 +81,14 @@ describe('tallennusmuoto', () => {
     expect(state?.inventory).toEqual({ potion: 2 });
     expect(state?.defeated).toEqual([1, 2]);
     expect(state?.skills).toEqual({ attack: 1, defense: 0, vitality: 0 });
+  });
+
+  it('tuntematon viimeisin paikkakunta vaihtuu aloituspaikkakunnaksi', () => {
+    const raw = JSON.parse(encodeSave(playedGame(), meta)) as { state: Record<string, unknown> };
+    raw.state['lastTown'] = 'atlantis';
+    expect(decodeSave(JSON.stringify(raw))?.state.lastTown).toBe(WORLD.startTown);
+    delete raw.state['lastTown'];
+    expect(decodeSave(JSON.stringify(raw))?.state.lastTown).toBe(WORLD.startTown);
   });
 
   it('elämä pysyy rajoissa', () => {

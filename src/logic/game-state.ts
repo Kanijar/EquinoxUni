@@ -1,4 +1,5 @@
 import { PLAYER } from '../data/player';
+import { WORLD } from '../data/world';
 import type { CombatStats, EnemyDef, ItemStack, SkillId } from '../data/types';
 import { recoverStolen, type Battle } from './battle';
 import type { Fighter } from './combat';
@@ -24,8 +25,13 @@ export interface GameState {
   readonly skills: SkillPoints;
   /** Esineiden määrät tunnisteittain. */
   readonly inventory: Record<string, number>;
-  /** Sijainti kartalla pikseleinä. null = aloituspaikkakunta. */
+  /** Sijainti kartalla pikseleinä. null = paikkakunnassa lastTown (esim. pelin alussa). */
   position: Vec2 | null;
+  /**
+   * Viimeisin paikkakunta, jossa pelaaja on käynyt (tunniste, data/towns.ts).
+   * Pelin alussa aloituspaikkakunta. Taistelussa kaatunut sankari herää täällä.
+   */
+  lastTown: string;
   /** Voitettujen karttavihollisten järjestysnumerot (data/map-enemies.ts). */
   readonly defeated: number[];
 }
@@ -41,6 +47,7 @@ export function createNewGame(): GameState {
     skills: noSkillPoints(),
     inventory,
     position: null,
+    lastTown: WORLD.startTown,
     defeated: [],
   };
 }

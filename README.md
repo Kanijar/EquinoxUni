@@ -1,4 +1,4 @@
-# Väinön seikkailu
+# Equinox Universe
 
 Pixelart 2D -seikkailu- ja taistelupeli, jota pelataan Android-puhelimen selaimella.
 

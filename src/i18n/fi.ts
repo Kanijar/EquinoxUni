@@ -1,3 +1,5 @@
+import { GAME_INFO } from '../data/game-info';
+
 // Kaikki pelaajalle näkyvät tekstit. Älä kirjoita tekstejä suoraan koodiin,
 // vaan lisää ne tänne ja käytä muodossa TEXT.menu.play.
 
@@ -9,7 +11,8 @@ function formatTime(time: number): string {
 }
 
 export const TEXT = {
-  gameTitle: 'Väinön seikkailu',
+  /** Pelin nimi. Vaihda se tiedostossa data/game-info.ts, ei tässä. */
+  gameTitle: GAME_INFO.name,
   menu: {
     play: 'PELAA',
     load: 'LATAA',
@@ -64,6 +67,7 @@ export const TEXT = {
   world: {
     intro: 'Seikkailu alkaa Valkeakoskelta!',
     rest: (townAt: string): string => `Lepäsit ${townAt}. Elämä palautui!`,
+    revived: (townAt: string): string => `Kaaduit... heräsit ${townAt}. Elämä palautui!`,
     skillPointsWaiting: (points: number): string =>
       `Sinulla on ${points} kykypistettä. Paina KYKYPISTEET.`,
   },

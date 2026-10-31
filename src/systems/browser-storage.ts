@@ -12,7 +12,7 @@ export function browserStore(): KeyValueStore {
 
 function openLocalStorage(): KeyValueStore {
   try {
-    const probe = '__vainon-seikkailu-testi__';
+    const probe = '__equinox-universe-testi__';
     window.localStorage.setItem(probe, probe);
     window.localStorage.removeItem(probe);
     return window.localStorage;

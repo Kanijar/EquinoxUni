@@ -3,8 +3,8 @@
 
 /** localStorage-avaimet. Etuliite erottaa pelin tiedot muista saman sivuston tiedoista. */
 export const STORAGE_KEYS = {
-  settings: 'vainon-seikkailu/asetukset',
-  saveSlotPrefix: 'vainon-seikkailu/tallennus-',
+  settings: 'equinox-universe/asetukset',
+  saveSlotPrefix: 'equinox-universe/tallennus-',
 } as const;
 
 /** Tallennuspaikkojen määrä LATAA-näkymässä. */

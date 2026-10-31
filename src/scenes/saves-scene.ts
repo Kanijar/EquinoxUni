@@ -106,7 +106,7 @@ export class SavesScene extends Phaser.Scene {
     const next: WorldSceneData = {
       state,
       graceMs: WORLD_VIEW.graceMs.start,
-      notice: TEXT.saves.loaded,
+      message: TEXT.saves.loaded,
     };
     this.scene.start(SCENES.world, next);
   }
