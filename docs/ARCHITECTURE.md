@@ -54,8 +54,10 @@ src/
   entities/             Kartan hahmot: Phaser-sprite (Player, Enemy)
   systems/              Pelin järjestelmät: ohjaus, kartan piirto, kohtaamiset, taistelun kulku
   ui/                   Käyttöliittymäpalat: virtuaalitikku, napit, HUD, taistelunäkymä
+  net/                  Verkkoyhteydet rajapinnan takana (pelaajalaskuri, docs/PELAAJALASKURI.md)
   scenes/               Phaserin näkymät: Boot, Menu, World, Battle, GameOver
 tests/                  Vitest-testit (logiikka + sisällön eheys)
+worker/presence/        Pelaajalaskurin pieni palvelin (Cloudflare Worker), julkaistaan erikseen
 docs/                   Tämä dokumentti ja muut suunnitelmat
 ```
 
@@ -63,6 +65,8 @@ docs/                   Tämä dokumentti ja muut suunnitelmat
 
 ```
 scenes  →  systems / ui  →  entities  →  logic
+              ↓
+             net  (verkkoyhteydet, ei Phaseria)
    ↘           ↘               ↘          ↗
                        data  (+ i18n, config)
 ```
@@ -134,6 +138,11 @@ scenes  →  systems / ui  →  entities  →  logic
 - **Asetukset:** valon määrä (CSS `brightness` pelin canvasiin) ja äänet (Phaserin
   äänenvoimakkuus ja mykistys). Säännöt `logic/settings.ts`, käyttöönotto
   `systems/game-settings.ts`, rajat `config/persistence.ts`.
+- **Pelaajalaskuri:** alkuruudun ja kartan vasemmassa alakulmassa "Pelaajia nyt: 3".
+  Peli avaa yhden WebSocket-yhteyden palvelimeen (`worker/presence`, Cloudflare), joka laskee
+  avoimet yhteydet. Ei tunnisteita, evästeitä eikä tallennettua tietoa. Toteutus on
+  `net/presence.ts`-rajapinnan takana, joten palvelun voi vaihtaa. Ilman osoitetta
+  (`VITE_PRESENCE_URL`) laskuri on piilossa. Pystytysohje: `docs/PELAAJALASKURI.md`.
 - **Äänet:** ääniefektit tehdään koodilla Web Audiolla (`data/sounds.ts` + `systems/sound-fx.ts`),
   joten tiedostoja ei tarvita. Ne kulkevat Phaserin äänijärjestelmän läpi, jolloin asetusten
   voimakkuus koskee niitä. Nappien painallus, osumat, voitto, tason nousu ja tallennus soivat.
@@ -204,4 +213,5 @@ kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 
 - Ei mainoksia, ostoja, chattia, kirjautumista eikä henkilötietojen keruuta.
 - Väkivalta on piirrettyä ja fantasiaa (limat, hirviöt): ei verta.
-- Peli on staattinen sivusto; palvelinta ei ole.
+- Peli on staattinen sivusto. Ainoa palvelin on valinnainen, anonyymi pelaajalaskuri, joka
+  laskee vain avoimet yhteydet eikä tallenna mitään (`docs/PELAAJALASKURI.md`).
