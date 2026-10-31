@@ -10,7 +10,8 @@ import { ensurePixelTexture } from './battle-particles';
 
 const BACKDROP_DEPTH = -10;
 const CLOUD_DEPTH = -9;
-const WEATHER_DEPTH = 650;
+/** Sää näkyy hahmojen edessä mutta nimikylttien, viestien ja nappien takana. */
+const WEATHER_DEPTH = 400;
 /** Leijuvat hiukkaset pysyvät näyttämöllä, eivät nimikylttien tai nappien päällä. */
 const FLOAT_AREA = { top: 60, bottom: 190 };
 const FALL_SPEED = { min: 18, max: 34 };
