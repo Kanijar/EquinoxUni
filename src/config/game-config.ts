@@ -85,6 +85,26 @@ export const MENU_VIEW = {
   versionAlpha: 0.7,
 } as const;
 
+/** Alkuruudun suden salaisuuden taikaefektit (ui/wolf-magic.ts). */
+export const WOLF_MAGIC = {
+  /** Tähtisäihke: tähtien määrä ensimmäisellä ja myöhemmillä napautuksilla. */
+  starCount: 16,
+  starCountSmall: 6,
+  starSizePx: 4,
+  starColors: [0xfff27a, 0xffffff, 0x6ff7ff],
+  starMinPx: 30,
+  starMaxPx: 80,
+  starMs: 800,
+  starDepth: 10,
+  /** Valkoisensininen välähdys koko ruudulle (punainen, vihreä, sininen 0–255). */
+  flashMs: 300,
+  flashRgb: [200, 240, 255],
+  /** Henkisuden ympärillä tuikkii tähti näin usein, enintään tämän matkan päässä keskeltä. */
+  twinkleEveryMs: 350,
+  twinkleRangePx: 34,
+  twinkleMs: 900,
+} as const;
+
 /** Pelaajalaskuri ("Pelaajia nyt: 3") alkuruudun ja kartan vasemmassa alakulmassa. */
 export const PLAYER_COUNT_VIEW = {
   margin: 4,

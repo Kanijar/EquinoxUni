@@ -87,6 +87,8 @@ export const TEXT = {
   },
   world: {
     intro: 'Seikkailu alkaa Valkeakoskelta!',
+    /** Alkuruudun suden salaisuus (logic/menu-secret.ts): näkyy vasta kartalla. */
+    wolfBlessing: (level: number): string => `Susi siunasi sinut! Taso ${level}!`,
     rest: (townAt: string): string => `Lepäsit ${townAt}. Elämä palautui!`,
     revived: (townAt: string): string => `Kaaduit... heräsit ${townAt}. Elämä palautui!`,
     skillPointsWaiting: (points: number): string =>

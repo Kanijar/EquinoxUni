@@ -179,6 +179,10 @@ export interface BattleRules {
 export interface MenuSecretRules {
   /** Kokemuspisteet, joilla uusi peli alkaa, kun alkuruudun sutta on napautettu ennen PELAA-nappia. */
   readonly wolfStartXp: number;
+  /** Esineet, jotka saa aloitusesineiden lisäksi (data/items.ts). */
+  readonly bonusItems: readonly ItemStack[];
+  /** Sprite, joksi alkuruudun susi muuttuu napautuksesta (hehkuvat silmät). */
+  readonly spiritSprite: string;
 }
 
 export interface MagicRules {
