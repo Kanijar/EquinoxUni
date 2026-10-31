@@ -1,0 +1,10 @@
+{
+  "name": "Väinön seikkailu",
+  "short_name": "Väinö",
+  "lang": "fi",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#10141f",
+  "theme_color": "#10141f"
+}
