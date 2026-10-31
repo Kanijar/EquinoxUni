@@ -10,7 +10,7 @@ import {
   playerLevel,
   restoreHp,
 } from '../src/logic/game-state';
-import { levelForXp, statsForLevel, xpToNextLevel } from '../src/logic/progression';
+import { levelForXp, statsForLevel, xpProgress, xpToNextLevel } from '../src/logic/progression';
 import type { Progression } from '../src/data/types';
 
 const progression: Progression = {
@@ -29,6 +29,30 @@ describe('kokemustasot', () => {
   it('kertoo, paljonko seuraavaan tasoon puuttuu', () => {
     expect(xpToNextLevel(4, progression)).toBe(6);
     expect(xpToNextLevel(30, progression)).toBeNull();
+  });
+
+  it('KP-palkki näyttää edistymisen nykyisen tason sisällä', () => {
+    expect(xpProgress(0, progression)).toEqual({
+      level: 1,
+      xp: 0,
+      nextLevelXp: 10,
+      fraction: 0,
+    });
+    expect(xpProgress(20, progression)).toEqual({
+      level: 2,
+      xp: 20,
+      nextLevelXp: 30,
+      fraction: 0.5,
+    });
+  });
+
+  it('huipputasolla KP-palkki on täynnä eikä seuraavaa rajaa ole', () => {
+    expect(xpProgress(45, progression)).toEqual({
+      level: 3,
+      xp: 45,
+      nextLevelXp: null,
+      fraction: 1,
+    });
   });
 
   it('taso kasvattaa arvoja', () => {
@@ -57,7 +81,7 @@ describe('pelin tila', () => {
     expect(state.xp).toBe(12);
     expect(state.defeated).toEqual([4]);
     expect(state.inventory['potion']).toBe(4);
-    expect(reward).toEqual({ xp: 12, leveledUp: true, level: 2, drop: 'potion' });
+    expect(reward).toEqual({ xp: 12, totalXp: 12, leveledUp: true, level: 2, drop: 'potion' });
   });
 
   it('tason noustessa elämä palautuu uuteen maksimiin', () => {

@@ -35,6 +35,7 @@ export class BattleScene extends Phaser.Scene {
     );
     const view = new BattleView(this, {
       playerName: PLAYER.name,
+      playerXp: data.state.xp,
       playerSprite: PLAYER.sprite,
       enemyName: enemy.name,
       enemySprite: enemy.sprite,

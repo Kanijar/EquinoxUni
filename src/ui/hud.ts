@@ -1,18 +1,19 @@
 import type Phaser from 'phaser';
 import { COLORS, FONT } from '../config/game-config';
 import { TEXT } from '../i18n/fi';
+import { XpBar } from './xp-bar';
 
-// Karttanäkymän yläreunan tiedot: elämäpalkki, taso, juomat ja paikkakunta.
+// Karttanäkymän yläreunan tiedot: elämäpalkki, KP-palkki ja taso, juomat ja paikkakunta.
 
 const BAR_WIDTH = 80;
 const BAR_HEIGHT = 6;
 const MARGIN = 8;
 const LINE = 12;
+const DEPTH = 900;
 
 export interface HudInfo {
   readonly hp: number;
   readonly maxHp: number;
-  readonly level: number;
   readonly xp: number;
   readonly potions: number;
   readonly enemiesLeft: number;
@@ -22,7 +23,7 @@ export interface HudInfo {
 export class Hud {
   private readonly bar: Phaser.GameObjects.Rectangle;
   private readonly hpText: Phaser.GameObjects.Text;
-  private readonly levelText: Phaser.GameObjects.Text;
+  private readonly xpBar: XpBar;
   private readonly itemText: Phaser.GameObjects.Text;
   private readonly townText: Phaser.GameObjects.Text;
 
@@ -32,22 +33,31 @@ export class Hud {
       .rectangle(MARGIN, MARGIN, BAR_WIDTH, BAR_HEIGHT, COLORS.hpBarBack)
       .setOrigin(0)
       .setScrollFactor(0)
-      .setDepth(900);
+      .setDepth(DEPTH);
     this.bar = scene.add
       .rectangle(MARGIN, MARGIN, BAR_WIDTH, BAR_HEIGHT, COLORS.hpBar)
       .setOrigin(0)
       .setScrollFactor(0)
-      .setDepth(901);
+      .setDepth(DEPTH + 1);
     this.hpText = this.addText(scene, MARGIN, MARGIN + BAR_HEIGHT + 2, 0);
-    this.levelText = this.addText(scene, width - MARGIN, MARGIN, 1);
-    this.itemText = this.addText(scene, width - MARGIN, MARGIN + LINE, 1);
+    this.xpBar = new XpBar(scene, {
+      x: width - MARGIN,
+      y: MARGIN,
+      width: BAR_WIDTH,
+      height: BAR_HEIGHT,
+      originX: 1,
+      depth: DEPTH,
+      label: (progress) =>
+        `${TEXT.hud.level(progress.level)}  ${TEXT.hud.xp(progress.xp, progress.nextLevelXp)}`,
+    });
+    this.itemText = this.addText(scene, width - MARGIN, MARGIN + BAR_HEIGHT + 2 + LINE, 1);
     this.townText = this.addText(scene, width / 2, MARGIN, 0.5).setFontSize(FONT.medium);
   }
 
   update(info: HudInfo): void {
     this.bar.setScale(Math.max(0, info.hp / info.maxHp), 1);
     this.hpText.setText(TEXT.hud.hp(info.hp, info.maxHp));
-    this.levelText.setText(TEXT.hud.level(info.level, info.xp));
+    this.xpBar.set(info.xp);
     this.itemText.setText(
       `${TEXT.hud.potions(info.potions)}  ${TEXT.hud.enemiesLeft(info.enemiesLeft)}`,
     );
@@ -65,6 +75,6 @@ export class Hud {
       .setOrigin(originX, 0)
       .setStroke(COLORS.textShadow, 3)
       .setScrollFactor(0)
-      .setDepth(901);
+      .setDepth(DEPTH + 1);
   }
 }

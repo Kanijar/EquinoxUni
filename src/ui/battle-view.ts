@@ -4,20 +4,24 @@ import { flash } from '../entities/effects';
 import { TEXT } from '../i18n/fi';
 import type { Battle, Side } from '../logic/battle';
 import type { Fighter } from '../logic/combat';
+import { XpBar } from './xp-bar';
 
-// Taistelunäkymän grafiikka: tausta, taistelijat, elämäpalkit ja viestilaatikko.
+// Taistelunäkymän grafiikka: tausta, taistelijat, elämäpalkit, pelaajan KP-palkki
+// ja viestilaatikko.
 
 const HORIZON_Y = 150;
 const PLAYER_POS = { x: 120, y: 172 };
 const ENEMY_POS = { x: 360, y: 142 };
 const PLATFORM = { width: 110, height: 22 };
-const PANEL = { x: 8, y: 6, barY: 22, barWidth: 120, barHeight: 6 };
+const PANEL = { x: 8, y: 6, barY: 22, barWidth: 120, barHeight: 6, xpBarY: 44, xpBarHeight: 4 };
 const MESSAGE = { y: 202, height: 34 };
 const LUNGE_PX = 14;
 const ANIM_MS = 120;
 
 export interface BattleViewInfo {
   readonly playerName: string;
+  /** Pelaajan kokemuspisteet taistelun alussa. */
+  readonly playerXp: number;
   readonly playerSprite: string;
   readonly enemyName: string;
   readonly enemySprite: string;
@@ -33,6 +37,7 @@ export class BattleView {
   private readonly player: FighterDisplay;
   private readonly enemy: FighterDisplay;
   private readonly message: Phaser.GameObjects.Text;
+  private readonly xpBar: XpBar;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -41,6 +46,16 @@ export class BattleView {
     drawBackground(scene);
     this.player = this.addFighter(info.playerSprite, info.playerName, 'player');
     this.enemy = this.addFighter(info.enemySprite, info.enemyName, 'enemy');
+    this.xpBar = new XpBar(scene, {
+      x: PANEL.x,
+      y: PANEL.xpBarY,
+      width: PANEL.barWidth,
+      height: PANEL.xpBarHeight,
+      originX: 0,
+      depth: 0,
+      label: (progress) => TEXT.hud.xp(progress.xp, progress.nextLevelXp),
+    });
+    this.xpBar.set(info.playerXp);
     scene.add
       .rectangle(GAME_WIDTH / 2, MESSAGE.y, GAME_WIDTH - BATTLE_VIEW.margin * 2, MESSAGE.height)
       .setFillStyle(COLORS.panel, 0.85)
@@ -63,6 +78,11 @@ export class BattleView {
   updateHp(battle: Battle): void {
     setHp(this.player, battle.player);
     setHp(this.enemy, battle.enemy);
+  }
+
+  /** KP-palkki täyttyy uusiin kokemuspisteisiin (voiton jälkeen). */
+  updateXp(xp: number): void {
+    this.xpBar.set(xp, BATTLE_VIEW.xpFillMs);
   }
 
   /** Hyökkääjä syöksähtää ja kohde välähtää. */

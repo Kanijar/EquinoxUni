@@ -21,6 +21,26 @@ export function xpToNextLevel(xp: number, progression: Progression = PROGRESSION
   return next === undefined ? null : next - xp;
 }
 
+export interface XpProgress {
+  readonly level: number;
+  readonly xp: number;
+  /** Seuraavan tason KP-raja, tai null jos taso on jo suurin. */
+  readonly nextLevelXp: number | null;
+  /** Kuinka pitkällä nykyinen taso on: 0 = juuri noustu, 1 = seuraava taso heti. */
+  readonly fraction: number;
+}
+
+/** Edistyminen kohti seuraavaa tasoa, esim. KP-palkkia varten. */
+export function xpProgress(xp: number, progression: Progression = PROGRESSION): XpProgress {
+  const level = levelForXp(xp, progression);
+  const start = progression.xpForLevel[level - 1] ?? 0;
+  const next = progression.xpForLevel[level];
+  if (next === undefined) {
+    return { level, xp, nextLevelXp: null, fraction: 1 };
+  }
+  return { level, xp, nextLevelXp: next, fraction: (xp - start) / (next - start) };
+}
+
 /** Pelaajan arvot annetulla tasolla. */
 export function statsForLevel(
   level: number,

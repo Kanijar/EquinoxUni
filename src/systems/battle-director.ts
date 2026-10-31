@@ -80,7 +80,7 @@ export class BattleDirector {
     let steps: BattleStep[] = [];
     if (reward) {
       view.playDefeat('enemy');
-      steps = victorySteps(reward, enemy.name);
+      steps = victorySteps(reward, enemy.name, view);
     } else if (outcome === 'lost') {
       view.playDefeat('player');
       steps = [{ text: TEXT.battle.lost }];
