@@ -12,6 +12,8 @@ import {
 import { PLAYER } from '../src/data/player';
 import { BATTLE_RULES, PROGRESSION, RESPAWN_RULES } from '../src/data/rules';
 import { SOUNDS } from '../src/data/sounds';
+import { CHARACTER_SPRITES } from '../src/data/sprites-characters';
+import { TILE_SPRITES } from '../src/data/sprites-tiles';
 import { ROADS } from '../src/data/towns';
 
 // Sisältötestit: varmistavat, että data/-kansion tiedostot ovat keskenään
@@ -41,14 +43,20 @@ describe('sisältödata', () => {
     }
   });
 
-  it.each(SPRITES)('sprite $id on 16x16 ja käyttää vain palettinsa värejä', (sprite) => {
-    expect(sprite.rows.length).toBe(16);
+  it.each(SPRITES)('sprite $id on suorakaide ja käyttää vain palettinsa värejä', (sprite) => {
+    const width = sprite.rows[0]?.length ?? 0;
+    expect(width).toBeGreaterThan(0);
     for (const row of sprite.rows) {
-      expect(row.length).toBe(16);
+      expect(row.length).toBe(width);
       for (const char of row) {
         expect(char === '.' || char in sprite.palette, `merkki "${char}"`).toBe(true);
       }
     }
+  });
+
+  it.each([...CHARACTER_SPRITES, ...TILE_SPRITES])('hahmo tai ruutu $id on 16x16', (sprite) => {
+    expect(sprite.rows.length).toBe(16);
+    expect(sprite.rows.every((row) => row.length === 16)).toBe(true);
   });
 
   it('karttaruudut ovat täysin peittäviä (ei läpinäkyviä pikseleitä)', () => {

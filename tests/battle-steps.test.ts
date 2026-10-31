@@ -10,7 +10,8 @@ import type { BattleView } from '../src/ui/battle-view';
 
 function fakeView(): { view: BattleView; updateXp: ReturnType<typeof vi.fn> } {
   const updateXp = vi.fn();
-  return { view: { updateXp } as unknown as BattleView, updateXp };
+  const view = { updateXp, playVictory: vi.fn(), playLevelUp: vi.fn() };
+  return { view: view as unknown as BattleView, updateXp };
 }
 
 describe('voiton viestit', () => {

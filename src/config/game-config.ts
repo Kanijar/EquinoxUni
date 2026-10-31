@@ -176,7 +176,6 @@ export const SKILLS_VIEW = {
 
 /** Taistelunäkymän asetukset. */
 export const BATTLE_VIEW = {
-  spriteScale: 4,
   /** Kuinka kauan kukin taisteluviesti näkyy ennen seuraavaa. */
   messageMs: 900,
   buttonWidth: 104,
@@ -184,10 +183,16 @@ export const BATTLE_VIEW = {
   margin: 6,
   /** Kuinka kauan KP-palkin täyttyminen kestää voiton jälkeen. */
   xpFillMs: 600,
+  /** Tulipallo lentää pelaajalta viholliseen kaarena (arcPx = kuinka korkealle). */
+  fireball: {
+    radius: 6,
+    flightMs: 380,
+    color: 0xff7a1a,
+    glowColor: 0xffd23f,
+    coreColor: 0xfff6d0,
+    arcPx: 34,
+    flickerMs: 60,
+  },
   /** Kriittinen osuma: ruutu tärähtää ja kohteen yläpuolelle nousee teksti. */
-  /** Tulipallo lentää pelaajalta viholliseen. */
-  fireball: { radius: 7, flightMs: 260, color: 0xff7a1a, glowColor: 0xffd23f, offsetY: 30 },
-  /** Palamisen vahinko nousee palavan vihollisen yläpuolelle. */
-  burn: { popupMs: 700, popupRisePx: 18, popupOffsetY: 68, stroke: 3 },
-  crit: { shakeMs: 200, shakeIntensity: 0.012, popupMs: 800, popupRisePx: 24, popupOffsetY: 70 },
+  crit: { shakeMs: 200, shakeIntensity: 0.012, popupMs: 800, popupRisePx: 24, popupOffsetY: 84 },
 } as const;

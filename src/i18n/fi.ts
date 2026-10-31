@@ -158,6 +158,12 @@ export const TEXT = {
     skillPoints: (points: number): string =>
       `Sait ${points} kykypistettä! Käytä ne paikkakunnassa.`,
     lost: 'Kaaduit taistelussa...',
+    /** Lentävät numerot taistelijoiden päällä. */
+    damagePopup: (damage: number): string => `-${damage}`,
+    healPopup: (amount: number): string => `+${amount}`,
+    /** Iso teksti ruudun keskellä, kun vihollinen kaatuu. */
+    victoryBanner: 'VOITTO!',
+    levelUpPopup: 'TASO NOUSI!',
   },
   /** Loitsujen nimet (data/spells.ts). */
   spells: {
