@@ -2,8 +2,11 @@ import Phaser from 'phaser';
 import { COLORS, GAME_HEIGHT, GAME_WIDTH } from './config/game-config';
 import { BattleScene } from './scenes/battle-scene';
 import { BootScene } from './scenes/boot-scene';
+import { ExitScene } from './scenes/exit-scene';
 import { GameOverScene } from './scenes/game-over-scene';
 import { MenuScene } from './scenes/menu-scene';
+import { SavesScene } from './scenes/saves-scene';
+import { SettingsScene } from './scenes/settings-scene';
 import { SkillsScene } from './scenes/skills-scene';
 import { WorldScene } from './scenes/world-scene';
 
@@ -25,5 +28,15 @@ new Phaser.Game({
     default: 'arcade',
     arcade: { debug: false },
   },
-  scene: [BootScene, MenuScene, WorldScene, BattleScene, GameOverScene, SkillsScene],
+  scene: [
+    BootScene,
+    MenuScene,
+    WorldScene,
+    BattleScene,
+    GameOverScene,
+    SkillsScene,
+    SettingsScene,
+    SavesScene,
+    ExitScene,
+  ],
 });

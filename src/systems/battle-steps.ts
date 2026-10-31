@@ -1,11 +1,13 @@
 import type Phaser from 'phaser';
 import { BATTLE_VIEW } from '../config/game-config';
 import { getItem } from '../data';
+import type { SoundId } from '../data/sounds';
 import { TEXT } from '../i18n/fi';
 import type { BattleEvent } from '../logic/battle';
 import type { VictoryReward } from '../logic/game-state';
 import { xpToNextLevel } from '../logic/progression';
 import type { BattleView } from '../ui/battle-view';
+import { playSound } from './sound-fx';
 
 // Muuttaa taistelun tapahtumat näytettäviksi askeliksi (teksti + animaatio)
 // ja näyttää ne yksi kerrallaan.
@@ -20,7 +22,10 @@ export function eventStep(event: BattleEvent, view: BattleView, enemyName: strin
     case 'hit':
       return {
         text: hitText(event, enemyName),
-        effect: () => view.playHit(event.attacker, event.crit),
+        effect: () => {
+          view.playHit(event.attacker, event.crit);
+          playSound(hitSound(event));
+        },
       };
     case 'defend':
       return { text: TEXT.battle.defending };
@@ -43,7 +48,13 @@ export function victorySteps(
   view: BattleView,
 ): BattleStep[] {
   const steps: BattleStep[] = [
-    { text: TEXT.battle.won(enemyName, reward.xp), effect: () => view.updateXp(reward.totalXp) },
+    {
+      text: TEXT.battle.won(enemyName, reward.xp),
+      effect: () => {
+        view.updateXp(reward.totalXp);
+        playSound('victory');
+      },
+    },
   ];
   for (const stack of reward.recovered ?? []) {
     steps.push({ text: TEXT.battle.recovered(getItem(stack.id).name, stack.count) });
@@ -52,7 +63,7 @@ export function victorySteps(
     steps.push({ text: TEXT.battle.drop(getItem(reward.drop).name) });
   }
   if (reward.leveledUp) {
-    steps.push({ text: TEXT.battle.levelUp(reward.level) });
+    steps.push({ text: TEXT.battle.levelUp(reward.level), effect: () => playSound('level-up') });
   }
   if (reward.skillPoints > 0) {
     steps.push({ text: TEXT.battle.skillPoints(reward.skillPoints) });
@@ -77,6 +88,13 @@ export function playSteps(
   view.say(first.text);
   first.effect?.();
   scene.time.delayedCall(BATTLE_VIEW.messageMs, () => playSteps(scene, view, rest, done));
+}
+
+function hitSound(event: Extract<BattleEvent, { kind: 'hit' }>): SoundId {
+  if (event.crit) {
+    return 'crit';
+  }
+  return event.attacker === 'player' ? 'hit' : 'hurt';
 }
 
 function hitText(event: Extract<BattleEvent, { kind: 'hit' }>, enemyName: string): string {

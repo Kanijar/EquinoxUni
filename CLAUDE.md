@@ -47,6 +47,9 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
 | Ruudulla näkyvät tiedot kartalla      | `src/ui/hud.ts`                                                                                                         |
 | Pelin nimi (alkuruutu, otsikko, PWA)  | `src/data/game-info.ts` (ei muualle: muut paikat lukevat nimen sieltä)                                                  |
 | Tekstit pelaajalle                    | `src/i18n/fi.ts`                                                                                                        |
+| Ääniefektit                           | `src/data/sounds.ts`, soitto `playSound('id')` (`src/systems/sound-fx.ts`)                                              |
+| Asetukset (valo, äänet)               | `src/logic/settings.ts` + testi, näkymä `src/scenes/settings-scene.ts`, rajat `src/config/persistence.ts`               |
+| Tallennus ja lataus                   | `src/logic/save-*.ts` + testi `tests/save.test.ts`. Uusi kenttä `GameState`en: katso `docs/ARCHITECTURE.md`             |
 | Värit, koot, scenejen nimet           | `src/config/game-config.ts`                                                                                             |
 | Uusi näkymä (esim. kauppa)            | uusi tiedosto `src/scenes/`, lisää `SCENES`-listaan ja `src/main.ts`:iin                                                |
 | Uusi pelijärjestelmä                  | uusi tiedosto `src/systems/`, kutsutaan `world-scene.ts`:stä tai `battle-scene.ts`:stä                                  |

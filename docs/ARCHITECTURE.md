@@ -76,10 +76,12 @@ scenes  →  systems / ui  →  entities  →  logic
 
 - **Resoluutio** 480 × 270 (16:9), skaalataan puhelimen näytölle `Scale.FIT`-tilassa.
   Ruutukoko 16 px, hahmot 16 × 16 px.
-- **Scenet:** `BootScene` (luo/lataa grafiikat) → `MenuScene` (koko näyttö + vaakasuunta
-  ensimmäisestä kosketuksesta) → `WorldScene` (Suomen kartta) ⇄ `BattleScene` (vuoropohjainen
-  taistelu) → `GameOverScene` (kun kaikki viholliset on voitettu). Paikkakunnassa
-  `WorldScene` ⇄ `SkillsScene` (kykypisteiden jako).
+- **Scenet:** `BootScene` (luo/lataa grafiikat, ottaa asetukset käyttöön) → `MenuScene`
+  (alkuruutu: PELAA, LATAA, ASETUKSET, LÄHDE) → `WorldScene` (Suomen kartta) ⇄ `BattleScene`
+  (vuoropohjainen taistelu) → `GameOverScene` (kun kaikki viholliset on voitettu) → alkuruutu.
+  Paikkakunnassa `WorldScene` ⇄ `SkillsScene` (kykypisteiden jako) ja `WorldScene` ⇄
+  `SavesScene` (tallennus). Alkuruudusta `SettingsScene` (valo ja äänet), `SavesScene` (lataus)
+  ja `ExitScene` (LÄHDE).
   Pelin tila (`logic/game-state.ts`: elämä, KP, kykypisteet, esineet, sijainti, viimeisin paikkakunta, voitetut viholliset) annetaan scenejen välillä `scene.start(key, data)` -datana.
 - **Kaatuminen:** taistelussa kaatunut sankari herää viimeisimmässä paikkakunnassa, jossa hän
   kävi (`GameState.lastTown`, aluksi aloituspaikkakunta), täysin elämin. KP, kykypisteet, esineet
@@ -105,8 +107,21 @@ scenes  →  systems / ui  →  entities  →  logic
   jolloin tekoäly voi tehdä uuden hahmon heti. Myöhemmin oikeat PNG-kuvat (esim. Aseprite tai
   Piskel) laitetaan `public/assets/`-kansioon ja ladataan BootScenessä **samalla avaimella**,
   jolloin muuta koodia ei tarvitse muuttaa.
-- **Tallennus:** pelin eteneminen tallennetaan selaimen `localStorage`en (tuleva
-  `systems/save.ts`), ei palvelinta. Ei kirjautumista, ei henkilötietoja.
+- **Tallennus:** kolme tallennuspaikkaa selaimen `localStorage`ssa, ei palvelinta, ei
+  kirjautumista, ei henkilötietoja. Pelin aikana tallennetaan paikkakunnassa TALLENNA-napista,
+  alkuruudun LATAA-napista ladataan. Tallennus on JSON: versio (`SAVE_VERSION`,
+  `config/persistence.ts`), aika, paikkakunta ja `GameState`. Muoto ja versiomuunnokset
+  `logic/save-format.ts`, tarkistus `logic/save-validate.ts` (rikkinäinen tai muokattu tallennus
+  ei kaada peliä), paikat `logic/save-slots.ts`. Logiikka käyttää `KeyValueStore`-rajapintaa,
+  joten testit ajetaan ilman selainta (`MemoryStore`). **Kun `GameState` muuttuu**, lisää uusi
+  kenttä niin, että vanha tallennus latautuu (oletusarvo `save-validate.ts`:ssä), tai nosta
+  `SAVE_VERSION` ja lisää muunnos `SAVE_MIGRATIONS`-listaan.
+- **Asetukset:** valon määrä (CSS `brightness` pelin canvasiin) ja äänet (Phaserin
+  äänenvoimakkuus ja mykistys). Säännöt `logic/settings.ts`, käyttöönotto
+  `systems/game-settings.ts`, rajat `config/persistence.ts`.
+- **Äänet:** ääniefektit tehdään koodilla Web Audiolla (`data/sounds.ts` + `systems/sound-fx.ts`),
+  joten tiedostoja ei tarvita. Ne kulkevat Phaserin äänijärjestelmän läpi, jolloin asetusten
+  voimakkuus koskee niitä. Nappien painallus, osumat, voitto, tason nousu ja tallennus soivat.
 
 ## 5. Tekoälykehityksen säännöt (valvotaan automaattisesti)
 
@@ -154,7 +169,7 @@ kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 **Vaihe 1 – Pelituntuma.**
 
 - Hahmojen kävelyanimaatiot ja suunta (4 suuntaa)
-- Vahinkonumerot, ruudun tärähdys, äänitehosteet (`systems/audio.ts`)
+- Vahinkonumerot, ruudun tärähdys ✓, äänitehosteet ✓ (`systems/sound-fx.ts`)
 - Pienkartta ja tarkempi Suomen rantaviiva (lisää pisteitä `data/finland.ts`:ään)
 
 **Vaihe 2 – Seikkailu.**
@@ -162,13 +177,13 @@ kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 - Paikkakuntien sisänäkymät (kauppa, majatalo) omina sceneinä
 - Inventaario ja aseet (`ItemKind: 'weapon'`), vihollisten erikoisiskut
 - NPC-hahmot ja dialogit (`data/dialogues.ts`)
-- Tallennus `localStorage`en
+- Tallennus `localStorage`en ✓ (alkuruutu, asetukset ja kolme tallennuspaikkaa)
 
 **Vaihe 3 – Sisältö ja viimeistely.**
 
 - Pomotaistelut (uusi tekoälytyyppi `logic/`-kansioon)
 - Oikeat pikselikuvat ja musiikki
-- PWA-offline-tila (`vite-plugin-pwa`), asetukset (äänenvoimakkuus)
+- PWA-offline-tila (`vite-plugin-pwa`), musiikki (asetukset ✓)
 
 ## 8. Turvallisuus ja kohderyhmä
 

@@ -15,6 +15,8 @@ import type { Vec2 } from './vector';
 
 // Pelin eteneminen, joka säilyy kartan ja taistelun välillä:
 // elämä, kokemus, kykypisteet, esineet, sijainti ja voitetut viholliset.
+// Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
+// tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
 export interface GameState {
   hp: number;

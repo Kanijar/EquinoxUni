@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import { COLORS, FONT } from '../config/game-config';
+import { playSound } from '../systems/sound-fx';
 
 // Suorakulmainen kosketusnappi tekstillä (esim. taistelun HYÖKKÄÄ).
-// onTap kutsutaan, kun sormi nostetaan napin päältä.
+// onTap kutsutaan, kun sormi nostetaan napin päältä. Napautus soittaa äänen.
 
 export interface TextButtonOptions {
   readonly x: number;
@@ -41,6 +42,7 @@ export class TextButton {
     this.box.on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
       this.setPressed(false);
       if (this.enabled) {
+        playSound('tap');
         options.onTap();
       }
     });
