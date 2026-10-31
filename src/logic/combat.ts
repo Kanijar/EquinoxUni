@@ -5,6 +5,8 @@ export interface Fighter {
   readonly maxHp: number;
   readonly attack: number;
   readonly defense: number;
+  /** Oma kriittisen osuman todennäköisyys. Puuttuessa käytetään taistelun sääntöjä. */
+  readonly critChance?: number;
 }
 
 /** Vahinko on aina vähintään 1, jotta jokainen osuma tuntuu. */

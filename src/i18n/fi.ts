@@ -45,7 +45,8 @@ export const TEXT = {
     enemyHit: (enemy: string, damage: number): string => `${enemy} löi sinua: -${damage}.`,
     enemyHitDefended: (enemy: string, damage: number): string =>
       `Torjuit iskun! ${enemy} teki vain ${damage}.`,
-    crit: 'Täysosuma! ',
+    crit: 'KRIITTINEN OSUMA! ',
+    critPopup: 'KRIITTINEN OSUMA!',
     defending: 'Nostit kilven ja valmistaudut torjumaan.',
     heal: (item: string, amount: number): string => `Joit: ${item}. Elämä +${amount}.`,
     fleeOk: 'Pääsit pakoon!',

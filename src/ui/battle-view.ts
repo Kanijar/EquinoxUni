@@ -4,6 +4,7 @@ import { flash } from '../entities/effects';
 import { TEXT } from '../i18n/fi';
 import type { Battle, Side } from '../logic/battle';
 import type { Fighter } from '../logic/combat';
+import { showCritPopup } from './crit-popup';
 import { XpBar } from './xp-bar';
 
 // Taistelunäkymän grafiikka: tausta, taistelijat, elämäpalkit, pelaajan KP-palkki
@@ -85,11 +86,15 @@ export class BattleView {
     this.xpBar.set(xp, BATTLE_VIEW.xpFillMs);
   }
 
-  /** Hyökkääjä syöksähtää ja kohde välähtää. */
-  playHit(attacker: Side): void {
+  /** Hyökkääjä syöksähtää ja kohde välähtää. Kriittinen osuma näkyy lisäksi efektinä. */
+  playHit(attacker: Side, crit = false): void {
     this.playLunge(attacker);
     const target = this.display(attacker === 'player' ? 'enemy' : 'player');
-    flash(target.sprite, attacker === 'player' ? COLORS.hitFlash : COLORS.hurt, ANIM_MS * 2);
+    const color = attacker === 'player' ? COLORS.hitFlash : COLORS.hurt;
+    flash(target.sprite, crit ? COLORS.critFlash : color, ANIM_MS * 2);
+    if (crit) {
+      showCritPopup(this.scene, target.sprite.x, target.sprite.y);
+    }
   }
 
   /** Hahmo syöksähtää vastustajaa kohti ja palaa paikalleen (esim. varastaessa). */

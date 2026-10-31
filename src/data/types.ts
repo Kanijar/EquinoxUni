@@ -47,6 +47,11 @@ export interface EnemyDef {
    * Varastetut esineet saa takaisin, kun vihollinen voitetaan.
    */
   readonly stealChance?: number;
+  /**
+   * Oma todennäköisyys (0..1) kriittiselle osumalle (valinnainen).
+   * Jos puuttuu, käytetään yhteistä arvoa BATTLE_RULES.critChance (data/rules.ts).
+   */
+  readonly critChance?: number;
 }
 
 export type ItemKind = 'heal' | 'weapon' | 'key';
@@ -146,7 +151,9 @@ export interface AmbushRule {
 export interface BattleRules {
   /** Satunnaisvaihtelu vahingossa, esim. 0.2 = ±20 %. */
   readonly damageVariance: number;
+  /** Todennäköisyys (0..1), jolla isku on kriittinen osuma. Vihollinen voi ylikirjoittaa. */
   readonly critChance: number;
+  /** Kriittisen osuman vahinko kerrotaan tällä, esim. 2 = tuplavahinko. */
   readonly critMultiplier: number;
   /** Puolustaessa saatu vahinko kerrotaan tällä. */
   readonly defendMultiplier: number;

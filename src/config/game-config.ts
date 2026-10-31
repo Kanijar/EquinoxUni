@@ -25,6 +25,9 @@ export const COLORS = {
   battlePlatform: 0x3d6e28,
   hurt: 0xff4444,
   hitFlash: 0xffffff,
+  /** Kriittisen osuman välähdys ja teksti. */
+  critFlash: 0xffd23f,
+  critText: '#ffd23f',
 } as const;
 
 export const FONT = {
@@ -82,4 +85,6 @@ export const BATTLE_VIEW = {
   margin: 6,
   /** Kuinka kauan KP-palkin täyttyminen kestää voiton jälkeen. */
   xpFillMs: 600,
+  /** Kriittinen osuma: ruutu tärähtää ja kohteen yläpuolelle nousee teksti. */
+  crit: { shakeMs: 200, shakeIntensity: 0.012, popupMs: 800, popupRisePx: 24, popupOffsetY: 70 },
 } as const;

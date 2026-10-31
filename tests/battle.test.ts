@@ -3,6 +3,7 @@ import type { BattleRules } from '../src/data/types';
 import {
   canChoose,
   createBattle,
+  enemyFighter,
   firstHealItem,
   healItemCount,
   rollDamage,
@@ -17,7 +18,7 @@ import type { Fighter } from '../src/logic/combat';
 const rules: BattleRules = {
   damageVariance: 0.2,
   critChance: 0.1,
-  critMultiplier: 1.5,
+  critMultiplier: 2,
   defendMultiplier: 0.5,
   fleeChance: 0.6,
 };
@@ -114,9 +115,51 @@ describe('taistelu', () => {
     const attacker = fighter(10, 10, 0);
     const target = fighter(10, 0, 0);
     expect(rollDamage(attacker, target, sequence(0.5, 0.0), rules)).toEqual({
-      damage: 15,
+      damage: 20,
       crit: true,
     });
+  });
+
+  it('kriittinen osuma tulee vain, kun arpa on alle todennäköisyyden', () => {
+    const attacker = fighter(10, 10, 0);
+    const target = fighter(10, 0, 0);
+    expect(rollDamage(attacker, target, sequence(0.5, 0.09), rules).crit).toBe(true);
+    expect(rollDamage(attacker, target, sequence(0.5, 0.1), rules).crit).toBe(false);
+  });
+
+  it('taistelijan oma kriittisen osuman todennäköisyys korvaa yhteisen', () => {
+    const target = fighter(10, 0, 0);
+    const lucky = { ...fighter(10, 10, 0), critChance: 0.5 };
+    const never = { ...fighter(10, 10, 0), critChance: 0 };
+    expect(rollDamage(lucky, target, sequence(0.5, 0.4), rules).crit).toBe(true);
+    expect(rollDamage(never, target, sequence(0.5, 0.0), rules).crit).toBe(false);
+  });
+
+  it('myös vihollinen voi lyödä kriittisen osuman', () => {
+    const battle = newBattle();
+    // pelaajan isku: vaihtelu 0.5, ei kriittistä; vihollisen isku: vaihtelu 0.5, kriittinen
+    const events = takeTurn(battle, { kind: 'attack' }, sequence(0.5, 0.5, 0.5, 0.0), rules);
+    expect(events[1]).toEqual({
+      kind: 'hit',
+      attacker: 'enemy',
+      damage: 6,
+      crit: true,
+      defended: false,
+    });
+    expect(battle.player.hp).toBe(24);
+  });
+
+  it('puolustus pienentää myös kriittistä osumaa', () => {
+    const battle = createBattle(fighter(30, 7, 0), fighter(12, 10, 0), {});
+    const events = takeTurn(battle, { kind: 'defend' }, sequence(0.5, 0.0), rules);
+    expect(events[1]).toMatchObject({ damage: 10, crit: true, defended: true });
+  });
+
+  it('vihollisen taistelija saa oman kriittisen osuman todennäköisyyden datasta', () => {
+    const stats = { maxHp: 20, attack: 7, defense: 1, speed: 50 };
+    const base = { id: 'test', name: 'Testi', sprite: 'slime', stats, aggroRange: 0, xp: 1 };
+    expect(enemyFighter(base)).toEqual({ hp: 20, maxHp: 20, attack: 7, defense: 1 });
+    expect(enemyFighter({ ...base, critChance: 0.3 }).critChance).toBe(0.3);
   });
 
   it('vahinko vaihtelee enintään ±20 % ja on aina vähintään 1', () => {
