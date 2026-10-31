@@ -47,6 +47,7 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
 | Liikkumisen ohjaus                    | `src/systems/controls.ts` (+ `src/ui/`)                                                                                 |
 | Ruudulla näkyvät tiedot kartalla      | `src/ui/hud.ts`                                                                                                         |
 | Pelin nimi (alkuruutu, otsikko, PWA)  | `src/data/game-info.ts` (ei muualle: muut paikat lukevat nimen sieltä)                                                  |
+| Pelin versio (alkuruudun alakulma)    | `src/data/game-info.ts`, kenttä `version` (esim. `'alfa'` → `'beta'`), ei muualle                                       |
 | Tekstit pelaajalle                    | `src/i18n/fi.ts`                                                                                                        |
 | Ääniefektit                           | `src/data/sounds.ts`, soitto `playSound('id')` (`src/systems/sound-fx.ts`)                                              |
 | Asetukset (valo, äänet)               | `src/logic/settings.ts` + testi, näkymä `src/scenes/settings-scene.ts`, rajat `src/config/persistence.ts`               |

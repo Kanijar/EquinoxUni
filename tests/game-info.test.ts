@@ -3,7 +3,7 @@ import indexHtml from '../index.html?raw';
 import { GAME_INFO, webManifest } from '../src/data/game-info';
 import { TEXT } from '../src/i18n/fi';
 
-// Pelin nimi on määritelty vain tiedostossa src/data/game-info.ts.
+// Pelin nimi ja versio on määritelty vain tiedostossa src/data/game-info.ts.
 
 describe('pelin nimi', () => {
   it('peli on nimeltään Equinox Universe', () => {
@@ -24,5 +24,15 @@ describe('pelin nimi', () => {
   it('index.html ei kovakoodaa nimeä vaan käyttää paikkamerkkiä', () => {
     expect(indexHtml).toContain('<title>%GAME_NAME%</title>');
     expect(indexHtml).not.toContain(GAME_INFO.name);
+  });
+});
+
+describe('pelin versio', () => {
+  it('peli on alfaversio', () => {
+    expect(GAME_INFO.version).toBe('alfa');
+  });
+
+  it('alkuruudun versioteksti tulee pelin versiosta', () => {
+    expect(TEXT.menu.version).toBe(`Versio: ${GAME_INFO.version}`);
   });
 });

@@ -76,6 +76,9 @@ export const MENU_VIEW = {
   groundScale: 2,
   bobPx: 3,
   bobMs: 600,
+  /** Versioteksti oikeassa alakulmassa: etäisyys reunoista ja himmennys. */
+  versionMargin: 4,
+  versionAlpha: 0.7,
 } as const;
 
 /** Asetusnäkymän asetukset. */
