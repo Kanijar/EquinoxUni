@@ -30,6 +30,9 @@ export const COLORS = {
   /** Kriittisen osuman välähdys ja teksti. */
   critFlash: 0xffd23f,
   critText: '#ffd23f',
+  /** Loitsun osuman ja palamisen välähdys sekä palamisen vahinkoteksti. */
+  spellFlash: 0xff7a1a,
+  burnText: '#ff9a3c',
 } as const;
 
 export const FONT = {
@@ -114,12 +117,13 @@ export const WORLD_VIEW = {
   saveButton: { width: 150, height: 40, gap: 6 },
 } as const;
 
-/** Kykypistenäkymän asetukset. */
+/** Kykypistenäkymän asetukset. Viisi riviä, VALMIS-nappi oikeassa yläkulmassa. */
 export const SKILLS_VIEW = {
   titleY: 20,
-  pointsLeftY: 46,
-  firstRowY: 84,
-  rowGap: 48,
+  pointsLeftY: 42,
+  firstRowY: 66,
+  rowGap: 42,
+  hintY: 262,
   nameX: 40,
   valueX: 190,
   perPointX: 210,
@@ -141,5 +145,9 @@ export const BATTLE_VIEW = {
   /** Kuinka kauan KP-palkin täyttyminen kestää voiton jälkeen. */
   xpFillMs: 600,
   /** Kriittinen osuma: ruutu tärähtää ja kohteen yläpuolelle nousee teksti. */
+  /** Tulipallo lentää pelaajalta viholliseen. */
+  fireball: { radius: 7, flightMs: 260, color: 0xff7a1a, glowColor: 0xffd23f, offsetY: 30 },
+  /** Palamisen vahinko nousee palavan vihollisen yläpuolelle. */
+  burn: { popupMs: 700, popupRisePx: 18, popupOffsetY: 68, stroke: 3 },
   crit: { shakeMs: 200, shakeIntensity: 0.012, popupMs: 800, popupRisePx: 24, popupOffsetY: 70 },
 } as const;

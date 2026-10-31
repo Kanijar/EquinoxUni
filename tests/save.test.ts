@@ -80,7 +80,27 @@ describe('tallennusmuoto', () => {
     const state = decodeSave(JSON.stringify(raw))?.state;
     expect(state?.inventory).toEqual({ potion: 2 });
     expect(state?.defeated).toEqual([1, 2]);
-    expect(state?.skills).toEqual({ attack: 1, defense: 0, vitality: 0 });
+    expect(state?.skills).toEqual({
+      attack: 1,
+      defense: 0,
+      vitality: 0,
+      precision: 0,
+      magic: 0,
+    });
+  });
+
+  it('vanha tallennus ilman tarkkuutta ja maagiaa latautuu, uudet kyvyt ovat 0', () => {
+    const raw = JSON.parse(encodeSave(playedGame(), meta)) as { state: Record<string, unknown> };
+    raw.state['skills'] = { attack: 2, defense: 0, vitality: 1 };
+    const state = decodeSave(JSON.stringify(raw))?.state;
+    expect(state?.skills).toEqual({ attack: 2, defense: 0, vitality: 1, precision: 0, magic: 0 });
+  });
+
+  it('tarkkuus ja maagia tallentuvat', () => {
+    const state = playedGame();
+    state.skills.precision = 1;
+    state.skills.magic = 1;
+    expect(decodeSave(encodeSave(state, meta))?.state.skills).toEqual(state.skills);
   });
 
   it('tuntematon viimeisin paikkakunta vaihtuu aloituspaikkakunnaksi', () => {

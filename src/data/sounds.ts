@@ -16,6 +16,14 @@ export const SOUNDS = {
       { freq: 400, ms: 120, slideTo: 100 },
     ],
   },
+  spell: {
+    wave: 'sawtooth',
+    gain: 0.2,
+    notes: [
+      { freq: 200, ms: 120, slideTo: 700 },
+      { freq: 500, ms: 140, slideTo: 90 },
+    ],
+  },
   victory: {
     wave: 'triangle',
     gain: 0.35,

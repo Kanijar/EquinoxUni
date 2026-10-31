@@ -16,6 +16,14 @@ export interface CombatStats {
   readonly speed: number;
 }
 
+/** Pelaajan arvot: taistelun perusarvojen lisäksi tarkkuus ja taikavoima. */
+export interface PlayerStats extends CombatStats {
+  /** Kriittisen osuman todennäköisyys prosentteina, esim. 8 = 8 %. */
+  readonly critPercent: number;
+  /** Tulivoima: kasvattaa tulipallon vahinkoa ja palamisaikaa (data/spells.ts). */
+  readonly magic: number;
+}
+
 export interface ItemStack {
   readonly id: string;
   readonly count: number;
@@ -25,7 +33,9 @@ export interface PlayerDef {
   readonly name: string;
   readonly sprite: string;
   /** Arvot pelin alussa. Kasvavat vain kykypisteillä (data/skills.ts). */
-  readonly stats: CombatStats;
+  readonly stats: PlayerStats;
+  /** Loitsu, joka on HYÖKKÄÄ-valikon TULIPALLO-napissa (data/spells.ts). */
+  readonly spell: SpellId;
   /** Esineet, jotka pelaajalla on pelin alussa. */
   readonly startItems: readonly ItemStack[];
 }
@@ -160,6 +170,14 @@ export interface BattleRules {
   readonly fleeChance: number;
 }
 
+export interface MagicRules {
+  /**
+   * Palamisen tahti millisekunteina: palava vihollinen menettää elämää näin usein.
+   * Palaminen kulkee oikeassa ajassa, myös silloin kun pelaaja miettii seuraavaa siirtoa.
+   */
+  readonly burnTickMs: number;
+}
+
 export interface Progression {
   /** Kokemuspisteet, jotka tarvitaan kullekin tasolle. Ensimmäinen on taso 1 (0 KP). */
   readonly xpForLevel: readonly number[];
@@ -173,16 +191,41 @@ export interface Progression {
 // --- Kykypisteet ---
 
 /** Kyky, johon pelaaja voi laittaa kykypisteitä paikkakunnassa. */
-export type SkillId = 'attack' | 'defense' | 'vitality';
+export type SkillId = 'attack' | 'defense' | 'vitality' | 'precision' | 'magic';
 
-/** Arvo, jota kyky kasvattaa. Elinvoima kasvattaa maksimielämää. */
-export type SkillStat = 'attack' | 'defense' | 'maxHp';
+/**
+ * Arvo, jota kyky kasvattaa. Elinvoima kasvattaa maksimielämää, tarkkuus kriittisen
+ * osuman todennäköisyyttä ja maagia tulivoimaa (tulipallo).
+ */
+export type SkillStat = 'attack' | 'defense' | 'maxHp' | 'critPercent' | 'magic';
 
 export interface SkillDef {
   readonly id: SkillId;
   readonly stat: SkillStat;
   /** Paljonko arvo kasvaa jokaisesta kykyyn laitetusta pisteestä. */
   readonly perPoint: number;
+  /** Arvon yläraja (valinnainen). Kun se on saavutettu, kykyyn ei voi laittaa pisteitä. */
+  readonly max?: number;
+}
+
+// --- Maagia ---
+
+/** Loitsun tunniste. Loitsun nimi on i18n/fi.ts:ssä (TEXT.spells). */
+export type SpellId = 'fireball';
+
+/** Loitsu osuu heti ja sytyttää vihollisen palamaan. Puolustus ei auta loitsua vastaan. */
+export interface SpellDef {
+  readonly id: SpellId;
+  /** Osuman vahinko ilman tulivoimaa. */
+  readonly power: number;
+  /** Paljonko osuman vahinko kasvaa jokaisesta tulivoiman pisteestä. */
+  readonly powerPerMagic: number;
+  /** Palamisen vahinko joka sekunti (MAGIC_RULES.burnTickMs). */
+  readonly burnDamage: number;
+  /** Kuinka monta sekuntia vihollinen palaa ilman tulivoimaa. */
+  readonly burnSeconds: number;
+  /** Paljonko palamisaika pitenee jokaisesta tulivoiman pisteestä. */
+  readonly burnSecondsPerMagic: number;
 }
 
 /** Aaltomuoto koodilla tehdylle äänelle (pixelart-pelin "piippaukset"). */

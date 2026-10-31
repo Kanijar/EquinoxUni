@@ -1,11 +1,13 @@
 import { PLAYER } from '../data/player';
 import { WORLD } from '../data/world';
-import type { CombatStats, EnemyDef, ItemStack, SkillId } from '../data/types';
+import type { EnemyDef, ItemStack, PlayerStats, SkillId } from '../data/types';
 import { recoverStolen, type Battle } from './battle';
 import type { Fighter } from './combat';
 import { levelForXp } from './progression';
 import {
   applySkillPoints,
+  getSkill,
+  isSkillMaxed,
   noSkillPoints,
   skillPointsEarned,
   skillPointsLeft,
@@ -56,7 +58,7 @@ export function playerLevel(state: GameState): number {
   return levelForXp(state.xp);
 }
 
-export function playerStats(state: GameState): CombatStats {
+export function playerStats(state: GameState): PlayerStats {
   return applySkillPoints(PLAYER.stats, state.skills);
 }
 
@@ -65,12 +67,17 @@ export function unspentSkillPoints(state: GameState): number {
   return skillPointsLeft(playerLevel(state), state.skills);
 }
 
+/** Voiko kykyyn laittaa pisteen: pisteitä on jäljellä eikä kyky ole ylärajallaan. */
+export function canSpendSkillPoint(state: GameState, id: SkillId): boolean {
+  return unspentSkillPoints(state) > 0 && !isSkillMaxed(getSkill(id), playerStats(state));
+}
+
 /**
  * Laittaa yhden kykypisteen kykyyn. Elinvoima nostaa myös nykyistä elämää saman verran.
- * Palauttaa false, jos käyttämättömiä pisteitä ei ole.
+ * Palauttaa false, jos käyttämättömiä pisteitä ei ole tai kyky on ylärajallaan.
  */
 export function spendSkillPoint(state: GameState, id: SkillId): boolean {
-  if (unspentSkillPoints(state) <= 0) {
+  if (!canSpendSkillPoint(state, id)) {
     return false;
   }
   const maxHpBefore = playerStats(state).maxHp;
@@ -79,10 +86,11 @@ export function spendSkillPoint(state: GameState, id: SkillId): boolean {
   return true;
 }
 
-/** Taisteluhahmo pelaajan nykyisillä arvoilla. */
+/** Taisteluhahmo pelaajan nykyisillä arvoilla (tarkkuus prosenteista todennäköisyydeksi). */
 export function playerFighter(state: GameState): Fighter {
-  const stats = playerStats(state);
-  return { ...stats, hp: Math.min(state.hp, stats.maxHp) };
+  const { maxHp, attack, defense, critPercent, magic } = playerStats(state);
+  const hp = Math.min(state.hp, maxHp);
+  return { hp, maxHp, attack, defense, critChance: critPercent / 100, magic };
 }
 
 /** Palauttaa elämän täyteen (esim. paikkakunnassa levätessä). */

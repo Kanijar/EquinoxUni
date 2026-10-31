@@ -7,6 +7,8 @@ export interface Fighter {
   readonly defense: number;
   /** Oma kriittisen osuman todennäköisyys. Puuttuessa käytetään taistelun sääntöjä. */
   readonly critChance?: number;
+  /** Tulivoima (vain pelaajalla). Kasvattaa loitsujen voimaa (logic/magic.ts). */
+  readonly magic?: number;
 }
 
 /** Vahinko on aina vähintään 1, jotta jokainen osuma tuntuu. */

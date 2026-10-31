@@ -27,6 +27,14 @@ export function eventStep(event: BattleEvent, view: BattleView, enemyName: strin
           playSound(hitSound(event));
         },
       };
+    case 'spell':
+      return {
+        text: spellText(event, enemyName),
+        effect: () => {
+          view.playSpell(event.crit);
+          playSound(event.crit ? 'crit' : 'spell');
+        },
+      };
     case 'defend':
       return { text: TEXT.battle.defending };
     case 'heal':
@@ -106,4 +114,9 @@ function hitText(event: Extract<BattleEvent, { kind: 'hit' }>, enemyName: string
     ? TEXT.battle.enemyHitDefended(enemyName, event.damage)
     : TEXT.battle.enemyHit(enemyName, event.damage);
   return crit + text;
+}
+
+function spellText(event: Extract<BattleEvent, { kind: 'spell' }>, enemyName: string): string {
+  const crit = event.crit ? TEXT.battle.crit : '';
+  return crit + TEXT.battle.spellHit(TEXT.spells[event.spellId], enemyName, event.damage);
 }

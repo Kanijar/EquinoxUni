@@ -1,7 +1,8 @@
-import { getItem } from '../data';
+import { getItem, getSpell } from '../data';
 import { BATTLE_RULES } from '../data/rules';
-import type { BattleRules, EnemyDef, ItemStack } from '../data/types';
+import type { BattleRules, EnemyDef, ItemStack, SpellId } from '../data/types';
 import { applyDamage, calculateDamage, heal, isDefeated, type Fighter } from './combat';
+import { castSpell, type Burn } from './magic';
 
 // Vuoropohjainen taistelu. Pelaaja valitsee toiminnon, sitten vihollinen vastaa.
 // Puhdasta logiikkaa: palauttaa tapahtumat, jotka taistelunäkymä näyttää järjestyksessä.
@@ -12,6 +13,7 @@ export type Rng = () => number;
 export type BattleAction =
   | { readonly kind: 'attack' }
   | { readonly kind: 'defend' }
+  | { readonly kind: 'spell'; readonly spellId: SpellId }
   | { readonly kind: 'item'; readonly itemId: string }
   | { readonly kind: 'flee' };
 
@@ -24,6 +26,14 @@ export type BattleEvent =
       readonly damage: number;
       readonly crit: boolean;
       readonly defended: boolean;
+    }
+  | {
+      readonly kind: 'spell';
+      readonly spellId: SpellId;
+      readonly damage: number;
+      readonly crit: boolean;
+      /** Kuinka monta sekuntia vihollinen palaa. */
+      readonly burnSeconds: number;
     }
   | { readonly kind: 'defend' }
   | { readonly kind: 'heal'; readonly itemId: string; readonly amount: number }
@@ -41,6 +51,8 @@ export interface Battle {
   readonly enemyStealChance: number;
   /** Vihollisen varastamat esineet. Pelaaja saa ne takaisin voittaessaan. */
   readonly stolen: Record<string, number>;
+  /** Vihollisen palaminen tulipallon jäljiltä, tai null (logic/magic.ts). */
+  enemyBurn: Burn | null;
   outcome: BattleOutcome;
 }
 
@@ -50,7 +62,15 @@ export function createBattle(
   inventory: Record<string, number>,
   enemyStealChance = 0,
 ): Battle {
-  return { player, enemy, inventory, enemyStealChance, stolen: {}, outcome: 'ongoing' };
+  return {
+    player,
+    enemy,
+    inventory,
+    enemyStealChance,
+    stolen: {},
+    enemyBurn: null,
+    outcome: 'ongoing',
+  };
 }
 
 /** Vihollisen taistelija täydellä elämällä. Mukana vihollisen oma kriittisen osuman mahdollisuus. */
@@ -114,6 +134,8 @@ function playerAct(
       }
       return { kind: 'hit', attacker: 'player', damage, crit, defended: false };
     }
+    case 'spell':
+      return castAtEnemy(battle, action.spellId, rng, rules);
     case 'defend':
       return { kind: 'defend' };
     case 'item':
@@ -126,6 +148,18 @@ function playerAct(
       return { kind: 'flee', success };
     }
   }
+}
+
+/** Loitsu osuu viholliseen ja sytyttää sen palamaan (uusi loitsu aloittaa palamisen alusta). */
+function castAtEnemy(battle: Battle, spellId: SpellId, rng: Rng, rules: BattleRules): BattleEvent {
+  const { damage, crit, burn } = castSpell(battle.player, getSpell(spellId), rng, rules);
+  applyDamage(battle.enemy, damage);
+  if (isDefeated(battle.enemy)) {
+    battle.outcome = 'won';
+  } else {
+    battle.enemyBurn = burn;
+  }
+  return { kind: 'spell', spellId, damage, crit, burnSeconds: burn.secondsLeft };
 }
 
 function useItem(battle: Battle, itemId: string): BattleEvent {

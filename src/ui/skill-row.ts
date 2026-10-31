@@ -5,6 +5,7 @@ import { TEXT } from '../i18n/fi';
 import { TextButton } from './text-button';
 
 // Kykypistenäkymän yksi rivi: kyvyn nimi, nykyinen arvo, mitä piste antaa ja +-nappi.
+// Kun kyky on ylärajallaan (esim. tarkkuus), napissa lukee MAKS.
 
 export interface SkillRowOptions {
   readonly skill: SkillDef;
@@ -16,7 +17,10 @@ export class SkillRow {
   private readonly valueText: Phaser.GameObjects.Text;
   private readonly button: TextButton;
 
-  constructor(scene: Phaser.Scene, options: SkillRowOptions) {
+  constructor(
+    scene: Phaser.Scene,
+    private readonly options: SkillRowOptions,
+  ) {
     const { skill, y } = options;
     const style = { fontFamily: FONT.family, color: COLORS.text };
     scene.add
@@ -25,9 +29,11 @@ export class SkillRow {
     this.valueText = scene.add
       .text(SKILLS_VIEW.valueX, y, '', { ...style, fontSize: FONT.medium })
       .setOrigin(1, 0.5);
-    const perPoint = TEXT.skills.perPoint(skill.perPoint, TEXT.skills.statNames[skill.stat]);
     scene.add
-      .text(SKILLS_VIEW.perPointX, y, perPoint, { ...style, fontSize: FONT.small })
+      .text(SKILLS_VIEW.perPointX, y, TEXT.skills.perPoint(skill.perPoint, skill.stat), {
+        ...style,
+        fontSize: FONT.small,
+      })
       .setOrigin(0, 0.5);
     this.button = new TextButton(scene, {
       x: SKILLS_VIEW.addButtonX,
@@ -39,9 +45,10 @@ export class SkillRow {
     });
   }
 
-  /** Näyttää arvon ja sallii +-napin vain, jos pisteitä on jäljellä. */
-  update(value: number, canAdd: boolean): void {
-    this.valueText.setText(String(value));
+  /** Näyttää arvon ja sallii +-napin vain, jos pisteen voi laittaa tähän kykyyn. */
+  update(value: number, canAdd: boolean, maxed: boolean): void {
+    this.valueText.setText(TEXT.skills.value(this.options.skill.stat, value));
+    this.button.setLabel(maxed ? TEXT.skills.maxed : TEXT.skills.add);
     this.button.setEnabled(canAdd);
   }
 }
