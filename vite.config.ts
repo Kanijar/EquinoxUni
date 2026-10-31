@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config';
 
-// base: './' toimii sekä paikallisesti että GitHub Pagesissa (/Vaipaju/).
+// base: './' toimii sekä paikallisesti että GitHub Pagesissa (/EquinoxUni/).
 export default defineConfig({
   base: './',
   build: {

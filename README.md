@@ -4,7 +4,7 @@ Pixelart 2D -seikkailu- ja taistelupeli, jota pelataan Android-puhelimen selaime
 
 ## Pelaaminen
 
-- Valmis versio: https://kanijar.github.io/Vaipaju/ (kun GitHub Pages on otettu käyttöön)
+- Valmis versio: https://kanijar.github.io/EquinoxUni/ (kun GitHub Pages on otettu käyttöön)
 - Käännä puhelin vaakatasoon. Vasen peukalo liikuttaa, oikea peukalo painaa **LYÖ**.
 - Tietokoneella: nuolet tai WASD liikkuu, välilyönti lyö.
 

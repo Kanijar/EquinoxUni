@@ -1,6 +1,6 @@
 name: Julkaise GitHub Pagesiin
 
-# Julkaisee pelin osoitteeseen https://kanijar.github.io/Vaipaju/ aina kun main päivittyy.
+# Julkaisee pelin osoitteeseen https://kanijar.github.io/EquinoxUni/ aina kun main päivittyy.
 # Vaatii kerran: repon Settings → Pages → Source: "GitHub Actions".
 
 on:
