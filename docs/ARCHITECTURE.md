@@ -82,14 +82,22 @@ scenes  →  systems / ui  →  entities  →  logic
   Ruutukoko 16 px, hahmot 16 × 16 px.
 - **Scenet:** `BootScene` (luo/lataa grafiikat, ottaa asetukset käyttöön) → `MenuScene`
   (alkuruutu: PELAA, LATAA, ASETUKSET, LÄHDE) → `WorldScene` (Suomen kartta) ⇄ `BattleScene`
-  (vuoropohjainen taistelu) → `GameOverScene` (kun kaikki viholliset on voitettu) → alkuruutu.
+  (vuoropohjainen taistelu) → `GameOverScene` (kun jokainen karttavihollinen on voitettu ainakin
+  kerran) → alkuruutu.
   Paikkakunnassa `WorldScene` ⇄ `SkillsScene` (kykypisteiden jako) ja `WorldScene` ⇄
   `SavesScene` (tallennus). Alkuruudusta `SettingsScene` (valo ja äänet), `SavesScene` (lataus)
   ja `ExitScene` (LÄHDE).
-  Pelin tila (`logic/game-state.ts`: elämä, KP, kykypisteet, esineet, sijainti, viimeisin paikkakunta, voitetut viholliset) annetaan scenejen välillä `scene.start(key, data)` -datana.
+  Pelin tila (`logic/game-state.ts`: elämä, KP, kykypisteet, esineet, sijainti, viimeisin paikkakunta, voitetut viholliset ja niiden palautusajat) annetaan scenejen välillä `scene.start(key, data)` -datana.
 - **Kaatuminen:** taistelussa kaatunut sankari herää viimeisimmässä paikkakunnassa, jossa hän
   kävi (`GameState.lastTown`, aluksi aloituspaikkakunta), täysin elämin. KP, kykypisteet, esineet
   ja voitetut viholliset säilyvät. Säännöt `logic/town-visits.ts`.
+- **Vihollisten paluu:** voitettu karttavihollinen katoaa kartalta ja palaa alkuperäiselle
+  paikalleen palautusajan jälkeen (`RESPAWN_RULES.delayMs`, 60 s, `data/rules.ts`; oma aika
+  `EnemyDef.respawnMs`, peikolla 2 min). Aika kuluu vain kartalla. Jos pelaaja on lähempänä kuin
+  `RESPAWN_RULES.minPlayerDistancePx`, vihollinen odottaa, ettei se ilmesty pelaajan viereen.
+  Ajastimet ovat `GameState.respawning`issa (tallentuvat), säännöt `logic/respawn.ts` (kello
+  annetaan ulkoa), kartalle palautus `systems/map-encounters.ts`. `GameState.defeated` kertoo,
+  ketkä on voitettu ainakin kerran; HUD näyttää vielä voittamattomien määrän.
 - **Suomen kartta:** `logic/world-grid.ts` rakentaa ruudukon `data/finland.ts`:n rajoista
   (oikeat koordinaatit, 1 ruutu = 8 km), järvistä ja maastovyöhykkeistä sekä vetää tiet
   paikkakuntien välille. `systems/world-map.ts` piirtää ruudukon Phaserin tilemapiksi, jossa meri

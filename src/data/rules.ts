@@ -1,4 +1,4 @@
-import type { BattleRules, MagicRules, Progression } from './types';
+import type { BattleRules, MagicRules, MenuSecretRules, Progression, RespawnRules } from './types';
 
 // Taistelun ja kokemustasojen säännöt. Muuta näitä, kun haluat pelistä
 // helpomman tai vaikeamman.
@@ -16,7 +16,25 @@ export const MAGIC_RULES: MagicRules = {
   burnTickMs: 1000,
 };
 
+/**
+ * Voitettu karttavihollinen palaa alkuperäiselle paikalleen minuutin kuluttua.
+ * Aika kuluu vain kartalla (ei taistelussa eikä valikoissa). Viholliskohtainen aika:
+ * EnemyDef.respawnMs (data/enemies.ts). 160 px = 10 ruutua, yli vihollisten huomausetäisyyden.
+ */
+export const RESPAWN_RULES: RespawnRules = {
+  delayMs: 60_000,
+  minPlayerDistancePx: 160,
+};
+
 export const PROGRESSION: Progression = {
   xpForLevel: [0, 12, 30, 55, 90, 140, 200, 280, 380, 500],
   skillPointsPerLevel: 3,
+};
+
+/**
+ * Salaisuus: napauta alkuruudun sutta ja sitten PELAA, niin uusi peli alkaa 30 KP:llä
+ * (taso nousee ja kykypisteet tulevat heti). Tästä ei kerrota pelin teksteissä.
+ */
+export const MENU_SECRET: MenuSecretRules = {
+  wolfStartXp: 30,
 };

@@ -62,6 +62,11 @@ export interface EnemyDef {
    * Jos puuttuu, käytetään yhteistä arvoa BATTLE_RULES.critChance (data/rules.ts).
    */
   readonly critChance?: number;
+  /**
+   * Oma palautusaika millisekunteina (valinnainen): kuinka kauan voitettu vihollinen on poissa
+   * kartalta. Jos puuttuu, käytetään yhteistä arvoa RESPAWN_RULES.delayMs (data/rules.ts).
+   */
+  readonly respawnMs?: number;
 }
 
 export type ItemKind = 'heal' | 'weapon' | 'key';
@@ -170,12 +175,29 @@ export interface BattleRules {
   readonly fleeChance: number;
 }
 
+/** Alkuruudun salaisuus (pääsiäismuna), data/rules.ts. */
+export interface MenuSecretRules {
+  /** Kokemuspisteet, joilla uusi peli alkaa, kun alkuruudun sutta on napautettu ennen PELAA-nappia. */
+  readonly wolfStartXp: number;
+}
+
 export interface MagicRules {
   /**
    * Palamisen tahti millisekunteina: palava vihollinen menettää elämää näin usein.
    * Palaminen kulkee oikeassa ajassa, myös silloin kun pelaaja miettii seuraavaa siirtoa.
    */
   readonly burnTickMs: number;
+}
+
+/** Voitettujen karttavihollisten palaaminen kartalle. */
+export interface RespawnRules {
+  /** Kuinka kauan (ms karttapeliaikaa) voitettu vihollinen on poissa ennen kuin se palaa. */
+  readonly delayMs: number;
+  /**
+   * Vihollinen palaa paikalleen vasta, kun pelaaja on vähintään näin kaukana (pikseleinä),
+   * jottei se ilmesty suoraan pelaajan viereen.
+   */
+  readonly minPlayerDistancePx: number;
 }
 
 export interface Progression {

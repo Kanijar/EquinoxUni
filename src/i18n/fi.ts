@@ -80,7 +80,8 @@ export const TEXT = {
     xp: (xp: number, nextLevelXp: number | null): string =>
       nextLevelXp === null ? `KP ${xp} (huipputaso)` : `KP ${xp}/${nextLevelXp}`,
     potions: (count: number): string => `Juomat ${count}`,
-    enemiesLeft: (count: number): string => `Vihollisia ${count}`,
+    /** Viholliset, joita ei ole vielä voitettu kertaakaan (voitetut palaavat kartalle). */
+    enemiesLeft: (count: number): string => `Voittamatta ${count}`,
     /** Montako ihmistä pelaa juuri nyt (pelaaja itse mukaan lukien). */
     players: (count: number): string => `Pelaajia nyt: ${count}`,
   },
