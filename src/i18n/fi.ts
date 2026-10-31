@@ -31,6 +31,8 @@ export const TEXT = {
     load: 'LATAA',
     settings: 'ASETUKSET',
     quit: 'LÄHDE',
+    /** Alakulman versioteksti. Vaihda versio tiedostossa data/game-info.ts, ei tässä. */
+    version: `Versio: ${GAME_INFO.version}`,
   },
   settings: {
     title: 'Asetukset',

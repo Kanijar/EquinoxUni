@@ -1,4 +1,4 @@
-// Pelin nimi yhdessä paikassa. Kun nimi vaihtuu, muuta vain tätä tiedostoa:
+// Pelin nimi ja versio yhdessä paikassa. Kun ne vaihtuvat, muuta vain tätä tiedostoa:
 // - pelin sisäiset tekstit käyttävät nimeä i18n/fi.ts:n kautta (TEXT.gameTitle)
 // - vite.config.ts kirjoittaa nimen sivun otsikkoon (index.html) ja PWA-manifestiin
 // Repon nimi ja julkaisuosoite (/EquinoxUni/) eivät riipu tästä.
@@ -9,6 +9,11 @@ export const GAME_INFO = {
   name: 'Equinox Universe',
   /** Lyhyt nimi puhelimen aloitusnäytön kuvakkeen alle (enintään noin 12 merkkiä). */
   shortName: 'Equinox',
+  /**
+   * Pelin versio, joka näkyy alkuruudun oikeassa alakulmassa ("Versio: alfa").
+   * Kun peli etenee, vaihda tähän esim. 'beta' tai '1.0'.
+   */
+  version: 'alfa',
 } as const;
 
 /** PWA-manifestin sisältö. vite.config.ts tarjoilee sen osoitteessa manifest.webmanifest. */

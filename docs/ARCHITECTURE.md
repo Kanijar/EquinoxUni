@@ -44,7 +44,7 @@ src/
   i18n/fi.ts            KAIKKI pelaajalle näkyvät tekstit
   data/                 Pelisisältö datana: viholliset, esineet, Suomen kartta, spritet
     types.ts            Sisällön tyypit (muokkaa ensin tätä, kun lisäät uuden kentän)
-    game-info.ts        Pelin nimi ja PWA-manifestin sisältö (nimen ainoa määrittelypaikka)
+    game-info.ts        Pelin nimi, versio ja PWA-manifestin sisältö (niiden ainoa määrittelypaikka)
     index.ts            getEnemy(), getItem(), getTown() ... hakufunktiot
     finland.ts          Suomen rajat, järvet ja maastovyöhykkeet oikeina koordinaatteina
     towns.ts            Paikkakunnat ja tiet
