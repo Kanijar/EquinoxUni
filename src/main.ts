@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
 import { COLORS, GAME_HEIGHT, GAME_WIDTH } from './config/game-config';
+import { BattleScene } from './scenes/battle-scene';
 import { BootScene } from './scenes/boot-scene';
 import { GameOverScene } from './scenes/game-over-scene';
-import { GameScene } from './scenes/game-scene';
 import { MenuScene } from './scenes/menu-scene';
+import { WorldScene } from './scenes/world-scene';
 
 // Pelin käynnistys. Uusi scene: luo tiedosto scenes/-kansioon ja lisää se listaan.
 
@@ -23,5 +24,5 @@ new Phaser.Game({
     default: 'arcade',
     arcade: { debug: false },
   },
-  scene: [BootScene, MenuScene, GameScene, GameOverScene],
+  scene: [BootScene, MenuScene, WorldScene, BattleScene, GameOverScene],
 });

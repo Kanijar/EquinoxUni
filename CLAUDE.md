@@ -29,20 +29,25 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
 
 ## Mihin mikin muutos kuuluu
 
-| Pyyntö                               | Tiedosto                                                                                                                   |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| Uusi vihollinen                      | `src/data/enemies.ts` (+ sprite `src/data/sprites.ts`)                                                                     |
-| Uusi esine                           | `src/data/items.ts` (+ sprite). Uusi esinetyyppi: `ItemKind` tiedostossa `data/types.ts` ja käsittely `systems/pickups.ts` |
-| Uusi kenttä tai kentän muutos        | `src/data/levels.ts`                                                                                                       |
-| Pelaajan arvot (elämä, nopeus, isku) | `src/data/player.ts`                                                                                                       |
-| Taistelukaavat                       | `src/logic/combat.ts` + testi                                                                                              |
-| Vihollisten käyttäytyminen           | `src/logic/enemy-ai.ts` + testi                                                                                            |
-| Uusi nappi tai ohjaus                | `src/systems/controls.ts` (+ `src/ui/`)                                                                                    |
-| Ruudulla näkyvät tiedot              | `src/ui/hud.ts`                                                                                                            |
-| Tekstit pelaajalle                   | `src/i18n/fi.ts`                                                                                                           |
-| Värit, koot, scenejen nimet          | `src/config/game-config.ts`                                                                                                |
-| Uusi näkymä (esim. kauppa)           | uusi tiedosto `src/scenes/`, lisää `SCENES`-listaan ja `src/main.ts`:iin                                                   |
-| Uusi pelijärjestelmä                 | uusi tiedosto `src/systems/`, kutsutaan `game-scene.ts`:stä                                                                |
+| Pyyntö                                | Tiedosto                                                                                                                |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Uusi vihollinen                       | `src/data/enemies.ts` (+ sprite `src/data/sprites-characters.ts`)                                                       |
+| Vihollinen kartalle                   | `src/data/map-enemies.ts` (sijainti oikeina koordinaatteina)                                                            |
+| Uusi esine                            | `src/data/items.ts` (+ sprite). Uusi esinetyyppi: `ItemKind` tiedostossa `data/types.ts` ja käsittely `logic/battle.ts` |
+| Uusi paikkakunta tai tie              | `src/data/towns.ts` (koordinaatit esim. Wikipediasta)                                                                   |
+| Kartan muoto, järvet, maasto          | `src/data/finland.ts` (+ ruutujen kuvat `src/data/sprites-tiles.ts`)                                                    |
+| Pelaajan arvot (elämä, nopeus, isku)  | `src/data/player.ts`                                                                                                    |
+| Kokemustasot, taistelun vaikeus       | `src/data/rules.ts`                                                                                                     |
+| Taistelun säännöt (vuorot, toiminnot) | `src/logic/battle.ts` + testi                                                                                           |
+| Taistelukaavat                        | `src/logic/combat.ts` + testi                                                                                           |
+| Vihollisten käyttäytyminen kartalla   | `src/logic/enemy-ai.ts` + testi                                                                                         |
+| Taistelunäkymän ulkoasu ja napit      | `src/ui/battle-view.ts`, `src/ui/battle-menu.ts`                                                                        |
+| Liikkumisen ohjaus                    | `src/systems/controls.ts` (+ `src/ui/`)                                                                                 |
+| Ruudulla näkyvät tiedot kartalla      | `src/ui/hud.ts`                                                                                                         |
+| Tekstit pelaajalle                    | `src/i18n/fi.ts`                                                                                                        |
+| Värit, koot, scenejen nimet           | `src/config/game-config.ts`                                                                                             |
+| Uusi näkymä (esim. kauppa)            | uusi tiedosto `src/scenes/`, lisää `SCENES`-listaan ja `src/main.ts`:iin                                                |
+| Uusi pelijärjestelmä                  | uusi tiedosto `src/systems/`, kutsutaan `world-scene.ts`:stä tai `battle-scene.ts`:stä                                  |
 
 ## Säännöt (lintteri ja CI valvovat)
 
@@ -51,7 +56,7 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
    `eslint-disable`-kommentteja.
 2. **`src/logic/` ja `src/data/` eivät saa tuoda Phaseria.** Pelisäännöt ovat puhdasta
    TypeScriptiä, jotta ne voi testata.
-3. **Sisältö on dataa.** Uusi vihollinen/esine/kenttä = uusi olio data-tiedostoon, ei uutta luokkaa.
+3. **Sisältö on dataa.** Uusi vihollinen/esine/paikkakunta = uusi olio data-tiedostoon, ei uutta luokkaa.
 4. **Kaikki pelaajalle näkyvä teksti `src/i18n/fi.ts`:ään**, hyvällä suomen kielellä.
 5. **Ei maagisia numeroita**: vakiot `config/`- tai `data/`-kansioon.
 6. **Uudelle logiikalle testi** `tests/`-kansioon. Sisältö tarkistetaan `tests/content.test.ts`:llä.

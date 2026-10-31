@@ -40,14 +40,18 @@ src/
   main.ts               Käynnistää Phaserin ja listaa scenet
   config/               Vakiot: resoluutio, ruutukoko, värit, fontit, scenejen nimet
   i18n/fi.ts            KAIKKI pelaajalle näkyvät tekstit
-  data/                 Pelisisältö datana: viholliset, esineet, kentät, spritet
+  data/                 Pelisisältö datana: viholliset, esineet, Suomen kartta, spritet
     types.ts            Sisällön tyypit (muokkaa ensin tätä, kun lisäät uuden kentän)
-    index.ts            getEnemy(), getItem() ... hakufunktiot
-  logic/                Puhdas pelilogiikka (taistelu, tekoäly, ajastimet). EI Phaseria.
-  entities/             Pelihahmot: Phaser-sprite + logiikan tila (Player, Enemy)
-  systems/              Pelin järjestelmät: ohjaus, taistelu, kentän rakennus, poiminnat
-  ui/                   Käyttöliittymäpalat: virtuaalitikku, napit, HUD
-  scenes/               Phaserin näkymät: Boot, Menu, Game, GameOver
+    index.ts            getEnemy(), getItem(), getTown() ... hakufunktiot
+    finland.ts          Suomen rajat, järvet ja maastovyöhykkeet oikeina koordinaatteina
+    towns.ts            Paikkakunnat ja tiet
+    map-enemies.ts      Viholliset kartalla
+    rules.ts            Taistelun ja kokemustasojen säännöt
+  logic/                Puhdas pelilogiikka (vuoropohjainen taistelu, kartta, tasot). EI Phaseria.
+  entities/             Kartan hahmot: Phaser-sprite (Player, Enemy)
+  systems/              Pelin järjestelmät: ohjaus, kartan piirto, kohtaamiset, taistelun kulku
+  ui/                   Käyttöliittymäpalat: virtuaalitikku, napit, HUD, taistelunäkymä
+  scenes/               Phaserin näkymät: Boot, Menu, World, Battle, GameOver
 tests/                  Vitest-testit (logiikka + sisällön eheys)
 docs/                   Tämä dokumentti ja muut suunnitelmat
 ```
@@ -70,10 +74,20 @@ scenes  →  systems / ui  →  entities  →  logic
 - **Resoluutio** 480 × 270 (16:9), skaalataan puhelimen näytölle `Scale.FIT`-tilassa.
   Ruutukoko 16 px, hahmot 16 × 16 px.
 - **Scenet:** `BootScene` (luo/lataa grafiikat) → `MenuScene` (koko näyttö + vaakasuunta
-  ensimmäisestä kosketuksesta) → `GameScene` (pelaaminen) → `GameOverScene`.
-- **Ohjaus:** ruudun vasemmalla puoliskolla kelluva virtuaalitikku, oikeassa alakulmassa
-  toimintonapit. Tietokoneella nuolet/WASD + välilyönti. Kaikki pelilogiikka lukee ohjauksen
-  `Controls.read()`-metodista, joten uusi nappi lisätään vain yhteen paikkaan.
+  ensimmäisestä kosketuksesta) → `WorldScene` (Suomen kartta) ⇄ `BattleScene` (vuoropohjainen
+  taistelu) → `GameOverScene`. Pelin tila (`logic/game-state.ts`: elämä, KP, esineet, sijainti,
+  voitetut viholliset) annetaan scenejen välillä `scene.start(key, data)` -datana.
+- **Suomen kartta:** `logic/world-grid.ts` rakentaa ruudukon `data/finland.ts`:n rajoista
+  (oikeat koordinaatit, 1 ruutu = 8 km), järvistä ja maastovyöhykkeistä sekä vetää tiet
+  paikkakuntien välille. `systems/world-map.ts` piirtää ruudukon Phaserin tilemapiksi, jossa meri
+  ja järvet ovat esteitä. Seikkailu alkaa Valkeakoskelta, ja paikkakunnassa elämä palautuu.
+- **Taistelu:** kun kartan vihollinen saa pelaajan kiinni, alkaa vuoropohjainen taistelu.
+  Pelaaja valitsee HYÖKKÄÄ, PUOLUSTA, JUOMA tai PAKENE, sitten vihollinen vastaa.
+  Säännöt ovat `logic/battle.ts`:ssä (palauttaa tapahtumalistan), näyttäminen
+  `systems/battle-director.ts`:ssä ja `ui/battle-*.ts`:ssä.
+- **Ohjaus:** kartalla kelluva virtuaalitikku (missä tahansa kohtaa ruutua), taistelussa neljä
+  nappia ruudun alareunassa. Tietokoneella nuolet/WASD. Kartan liike luetaan
+  `Controls.read()`-metodista.
 - **Fysiikka:** Phaser Arcade (suorakaidetörmäykset riittävät ylhäältä kuvattuun peliin).
 - **Grafiikka:** aluksi spritet piirretään koodista merkkiruudukoina (`data/sprites.ts`),
   jolloin tekoäly voi tehdä uuden hahmon heti. Myöhemmin oikeat PNG-kuvat (esim. Aseprite tai
@@ -98,14 +112,15 @@ Säännöt ovat `eslint.config.js`-tiedostossa, ja CI hylkää muutoksen, joka r
 
 Lisäksi periaatteet:
 
-1. **Sisältö on dataa.** Uusi vihollinen, esine tai kenttä on uusi olio `data/`-kansiossa,
+1. **Sisältö on dataa.** Uusi vihollinen, esine tai paikkakunta on uusi olio `data/`-kansiossa,
    ei uutta koodia. Koodia kirjoitetaan vain uudelle _käyttäytymiselle_.
 2. **Tekstit `i18n/fi.ts`:ään.** Ei kovakoodattuja suomenkielisiä tekstejä muualle.
 3. **Luvut `config/`- tai `data/`-kansioon.** Ei "maagisia numeroita" keskelle koodia.
 4. **Yksi asia per tiedosto.** Tiedoston nimi kertoo sisällön (`kebab-case.ts`).
 5. **Logiikka testataan.** Uusi kaava tai sääntö `logic/`-kansioon + testi `tests/`-kansioon.
 6. **Sisältötesti suojaa dataa.** `tests/content.test.ts` tarkistaa, että tunnisteet ovat
-   uniikkeja, spritet olemassa ja kenttien aloituspaikat lattialla.
+   uniikkeja ja spritet olemassa. `tests/world.test.ts` tarkistaa, että paikkakunnat ja
+   viholliset ovat maalla ja että kaikkialle pääsee kävellen Valkeakoskelta.
 7. **Kun raja tulee vastaan, jaa tiedosto.** Rajoja ei nosteta eikä `eslint-disable`a käytetä.
 
 ## 6. Laatuportit
@@ -118,19 +133,22 @@ tai pelaa GitHub Pagesista mainiin yhdistämisen jälkeen.
 
 ## 7. Tiekartta
 
-**Vaihe 0 – Runko (tämä PR).** Vite + TS + Phaser 4, lintteri, testit, CI, julkaisu.
-Pelattava demo: sankari liikkuu, kolme limaa jahtaa, LYÖ-nappi, parannusjuoma, voitto/häviö.
+**Vaihe 0 – Runko.** Vite + TS + Phaser 4, lintteri, testit, CI, julkaisu. ✓
+
+**Suomen kartta ja vuoropohjainen taistelu.** ✓ Kartta oikeista koordinaateista, 24 paikkakuntaa
+tieverkolla, 17 vihollista (lima, metsähiisi, harmaasusi, tunturipeikko), vuoropohjainen taistelu,
+kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 
 **Vaihe 1 – Pelituntuma.**
 
 - Hahmojen kävelyanimaatiot ja suunta (4 suuntaa)
 - Vahinkonumerot, ruudun tärähdys, äänitehosteet (`systems/audio.ts`)
-- Tilemap-kentät (Tiled-editori → JSON) kun merkkikartat käyvät pieniksi
+- Pienkartta ja tarkempi Suomen rantaviiva (lisää pisteitä `data/finland.ts`:ään)
 
 **Vaihe 2 – Seikkailu.**
 
-- Useampi kenttä ja ovet kenttien välillä
-- Inventaario ja aseet (`ItemKind: 'weapon'`), kokemustasot
+- Paikkakuntien sisänäkymät (kauppa, majatalo) omina sceneinä
+- Inventaario ja aseet (`ItemKind: 'weapon'`), vihollisten erikoisiskut
 - NPC-hahmot ja dialogit (`data/dialogues.ts`)
 - Tallennus `localStorage`en
 
