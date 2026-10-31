@@ -39,6 +39,7 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
 | Pelaajan arvot (elämä, nopeus, isku)  | `src/data/player.ts`                                                                                                    |
 | Kokemustasot, taistelun vaikeus       | `src/data/rules.ts`                                                                                                     |
 | Kykypisteet (mitä piste antaa)        | `src/data/skills.ts`, säännöt `src/logic/skill-points.ts` + testi                                                       |
+| Loitsut (tulipallo, palaminen)        | `src/data/spells.ts`, säännöt `src/logic/magic.ts` + testi `tests/magic.test.ts`                                        |
 | Taistelun säännöt (vuorot, toiminnot) | `src/logic/battle.ts` + testi                                                                                           |
 | Taistelukaavat                        | `src/logic/combat.ts` + testi                                                                                           |
 | Vihollisten käyttäytyminen kartalla   | `src/logic/enemy-ai.ts` + testi                                                                                         |

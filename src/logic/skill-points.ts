@@ -1,16 +1,17 @@
 import { PROGRESSION } from '../data/rules';
 import { SKILLS } from '../data/skills';
-import type { CombatStats, Progression, SkillDef, SkillId } from '../data/types';
+import type { PlayerStats, Progression, SkillDef, SkillId } from '../data/types';
 
 // Kykypisteet: jokaisesta uudesta tasosta saa pisteitä, jotka pelaaja jakaa
-// paikkakunnassa hyökkäykseen, puolustukseen tai elinvoimaan (maksimielämä).
+// paikkakunnassa hyökkäykseen, puolustukseen, elinvoimaan (maksimielämä),
+// tarkkuuteen (kriittinen osuma) tai maagiaan (taikavoima).
 // Pelaajan tilaan tallennetaan vain käytetyt pisteet; käyttämättömät lasketaan tasosta.
 
 /** Kuhunkin kykyyn käytetyt pisteet. */
 export type SkillPoints = Record<SkillId, number>;
 
 export function noSkillPoints(): SkillPoints {
-  return { attack: 0, defense: 0, vitality: 0 };
+  return { attack: 0, defense: 0, vitality: 0, precision: 0, magic: 0 };
 }
 
 export function getSkill(id: SkillId, skills: readonly SkillDef[] = SKILLS): SkillDef {
@@ -35,15 +36,21 @@ export function skillPointsLeft(level: number, spent: SkillPoints): number {
   return Math.max(0, skillPointsEarned(level) - skillPointsSpent(spent));
 }
 
-/** Arvot, joihin on lisätty kykypisteiden tuoma kasvu. */
+/** Onko kyvyn arvo ylärajallaan, jolloin siihen ei voi enää laittaa pisteitä. */
+export function isSkillMaxed(skill: SkillDef, stats: PlayerStats): boolean {
+  return skill.max !== undefined && stats[skill.stat] >= skill.max;
+}
+
+/** Arvot, joihin on lisätty kykypisteiden tuoma kasvu. Arvo ei nouse ylärajan yli. */
 export function applySkillPoints(
-  stats: CombatStats,
+  stats: PlayerStats,
   spent: SkillPoints,
   skills: readonly SkillDef[] = SKILLS,
-): CombatStats {
+): PlayerStats {
   const result = { ...stats };
   for (const skill of skills) {
-    result[skill.stat] += spent[skill.id] * skill.perPoint;
+    const raised = result[skill.stat] + spent[skill.id] * skill.perPoint;
+    result[skill.stat] = skill.max === undefined ? raised : Math.min(skill.max, raised);
   }
   return result;
 }

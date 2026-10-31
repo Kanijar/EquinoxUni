@@ -5,6 +5,7 @@ import { TEXT } from '../i18n/fi';
 import type { Battle, Side } from '../logic/battle';
 import type { Fighter } from '../logic/combat';
 import { showCritPopup } from './crit-popup';
+import { showBurnPopup, showFireball } from './spell-effect';
 import { XpBar } from './xp-bar';
 
 // Taistelunäkymän grafiikka: tausta, taistelijat, elämäpalkit, pelaajan KP-palkki
@@ -95,6 +96,24 @@ export class BattleView {
     if (crit) {
       showCritPopup(this.scene, target.sprite.x, target.sprite.y);
     }
+  }
+
+  /** Pelaajan tulipallo lentää viholliseen, joka välähtää osuman hetkellä. */
+  playSpell(crit = false): void {
+    const target = this.enemy.sprite;
+    showFireball(this.scene, this.player.sprite, target, () => {
+      flash(target, crit ? COLORS.critFlash : COLORS.spellFlash, ANIM_MS * 2);
+      if (crit) {
+        showCritPopup(this.scene, target.x, target.y);
+      }
+    });
+  }
+
+  /** Palava vihollinen välähtää liekin värisenä ja sen yläpuolelle nousee vahinko. */
+  playBurn(damage: number): void {
+    const target = this.enemy.sprite;
+    flash(target, COLORS.spellFlash, ANIM_MS);
+    showBurnPopup(this.scene, target, TEXT.battle.burnPopup(damage));
   }
 
   /** Hahmo syöksähtää vastustajaa kohti ja palaa paikalleen (esim. varastaessa). */

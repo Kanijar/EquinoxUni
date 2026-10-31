@@ -4,6 +4,10 @@ import type { PlayerDef } from './types';
 export const PLAYER: PlayerDef = {
   name: 'Sankari',
   sprite: 'hero',
-  stats: { maxHp: 30, attack: 7, defense: 2, speed: 75 },
+  // attack 4: lyönti tekee ilman kykypisteitä 4 vahinkoa (miinus vihollisen puolustus).
+  // critPercent: kriittisen osuman mahdollisuus prosentteina (sama kuin yleinen 8 %),
+  // Tarkkuus-kyky nostaa sitä. magic: tulivoima, jota Maagia-kyky nostaa.
+  stats: { maxHp: 30, attack: 4, defense: 2, speed: 75, critPercent: 8, magic: 0 },
+  spell: 'fireball',
   startItems: [{ id: 'potion', count: 3 }],
 };

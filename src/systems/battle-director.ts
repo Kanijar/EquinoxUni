@@ -1,4 +1,5 @@
 import type Phaser from 'phaser';
+import { MAGIC_RULES } from '../data/rules';
 import type { EnemyDef } from '../data/types';
 import { TEXT } from '../i18n/fi';
 import {
@@ -9,12 +10,14 @@ import {
   type BattleOutcome,
 } from '../logic/battle';
 import { applyBattleResult, type GameState } from '../logic/game-state';
+import { burnTick } from '../logic/magic';
 import { BattleMenu } from '../ui/battle-menu';
 import type { BattleView } from '../ui/battle-view';
 import { eventStep, playSteps, victorySteps, type BattleStep } from './battle-steps';
 
 // Ohjaa taistelun kulkua: pelaaja valitsee napista, logiikka laskee vuoron,
 // tapahtumat näytetään järjestyksessä ja lopuksi tulos tallennetaan peliin.
+// Tulipallon sytyttämä palaminen kulkee oikeassa ajassa (kerran sekunnissa).
 
 export interface BattleSetup {
   readonly state: GameState;
@@ -36,11 +39,35 @@ export class BattleDirector {
     private readonly setup: BattleSetup,
     private readonly onEnd: (outcome: FinishedOutcome) => void,
   ) {
-    this.menu = new BattleMenu(scene, (action) => this.choose(action));
+    this.menu = new BattleMenu(scene, {
+      onChoose: (action) => this.choose(action),
+      onAttackMenu: (open) => setup.view.say(open ? TEXT.battle.chooseAttack : TEXT.battle.choose),
+    });
     setup.view.updateHp(setup.battle);
     const intro = setup.mapEnemyIndex === null ? TEXT.battle.ambush : TEXT.battle.appears;
     setup.view.say(intro(setup.enemy.name));
     this.menu.refresh(setup.battle, true);
+    scene.time.addEvent({
+      delay: MAGIC_RULES.burnTickMs,
+      loop: true,
+      callback: () => this.tickBurn(),
+    });
+  }
+
+  /** Palava vihollinen menettää elämää. Jos se kaatuu kesken vuoron, voitto näytetään vuoron jälkeen. */
+  private tickBurn(): void {
+    const { battle, view } = this.setup;
+    const tick = burnTick(battle);
+    if (!tick) {
+      return;
+    }
+    view.playBurn(tick.damage);
+    view.updateHp(battle);
+    if (battle.outcome === 'won' && !this.busy) {
+      this.busy = true;
+      this.menu.refresh(battle, false);
+      this.finish('won');
+    }
   }
 
   private choose(action: BattleAction): void {

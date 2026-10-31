@@ -92,12 +92,19 @@ scenes  →  systems / ui  →  entities  →  logic
   ja järvet ovat esteitä. Seikkailu alkaa Valkeakoskelta, ja paikkakunnassa elämä palautuu.
 - **Taistelu:** kun kartan vihollinen saa pelaajan kiinni, alkaa vuoropohjainen taistelu.
   Pelaaja valitsee HYÖKKÄÄ, PUOLUSTA, JUOMA tai PAKENE, sitten vihollinen vastaa.
+  HYÖKKÄÄ avaa valinnan LYÖNTI tai TULIPALLO. Lyönti tekee hyökkäys − puolustus vahinkoa
+  (ilman kykypisteitä 4). Tulipallo (`data/spells.ts`, `logic/magic.ts`) osuu 1 vahingolla
+  puolustuksesta välittämättä ja sytyttää vihollisen: palaminen vie 1 elämän sekunnissa
+  3 sekunnin ajan **oikeassa ajassa** (`MAGIC_RULES.burnTickMs`), myös kun pelaaja miettii.
+  Uusi tulipallo aloittaa palamisen alusta. `BattleDirector` kutsuu `burnTick()`ia ajastimella.
   Säännöt ovat `logic/battle.ts`:ssä (palauttaa tapahtumalistan), näyttäminen
   `systems/battle-director.ts`:ssä ja `ui/battle-*.ts`:ssä.
 - **Kykypisteet:** jokaisesta uudesta tasosta saa `PROGRESSION.skillPointsPerLevel` (3) pistettä.
   Ne ovat tason nousun ainoa palkinto (lisäksi elämä täyttyy): taso ei itse nosta arvoja.
-  Ne jaetaan paikkakunnassa KYKYPISTEET-napista hyökkäykseen, puolustukseen tai elinvoimaan
-  (maksimielämä). Pisteen arvo on `data/skills.ts`:ssä, säännöt `logic/skill-points.ts`:ssä.
+  Ne jaetaan paikkakunnassa KYKYPISTEET-napista hyökkäykseen, puolustukseen, elinvoimaan
+  (maksimielämä), tarkkuuteen (kriittisen osuman mahdollisuus, +2 %-yksikköä, enintään 40 %)
+  tai maagiaan (tulivoima: tulipallon osuma +1 ja palaminen +1 s). Kyvyllä voi olla yläraja
+  (`SkillDef.max`). Pisteen arvo on `data/skills.ts`:ssä, säännöt `logic/skill-points.ts`:ssä.
   Pelaajan tilaan tallennetaan vain käytetyt pisteet; käyttämättömät lasketaan tasosta.
 - **Ohjaus:** kartalla kelluva virtuaalitikku (missä tahansa kohtaa ruutua), taistelussa neljä
   nappia ruudun alareunassa. Tietokoneella nuolet/WASD. Kartan liike luetaan

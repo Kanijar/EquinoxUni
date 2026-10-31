@@ -1,7 +1,20 @@
 import { GAME_INFO } from '../data/game-info';
+import type { SkillStat } from '../data/types';
 
 // Kaikki pelaajalle näkyvät tekstit. Älä kirjoita tekstejä suoraan koodiin,
 // vaan lisää ne tänne ja käytä muodossa TEXT.menu.play.
+
+/** Kykyjen arvojen nimet kykypistenäkymässä ("+1 hyökkäys / piste"). */
+const STAT_NAMES: Readonly<Record<SkillStat, string>> = {
+  attack: 'hyökkäys',
+  defense: 'puolustus',
+  maxHp: 'maksimielämä',
+  critPercent: 'kriittinen osuma',
+  magic: 'tulivoima',
+};
+
+/** Prosentteina näytettävä arvo (kriittisen osuman mahdollisuus). */
+const isPercent = (stat: SkillStat): boolean => stat === 'critPercent';
 
 /** Tallennushetki muodossa "31.10. klo 14.05". */
 function formatTime(time: number): string {
@@ -76,10 +89,20 @@ export const TEXT = {
     title: 'Kykypisteet',
     left: (points: number): string => `Käyttämättä: ${points}`,
     hint: (points: number): string => `Jokaisesta uudesta tasosta saat ${points} kykypistettä.`,
-    names: { attack: 'Hyökkäys', defense: 'Puolustus', vitality: 'Elinvoima' },
-    perPoint: (amount: number, stat: string): string => `+${amount} ${stat} / piste`,
-    statNames: { attack: 'hyökkäys', defense: 'puolustus', maxHp: 'maksimielämä' },
+    names: {
+      attack: 'Hyökkäys',
+      defense: 'Puolustus',
+      vitality: 'Elinvoima',
+      precision: 'Tarkkuus',
+      magic: 'Maagia',
+    },
+    value: (stat: SkillStat, value: number): string =>
+      isPercent(stat) ? `${value} %` : String(value),
+    perPoint: (amount: number, stat: SkillStat): string =>
+      `+${amount}${isPercent(stat) ? ' %' : ''} ${STAT_NAMES[stat]} / piste`,
     add: '+',
+    /** Kyky on ylärajallaan (esim. tarkkuus 40 %). */
+    maxed: 'MAKS',
     done: 'VALMIS',
   },
   battle: {
@@ -88,9 +111,17 @@ export const TEXT = {
     choose: 'Mitä teet?',
     attack: 'HYÖKKÄÄ',
     defend: 'PUOLUSTA',
+    /** HYÖKKÄÄ avaa valinnan: lyönti tai tulipallo. */
+    punch: 'LYÖNTI',
+    back: 'TAKAISIN',
+    chooseAttack: 'Lyötkö vai heitätkö tulipallon?',
     item: (count: number): string => `JUOMA ${count}`,
     flee: 'PAKENE',
     playerHit: (enemy: string, damage: number): string => `Löit: ${enemy} menetti ${damage}.`,
+    spellHit: (spell: string, enemy: string, damage: number): string =>
+      `${spell}! ${enemy} menetti ${damage} ja syttyi liekkeihin!`,
+    /** Palamisen vahinko, joka nousee palavan vihollisen yläpuolelle. */
+    burnPopup: (damage: number): string => `-${damage}`,
     enemyHit: (enemy: string, damage: number): string => `${enemy} löi sinua: -${damage}.`,
     enemyHitDefended: (enemy: string, damage: number): string =>
       `Torjuit iskun! ${enemy} teki vain ${damage}.`,
@@ -110,6 +141,14 @@ export const TEXT = {
     skillPoints: (points: number): string =>
       `Sait ${points} kykypistettä! Käytä ne paikkakunnassa.`,
     lost: 'Kaaduit taistelussa...',
+  },
+  /** Loitsujen nimet (data/spells.ts). */
+  spells: {
+    fireball: 'Tulipallo',
+  },
+  /** Loitsujen napit taistelussa. */
+  spellButtons: {
+    fireball: 'TULIPALLO',
   },
   gameOver: {
     title: 'Hävisit!',
