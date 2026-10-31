@@ -111,6 +111,11 @@ scenes  →  systems / ui  →  entities  →  logic
   Uusi tulipallo aloittaa palamisen alusta. `BattleDirector` kutsuu `burnTick()`ia ajastimella.
   Säännöt ovat `logic/battle.ts`:ssä (palauttaa tapahtumalistan), näyttäminen
   `systems/battle-director.ts`:ssä ja `ui/battle-*.ts`:ssä.
+- **Tasot:** tasoja on 1–50 (taso 50 on huipputaso). KP-rajoja ei kirjoiteta käsin, vaan ne
+  lasketaan kaavasta `LEVEL_CURVE` (`data/rules.ts`, laskenta `data/level-curve.ts`):
+  raja = cubic × n³ + quadratic × n² + linear × n, kun n = taso − 1. Tasot 1–10 eivät vaadi
+  enempää kuin vanha käsin kirjoitettu taulukko, joten vanhojen tallennusten taso ei laske.
+  Tallennukseen menee vain KP; taso lasketaan siitä aina uudelleen (`logic/progression.ts`).
 - **Kykypisteet:** jokaisesta uudesta tasosta saa `PROGRESSION.skillPointsPerLevel` (3) pistettä.
   Ne ovat tason nousun ainoa palkinto (lisäksi elämä täyttyy): taso ei itse nosta arvoja.
   Ne jaetaan paikkakunnassa KYKYPISTEET-napista hyökkäykseen, puolustukseen, elinvoimaan

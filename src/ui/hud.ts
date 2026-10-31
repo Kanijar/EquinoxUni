@@ -47,8 +47,7 @@ export class Hud {
       height: BAR_HEIGHT,
       originX: 1,
       depth: DEPTH,
-      label: (progress) =>
-        `${TEXT.hud.level(progress.level)}  ${TEXT.hud.xp(progress.xp, progress.nextLevelXp)}`,
+      label: (progress) => TEXT.hud.levelAndXp(progress.level, progress.xp, progress.nextLevelXp),
     });
     this.itemText = this.addText(scene, width - MARGIN, MARGIN + BAR_HEIGHT + 2 + LINE, 1);
     this.townText = this.addText(scene, width / 2, MARGIN, 0.5).setFontSize(FONT.medium);

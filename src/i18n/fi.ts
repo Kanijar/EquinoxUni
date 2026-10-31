@@ -76,9 +76,13 @@ export const TEXT = {
   },
   hud: {
     hp: (hp: number, max: number): string => `Elämä ${hp}/${max}`,
-    level: (level: number): string => `Taso ${level}`,
     xp: (xp: number, nextLevelXp: number | null): string =>
       nextLevelXp === null ? `KP ${xp} (huipputaso)` : `KP ${xp}/${nextLevelXp}`,
+    /** Kartan HUD: huipputasolla lyhyt teksti, jottei se osu paikkakunnan nimeen. */
+    levelAndXp: (level: number, xp: number, nextLevelXp: number | null): string =>
+      nextLevelXp === null
+        ? `Huipputaso ${level}  KP ${xp}`
+        : `Taso ${level}  KP ${xp}/${nextLevelXp}`,
     potions: (count: number): string => `Juomat ${count}`,
     /** Viholliset, joita ei ole vielä voitettu kertaakaan (voitetut palaavat kartalle). */
     enemiesLeft: (count: number): string => `Voittamatta ${count}`,

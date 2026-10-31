@@ -35,7 +35,7 @@ describe('voiton viestit', () => {
       xp: 10,
       totalXp: maxXp,
       leveledUp: false,
-      level: 10,
+      level: PROGRESSION.xpForLevel.length,
       skillPoints: 0,
     };
     const texts = victorySteps(reward, 'Lima', view).map((step) => step.text);
