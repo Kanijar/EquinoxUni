@@ -80,7 +80,8 @@ export const TEXT = {
     xp: (xp: number, nextLevelXp: number | null): string =>
       nextLevelXp === null ? `KP ${xp} (huipputaso)` : `KP ${xp}/${nextLevelXp}`,
     potions: (count: number): string => `Juomat ${count}`,
-    enemiesLeft: (count: number): string => `Vihollisia ${count}`,
+    /** Viholliset, joita ei ole vielä voitettu kertaakaan (voitetut palaavat kartalle). */
+    enemiesLeft: (count: number): string => `Voittamatta ${count}`,
   },
   world: {
     intro: 'Seikkailu alkaa Valkeakoskelta!',

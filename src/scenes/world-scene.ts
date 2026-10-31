@@ -5,6 +5,7 @@ import { Player } from '../entities/player';
 import { healItemCount } from '../logic/battle';
 import {
   createNewGame,
+  enemiesToBeat,
   playerStats,
   unspentSkillPoints,
   type GameState,
@@ -80,7 +81,7 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  override update(time: number): void {
+  override update(time: number, delta: number): void {
     this.player.move(this.controls.read().move);
     const position = this.player.position;
     this.state.position = position;
@@ -89,12 +90,12 @@ export class WorldScene extends Phaser.Scene {
       this.rest(arrived.id, arrived.nameAt);
     }
     this.updateHud();
-    if (this.encounters.enemiesLeft === 0) {
+    if (enemiesToBeat(this.state) === 0) {
       this.scene.start(SCENES.gameOver, { won: true });
       return;
     }
     const active = time >= this.encountersFrom;
-    const enemy = this.encounters.update(position, active);
+    const enemy = this.encounters.update(position, active, delta);
     if (enemy) {
       this.startBattle(enemy.def.id, enemy.mapIndex);
       return;
@@ -138,7 +139,7 @@ export class WorldScene extends Phaser.Scene {
       maxHp: playerStats(this.state).maxHp,
       xp: this.state.xp,
       potions: healItemCount(this.state.inventory),
-      enemiesLeft: this.encounters.enemiesLeft,
+      enemiesLeft: enemiesToBeat(this.state),
       townName: this.towns.town?.name ?? '',
     });
     const inTown = this.towns.town !== undefined;

@@ -1,9 +1,11 @@
+import { MAP_ENEMIES } from '../data/map-enemies';
 import { PLAYER } from '../data/player';
 import { WORLD } from '../data/world';
 import type { EnemyDef, ItemStack, PlayerStats, SkillId } from '../data/types';
 import { recoverStolen, type Battle } from './battle';
 import type { Fighter } from './combat';
 import { levelForXp } from './progression';
+import { respawnDelayMs, startRespawn, type RespawnTimer } from './respawn';
 import {
   applySkillPoints,
   getSkill,
@@ -16,7 +18,7 @@ import {
 import type { Vec2 } from './vector';
 
 // Pelin eteneminen, joka säilyy kartan ja taistelun välillä:
-// elämä, kokemus, kykypisteet, esineet, sijainti ja voitetut viholliset.
+// elämä, kokemus, kykypisteet, esineet, sijainti, voitetut viholliset ja niiden paluu.
 // Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
 // tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
@@ -34,8 +36,13 @@ export interface GameState {
    * Pelin alussa aloituspaikkakunta. Taistelussa kaatunut sankari herää täällä.
    */
   lastTown: string;
-  /** Voitettujen karttavihollisten järjestysnumerot (data/map-enemies.ts). */
+  /**
+   * Karttavihollisten järjestysnumerot (data/map-enemies.ts), jotka on voitettu ainakin kerran.
+   * Kun kaikki on voitettu, peli on läpäisty.
+   */
   readonly defeated: number[];
+  /** Kartalta poissa olevat voitetut viholliset ja aika niiden paluuseen (logic/respawn.ts). */
+  readonly respawning: RespawnTimer[];
 }
 
 /**
@@ -55,7 +62,21 @@ export function createNewGame(startXp = 0): GameState {
     position: null,
     lastTown: WORLD.startTown,
     defeated: [],
+    respawning: [],
   };
+}
+
+/** Karttaviholliset, joita ei ole vielä voitettu kertaakaan. */
+export function enemiesToBeat(state: GameState): number {
+  return MAP_ENEMIES.length - state.defeated.length;
+}
+
+/** Merkitsee karttavihollisen voitetuksi: se lähtee kartalta ja palaa palautusajan jälkeen. */
+function markDefeated(state: GameState, mapEnemyIndex: number, enemy: EnemyDef): void {
+  if (!state.defeated.includes(mapEnemyIndex)) {
+    state.defeated.push(mapEnemyIndex);
+  }
+  startRespawn(state.respawning, mapEnemyIndex, respawnDelayMs(enemy));
 }
 
 export function playerLevel(state: GameState): number {
@@ -127,7 +148,7 @@ export function grantVictory(
   const before = playerLevel(state);
   state.xp += enemy.xp;
   if (mapEnemyIndex !== null) {
-    state.defeated.push(mapEnemyIndex);
+    markDefeated(state, mapEnemyIndex, enemy);
   }
   if (enemy.drop) {
     state.inventory[enemy.drop] = (state.inventory[enemy.drop] ?? 0) + 1;

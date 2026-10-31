@@ -118,6 +118,8 @@ export const WORLD_VIEW = {
   graceMs: { start: 1000, afterBattle: 1000, afterFlee: 2500, afterRevive: 3000 },
   /** Ilmoitusten näkymisaika. */
   toastMs: 2500,
+  /** Kartalle palaava voitettu vihollinen ilmestyy näkyviin näin monessa millisekunnissa. */
+  respawnFadeMs: 800,
   /** Paikkakunnassa näkyvä KYKYPISTEET-nappi oikeassa alakulmassa. */
   skillButton: { width: 150, height: 40, margin: 6 },
   /** Paikkakunnassa näkyvä TALLENNA-nappi KYKYPISTEET-napin yläpuolella. */

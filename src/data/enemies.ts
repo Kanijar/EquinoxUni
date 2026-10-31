@@ -38,6 +38,8 @@ export const ENEMIES: readonly EnemyDef[] = [
     aggroRange: 70,
     xp: 35,
     drop: 'potion',
+    // Peikko on vahva ja antaa paljon kokemusta, joten se palaa hitaammin (2 min).
+    respawnMs: 120_000,
   },
   {
     // Ei kulje kartalla, vaan hyökkää väijytyksestä metsässä (data/ambushes.ts).
