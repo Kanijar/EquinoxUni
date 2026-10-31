@@ -1,4 +1,4 @@
-import type { BattleRules, MagicRules, Progression } from './types';
+import type { BattleRules, MagicRules, Progression, RespawnRules } from './types';
 
 // Taistelun ja kokemustasojen säännöt. Muuta näitä, kun haluat pelistä
 // helpomman tai vaikeamman.
@@ -14,6 +14,16 @@ export const BATTLE_RULES: BattleRules = {
 /** Palava vihollinen menettää elämää kerran sekunnissa (data/spells.ts). */
 export const MAGIC_RULES: MagicRules = {
   burnTickMs: 1000,
+};
+
+/**
+ * Voitettu karttavihollinen palaa alkuperäiselle paikalleen minuutin kuluttua.
+ * Aika kuluu vain kartalla (ei taistelussa eikä valikoissa). Viholliskohtainen aika:
+ * EnemyDef.respawnMs (data/enemies.ts). 160 px = 10 ruutua, yli vihollisten huomausetäisyyden.
+ */
+export const RESPAWN_RULES: RespawnRules = {
+  delayMs: 60_000,
+  minPlayerDistancePx: 160,
 };
 
 export const PROGRESSION: Progression = {

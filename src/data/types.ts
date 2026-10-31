@@ -62,6 +62,11 @@ export interface EnemyDef {
    * Jos puuttuu, käytetään yhteistä arvoa BATTLE_RULES.critChance (data/rules.ts).
    */
   readonly critChance?: number;
+  /**
+   * Oma palautusaika millisekunteina (valinnainen): kuinka kauan voitettu vihollinen on poissa
+   * kartalta. Jos puuttuu, käytetään yhteistä arvoa RESPAWN_RULES.delayMs (data/rules.ts).
+   */
+  readonly respawnMs?: number;
 }
 
 export type ItemKind = 'heal' | 'weapon' | 'key';
@@ -176,6 +181,17 @@ export interface MagicRules {
    * Palaminen kulkee oikeassa ajassa, myös silloin kun pelaaja miettii seuraavaa siirtoa.
    */
   readonly burnTickMs: number;
+}
+
+/** Voitettujen karttavihollisten palaaminen kartalle. */
+export interface RespawnRules {
+  /** Kuinka kauan (ms karttapeliaikaa) voitettu vihollinen on poissa ennen kuin se palaa. */
+  readonly delayMs: number;
+  /**
+   * Vihollinen palaa paikalleen vasta, kun pelaaja on vähintään näin kaukana (pikseleinä),
+   * jottei se ilmesty suoraan pelaajan viereen.
+   */
+  readonly minPlayerDistancePx: number;
 }
 
 export interface Progression {

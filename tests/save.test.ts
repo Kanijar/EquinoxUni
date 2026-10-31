@@ -3,6 +3,7 @@ import { SAVE_SLOT_COUNT, SAVE_VERSION } from '../src/config/persistence';
 import { MAP_ENEMIES, WORLD } from '../src/data';
 import { createNewGame, playerStats, type GameState } from '../src/logic/game-state';
 import { MemoryStore, type KeyValueStore } from '../src/logic/key-value-store';
+import { mapEnemyRespawnMs } from '../src/logic/respawn';
 import { decodeSave, encodeSave, migrateSave } from '../src/logic/save-format';
 import { deleteSlot, listSlots, loadFromSlot, saveToSlot, slotKey } from '../src/logic/save-slots';
 
@@ -16,6 +17,7 @@ function playedGame(): GameState {
   state.inventory['potion'] = 5;
   state.position = { x: 123.5, y: 456 };
   state.defeated.push(0, 3);
+  state.respawning.push({ index: 3, msLeft: 12_345 });
   state.hp = 20;
   state.lastTown = 'tampere';
   return state;
@@ -57,6 +59,39 @@ describe('tallennusmuoto', () => {
   it('tuntematon vanha versio hylätään, nykyinen kelpaa sellaisenaan', () => {
     expect(migrateSave({ version: 0 })).toBeNull();
     expect(migrateSave({ version: SAVE_VERSION, x: 1 })).toEqual({ version: SAVE_VERSION, x: 1 });
+  });
+
+  it('versio 1: aiemmin voitetut viholliset saavat täyden palautusajan', () => {
+    const raw = JSON.parse(encodeSave(playedGame(), meta)) as Record<string, unknown>;
+    const oldState = raw['state'] as Record<string, unknown>;
+    delete oldState['respawning'];
+    const old = { ...raw, version: 1, state: oldState };
+    const state = decodeSave(JSON.stringify(old))?.state;
+    expect(state?.defeated).toEqual([0, 3]);
+    expect(state?.respawning).toEqual([
+      { index: 0, msLeft: mapEnemyRespawnMs(0) },
+      { index: 3, msLeft: mapEnemyRespawnMs(3) },
+    ]);
+  });
+
+  it('palautusajat tarkistetaan: rajoissa, vain voitetut, vain kerran', () => {
+    const raw = JSON.parse(encodeSave(playedGame(), meta)) as { state: Record<string, unknown> };
+    raw.state['respawning'] = [
+      { index: 0, msLeft: -50 },
+      { index: 0, msLeft: 10 },
+      { index: 3, msLeft: 10_000_000 },
+      { index: 7, msLeft: 10 },
+      { index: 'a', msLeft: 1 },
+      'rikki',
+    ];
+    expect(decodeSave(JSON.stringify(raw))?.state.respawning).toEqual([
+      { index: 0, msLeft: 0 },
+      { index: 3, msLeft: mapEnemyRespawnMs(3) },
+    ]);
+    delete raw.state['respawning'];
+    expect(decodeSave(JSON.stringify(raw))?.state.respawning).toEqual([]);
+    raw.state['respawning'] = 'pian';
+    expect(decodeSave(JSON.stringify(raw))).toBeNull();
   });
 
   it('väärät arvot hylätään', () => {
