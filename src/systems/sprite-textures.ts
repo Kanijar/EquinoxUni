@@ -16,15 +16,36 @@ export function createSpriteTexture(
   if (!canvas) {
     throw new Error(`Tekstuurin luonti epäonnistui: ${def.id}`);
   }
-  const ctx = canvas.getContext();
+  drawSprite(canvas.getContext(), def, 0);
+  canvas.refresh();
+}
+
+/** Kokoaa monta spriteä vierekkäin yhdeksi kuvaksi (esim. karttaruudut tilemapille). */
+export function createStripTexture(
+  textures: Phaser.Textures.TextureManager,
+  key: string,
+  defs: readonly SpriteDef[],
+): void {
+  if (textures.exists(key)) {
+    return;
+  }
+  const size = defs[0]?.rows.length ?? 0;
+  const canvas = textures.createCanvas(key, size * defs.length, size);
+  if (!canvas) {
+    throw new Error(`Tekstuurin luonti epäonnistui: ${key}`);
+  }
+  defs.forEach((def, index) => drawSprite(canvas.getContext(), def, index * size));
+  canvas.refresh();
+}
+
+function drawSprite(ctx: CanvasRenderingContext2D, def: SpriteDef, offsetX: number): void {
   def.rows.forEach((row, y) => {
     [...row].forEach((char, x) => {
       const color = def.palette[char];
       if (color) {
         ctx.fillStyle = color;
-        ctx.fillRect(x, y, 1, 1);
+        ctx.fillRect(offsetX + x, y, 1, 1);
       }
     });
   });
-  canvas.refresh();
 }

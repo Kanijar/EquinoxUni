@@ -10,18 +10,41 @@ export const TEXT = {
   },
   hud: {
     hp: (hp: number, max: number): string => `Elämä ${hp}/${max}`,
-    xp: (xp: number): string => `KP ${xp}`,
+    level: (level: number, xp: number): string => `Taso ${level}  KP ${xp}`,
+    potions: (count: number): string => `Juomat ${count}`,
+    enemiesLeft: (count: number): string => `Vihollisia ${count}`,
   },
-  controls: {
-    attack: 'LYÖ',
+  world: {
+    intro: 'Seikkailu alkaa Valkeakoskelta!',
+    rest: (townAt: string): string => `Lepäsit ${townAt}. Elämä palautui!`,
+  },
+  battle: {
+    appears: (enemy: string): string => `${enemy} hyökkää kimppuusi!`,
+    choose: 'Mitä teet?',
+    attack: 'HYÖKKÄÄ',
+    defend: 'PUOLUSTA',
+    item: (count: number): string => `JUOMA ${count}`,
+    flee: 'PAKENE',
+    playerHit: (enemy: string, damage: number): string => `Löit: ${enemy} menetti ${damage}.`,
+    enemyHit: (enemy: string, damage: number): string => `${enemy} löi sinua: -${damage}.`,
+    enemyHitDefended: (enemy: string, damage: number): string =>
+      `Torjuit iskun! ${enemy} teki vain ${damage}.`,
+    crit: 'Täysosuma! ',
+    defending: 'Nostit kilven ja valmistaudut torjumaan.',
+    heal: (item: string, amount: number): string => `Joit: ${item}. Elämä +${amount}.`,
+    fleeOk: 'Pääsit pakoon!',
+    fleeFail: 'Pako epäonnistui!',
+    won: (enemy: string, xp: number): string => `Voitit: ${enemy}! Sait ${xp} KP.`,
+    drop: (item: string): string => `Löysit: ${item}.`,
+    levelUp: (level: number): string => `Nousit tasolle ${level}! Elämä palautui.`,
+    lost: 'Kaaduit taistelussa...',
   },
   gameOver: {
     title: 'Hävisit!',
     retry: 'Yritä uudelleen',
   },
   victory: {
-    title: 'Kenttä läpäisty!',
-    next: 'Jatka',
+    title: 'Suomi on pelastettu!',
+    next: 'Pelaa uudelleen',
   },
-  pickup: (name: string): string => `Löysit: ${name}`,
 } as const;

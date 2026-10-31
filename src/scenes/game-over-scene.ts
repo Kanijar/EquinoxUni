@@ -21,6 +21,6 @@ export class GameOverScene extends Phaser.Scene {
     this.add
       .text(GAME_WIDTH / 2, GAME_HEIGHT * 0.65, button, { ...style, fontSize: FONT.medium })
       .setOrigin(0.5);
-    this.input.once(Phaser.Input.Events.POINTER_UP, () => this.scene.start(SCENES.game));
+    this.input.once(Phaser.Input.Events.POINTER_UP, () => this.scene.start(SCENES.world, {}));
   }
 }

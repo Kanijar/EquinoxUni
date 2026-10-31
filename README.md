@@ -5,8 +5,10 @@ Pixelart 2D -seikkailu- ja taistelupeli, jota pelataan Android-puhelimen selaime
 ## Pelaaminen
 
 - Valmis versio: https://kanijar.github.io/EquinoxUni/ (kun GitHub Pages on otettu käyttöön)
-- Käännä puhelin vaakatasoon. Vasen peukalo liikuttaa, oikea peukalo painaa **LYÖ**.
-- Tietokoneella: nuolet tai WASD liikkuu, välilyönti lyö.
+- Käännä puhelin vaakatasoon. Seikkailu alkaa Valkeakoskelta: liiku Suomen kartalla vetämällä
+  sormea ruudulla. Kun vihollinen saa sinut kiinni, alkaa vuoropohjainen taistelu, jossa valitset
+  **HYÖKKÄÄ**, **PUOLUSTA**, **JUOMA** tai **PAKENE**. Paikkakunnissa elämä palautuu.
+- Tietokoneella: nuolet tai WASD liikkuu, taistelussa napautetaan nappeja hiirellä.
 
 ## Kehittäminen
 

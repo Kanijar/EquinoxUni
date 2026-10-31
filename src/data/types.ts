@@ -1,4 +1,4 @@
-// Pelisisällön tyypit. Kaikki sisältö (viholliset, esineet, kentät, spritet)
+// Pelisisällön tyypit. Kaikki sisältö (viholliset, esineet, paikkakunnat, spritet)
 // kuvataan näillä tyypeillä data/-kansiossa. Lisää uusi kenttä ensin tänne.
 
 /** Yksinkertainen pikseligrafiikka: jokainen merkki on yksi pikseli, '.' = läpinäkyvä. */
@@ -12,17 +12,22 @@ export interface CombatStats {
   readonly maxHp: number;
   readonly attack: number;
   readonly defense: number;
-  /** Liikkumisnopeus pikseleinä sekunnissa. */
+  /** Liikkumisnopeus kartalla pikseleinä sekunnissa. */
   readonly speed: number;
 }
 
+export interface ItemStack {
+  readonly id: string;
+  readonly count: number;
+}
+
 export interface PlayerDef {
+  readonly name: string;
   readonly sprite: string;
+  /** Arvot tasolla 1. Tasot nostavat näitä (data/progression.ts). */
   readonly stats: CombatStats;
-  /** Hyökkäyksen kantama pikseleinä. */
-  readonly attackRange: number;
-  /** Hyökkäysten väli millisekunteina. */
-  readonly attackCooldownMs: number;
+  /** Esineet, jotka pelaajalla on pelin alussa. */
+  readonly startItems: readonly ItemStack[];
 }
 
 export interface EnemyDef {
@@ -31,12 +36,12 @@ export interface EnemyDef {
   readonly name: string;
   readonly sprite: string;
   readonly stats: CombatStats;
-  /** Etäisyys, jolta vihollinen huomaa pelaajan. */
+  /** Etäisyys pikseleinä, jolta vihollinen huomaa pelaajan kartalla ja lähtee perään. */
   readonly aggroRange: number;
-  readonly attackRange: number;
-  readonly attackCooldownMs: number;
   /** Kokemuspisteet voitosta. */
   readonly xp: number;
+  /** Esine, jonka pelaaja saa voitosta (valinnainen). */
+  readonly drop?: string;
 }
 
 export type ItemKind = 'heal' | 'weapon' | 'key';
@@ -51,19 +56,92 @@ export interface ItemDef {
   readonly value: number;
 }
 
-export interface Spawn {
-  readonly id: string;
-  /** Sijainti ruutuina (tile), ei pikseleinä. */
-  readonly x: number;
-  readonly y: number;
+// --- Suomen kartta ---
+
+/** Maantieteellinen piste: pituusaste (itä) ja leveysaste (pohjoinen) asteina. */
+export interface GeoPoint {
+  readonly lon: number;
+  readonly lat: number;
 }
 
-export interface LevelDef {
+export interface TownDef extends GeoPoint {
   readonly id: string;
+  /** Paikkakunnan nimi perusmuodossa, esim. "Tampere". */
   readonly name: string;
-  /** Kartta merkkeinä: '#' = seinä, '.' = lattia. Katso data/levels/README. */
-  readonly map: readonly string[];
-  readonly playerStart: { readonly x: number; readonly y: number };
-  readonly enemies: readonly Spawn[];
-  readonly items: readonly Spawn[];
+  /** Nimi sisäpaikallissijassa, esim. "Tampereella" tai "Helsingissä". */
+  readonly nameAt: string;
+}
+
+/** Järvi kuvataan yhtenä tai useampana ympyränä. */
+export interface LakeDef {
+  readonly name: string;
+  readonly circles: readonly (GeoPoint & { readonly radiusKm: number })[];
+}
+
+export type TerrainId = 'sea' | 'lake' | 'field' | 'forest' | 'snow' | 'road';
+
+export interface TerrainDef {
+  readonly id: TerrainId;
+  readonly sprite: string;
+  /** Voiko ruudulla kävellä. Meri ja järvet estävät liikkumisen. */
+  readonly walkable: boolean;
+}
+
+/** Leveysastevyöhyke, joka määrää maaston: etelässä peltoa, pohjoisessa lunta. */
+export interface TerrainBand {
+  /** Vyöhyke on voimassa tätä leveysastetta etelämpänä. */
+  readonly untilLat: number;
+  readonly main: TerrainId;
+  /** Toinen maasto, jota on sekaisin pääasiallisen kanssa. */
+  readonly mix: TerrainId;
+  /** Kuinka suuri osa ruuduista on toista maastoa (0..1). */
+  readonly mixShare: number;
+}
+
+/** Kartan mittakaava ja rajat. Kartta piirretään tasakulmaisella projektiolla. */
+export interface MapProjection {
+  readonly west: number;
+  readonly east: number;
+  readonly north: number;
+  readonly south: number;
+  /** Kuinka monta kilometriä yksi ruutu on. */
+  readonly kmPerTile: number;
+  /** Leveysaste, jonka mukaan pituusasteet muutetaan kilometreiksi. */
+  readonly referenceLat: number;
+}
+
+export interface WorldDef {
+  readonly projection: MapProjection;
+  readonly border: readonly GeoPoint[];
+  readonly lakes: readonly LakeDef[];
+  readonly bands: readonly TerrainBand[];
+  readonly towns: readonly TownDef[];
+  /** Tiet paikkakuntien välillä tunnistepareina. */
+  readonly roads: readonly (readonly [string, string])[];
+  /** Paikkakunta, josta seikkailu alkaa. */
+  readonly startTown: string;
+}
+
+/** Kartalla kulkeva vihollinen. */
+export interface MapEnemyDef extends GeoPoint {
+  readonly enemy: string;
+}
+
+// --- Säännöt ---
+
+export interface BattleRules {
+  /** Satunnaisvaihtelu vahingossa, esim. 0.2 = ±20 %. */
+  readonly damageVariance: number;
+  readonly critChance: number;
+  readonly critMultiplier: number;
+  /** Puolustaessa saatu vahinko kerrotaan tällä. */
+  readonly defendMultiplier: number;
+  readonly fleeChance: number;
+}
+
+export interface Progression {
+  /** Kokemuspisteet, jotka tarvitaan kullekin tasolle. Ensimmäinen on taso 1 (0 KP). */
+  readonly xpForLevel: readonly number[];
+  /** Arvojen kasvu jokaista tasoa kohti. */
+  readonly perLevel: { readonly maxHp: number; readonly attack: number; readonly defense: number };
 }

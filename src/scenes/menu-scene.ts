@@ -28,7 +28,7 @@ export class MenuScene extends Phaser.Scene {
     this.tweens.add({ targets: hint, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
     this.input.once(Phaser.Input.Events.POINTER_UP, () => {
       enterFullscreenLandscape(this);
-      this.scene.start(SCENES.game);
+      this.scene.start(SCENES.world, {});
     });
   }
 }

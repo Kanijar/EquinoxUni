@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import { clampLength, ZERO, type Vec2 } from '../logic/vector';
 
-// Kelluva virtuaalitikku: ilmestyy kohtaan, jota pelaaja koskettaa ruudun
-// vasemmalla puoliskolla. value on vektori, jonka pituus on 0..1.
+// Kelluva virtuaalitikku: ilmestyy kohtaan, jota pelaaja koskettaa (missä tahansa
+// kohdassa ruutua, joten sopii kummallekin peukalolle). value on vektori, pituus 0..1.
 
 const RADIUS = 28;
 const ALPHA = 0.35;
@@ -14,7 +14,7 @@ export class VirtualJoystick {
   private readonly base: Phaser.GameObjects.Arc;
   private readonly knob: Phaser.GameObjects.Arc;
 
-  constructor(private readonly scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene) {
     this.base = scene.add.circle(0, 0, RADIUS, 0xffffff, ALPHA).setVisible(false);
     this.knob = scene.add.circle(0, 0, RADIUS / 2.2, 0xffffff, ALPHA * 2).setVisible(false);
     for (const obj of [this.base, this.knob]) {
@@ -35,7 +35,7 @@ export class VirtualJoystick {
   }
 
   private onDown(pointer: Phaser.Input.Pointer): void {
-    if (this.pointerId !== null || pointer.x > this.scene.scale.width / 2) {
+    if (this.pointerId !== null) {
       return;
     }
     this.pointerId = pointer.id;

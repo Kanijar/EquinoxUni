@@ -1,8 +1,10 @@
 import { ENEMIES } from './enemies';
 import { ITEMS } from './items';
-import { LEVELS } from './levels';
+import { MAP_ENEMIES } from './map-enemies';
 import { SPRITES } from './sprites';
-import type { EnemyDef, ItemDef, LevelDef, SpriteDef } from './types';
+import { TOWNS } from './towns';
+import { TERRAINS, WORLD } from './world';
+import type { EnemyDef, ItemDef, SpriteDef, TownDef } from './types';
 
 // Hakufunktiot sisältöön tunnisteen perusteella. Heittää virheen tuntemattomalla
 // tunnisteella, jotta kirjoitusvirheet huomataan heti eikä peli hajoa hiljaa.
@@ -21,7 +23,7 @@ function findById<T extends { readonly id: string }>(
 
 export const getEnemy = (id: string): EnemyDef => findById(ENEMIES, id, 'vihollinen');
 export const getItem = (id: string): ItemDef => findById(ITEMS, id, 'esine');
-export const getLevel = (id: string): LevelDef => findById(LEVELS, id, 'kenttä');
 export const getSprite = (id: string): SpriteDef => findById(SPRITES, id, 'sprite');
+export const getTown = (id: string): TownDef => findById(TOWNS, id, 'paikkakunta');
 
-export { ENEMIES, ITEMS, LEVELS, SPRITES };
+export { ENEMIES, ITEMS, MAP_ENEMIES, SPRITES, TERRAINS, TOWNS, WORLD };
