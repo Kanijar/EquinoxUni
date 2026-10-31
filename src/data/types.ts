@@ -24,7 +24,7 @@ export interface ItemStack {
 export interface PlayerDef {
   readonly name: string;
   readonly sprite: string;
-  /** Arvot tasolla 1. Tasot nostavat näitä (data/progression.ts). */
+  /** Arvot pelin alussa. Kasvavat vain kykypisteillä (data/skills.ts). */
   readonly stats: CombatStats;
   /** Esineet, jotka pelaajalla on pelin alussa. */
   readonly startItems: readonly ItemStack[];
@@ -156,9 +156,10 @@ export interface BattleRules {
 export interface Progression {
   /** Kokemuspisteet, jotka tarvitaan kullekin tasolle. Ensimmäinen on taso 1 (0 KP). */
   readonly xpForLevel: readonly number[];
-  /** Arvojen kasvu jokaista tasoa kohti. */
-  readonly perLevel: { readonly maxHp: number; readonly attack: number; readonly defense: number };
-  /** Kykypisteet, jotka pelaaja saa jokaisesta uudesta tasosta. */
+  /**
+   * Kykypisteet, jotka pelaaja saa jokaisesta uudesta tasosta. Tämä on tason nousun
+   * ainoa palkinto: arvot kasvavat vain, kun pelaaja jakaa pisteet (data/skills.ts).
+   */
   readonly skillPointsPerLevel: number;
 }
 

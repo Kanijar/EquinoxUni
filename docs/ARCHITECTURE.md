@@ -86,6 +86,7 @@ scenes  →  systems / ui  →  entities  →  logic
   Säännöt ovat `logic/battle.ts`:ssä (palauttaa tapahtumalistan), näyttäminen
   `systems/battle-director.ts`:ssä ja `ui/battle-*.ts`:ssä.
 - **Kykypisteet:** jokaisesta uudesta tasosta saa `PROGRESSION.skillPointsPerLevel` (3) pistettä.
+  Ne ovat tason nousun ainoa palkinto (lisäksi elämä täyttyy): taso ei itse nosta arvoja.
   Ne jaetaan paikkakunnassa KYKYPISTEET-napista hyökkäykseen, puolustukseen tai elinvoimaan
   (maksimielämä). Pisteen arvo on `data/skills.ts`:ssä, säännöt `logic/skill-points.ts`:ssä.
   Pelaajan tilaan tallennetaan vain käytetyt pisteet; käyttämättömät lasketaan tasosta.

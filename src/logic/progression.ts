@@ -1,8 +1,8 @@
-import { PLAYER } from '../data/player';
 import { PROGRESSION } from '../data/rules';
-import type { CombatStats, Progression } from '../data/types';
+import type { Progression } from '../data/types';
 
-// Kokemustasot: kokemuspisteistä (KP) lasketaan taso ja tasosta pelaajan arvot.
+// Kokemustasot: kokemuspisteistä (KP) lasketaan taso. Taso ei itse nosta arvoja,
+// vaan jokaisesta uudesta tasosta saa kykypisteitä (skill-points.ts).
 
 /** Taso (1, 2, 3...) annetuilla kokemuspisteillä. */
 export function levelForXp(xp: number, progression: Progression = PROGRESSION): number {
@@ -39,19 +39,4 @@ export function xpProgress(xp: number, progression: Progression = PROGRESSION): 
     return { level, xp, nextLevelXp: null, fraction: 1 };
   }
   return { level, xp, nextLevelXp: next, fraction: (xp - start) / (next - start) };
-}
-
-/** Pelaajan arvot annetulla tasolla. */
-export function statsForLevel(
-  level: number,
-  base: CombatStats = PLAYER.stats,
-  progression: Progression = PROGRESSION,
-): CombatStats {
-  const ups = Math.max(0, level - 1);
-  return {
-    ...base,
-    maxHp: base.maxHp + ups * progression.perLevel.maxHp,
-    attack: base.attack + ups * progression.perLevel.attack,
-    defense: base.defense + ups * progression.perLevel.defense,
-  };
 }
