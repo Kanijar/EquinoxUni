@@ -105,6 +105,15 @@ export const WOLF_MAGIC = {
   twinkleMs: 900,
 } as const;
 
+/** Alkuruudun liman napautus: lima litistyy ja roiskii vihreitä pisaroita (ui/squishy-slime.ts). */
+export const SLIME_SQUISH = {
+  scaleX: 1.3,
+  scaleY: 0.6,
+  ms: 120,
+  splashCount: 10,
+  splashColors: [0x5fd35f, 0x9cf29c, 0x2f8f2f],
+} as const;
+
 /** Pelaajalaskuri ("Pelaajia nyt: 3") alkuruudun ja kartan vasemmassa alakulmassa. */
 export const PLAYER_COUNT_VIEW = {
   margin: 4,

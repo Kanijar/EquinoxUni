@@ -1,5 +1,4 @@
 import type Phaser from 'phaser';
-import { PLAYER } from '../data/player';
 import type { Vec2 } from '../logic/vector';
 
 // Pelaajahahmo kartalla. Ei syötteenkäsittelyä (se on systems/controls.ts:ssä)
@@ -12,8 +11,9 @@ export class Player {
     scene: Phaser.Scene,
     position: Vec2,
     private readonly speed: number,
+    texture: string,
   ) {
-    this.sprite = scene.physics.add.sprite(position.x, position.y, PLAYER.sprite);
+    this.sprite = scene.physics.add.sprite(position.x, position.y, texture);
     this.sprite.setCollideWorldBounds(true).setDepth(10);
     this.sprite.body?.setSize(10, 10).setOffset(3, 6);
   }

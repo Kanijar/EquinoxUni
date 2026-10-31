@@ -3,7 +3,8 @@ import type { PlayerDef } from './types';
 // Pelaajan arvot pelin alussa. Arvot kasvavat vain kykypisteillä (skills.ts).
 export const PLAYER: PlayerDef = {
   name: 'Sankari',
-  sprite: 'hero',
+  eyeColor: 'yellow',
+  eyeSprites: { yellow: 'hero', black: 'hero-black-eyes' },
   // attack 4: lyönti tekee ilman kykypisteitä 4 vahinkoa (miinus vihollisen puolustus).
   // critPercent: kriittisen osuman mahdollisuus prosentteina (sama kuin yleinen 8 %),
   // Tarkkuus-kyky nostaa sitä. magic: tulivoima, jota Maagia-kyky nostaa.

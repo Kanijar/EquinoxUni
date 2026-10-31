@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { SAVE_SLOT_COUNT, SAVE_VERSION } from '../src/config/persistence';
 import { MAP_ENEMIES, WORLD } from '../src/data';
+import { PLAYER } from '../src/data/player';
 import { createNewGame, playerStats, type GameState } from '../src/logic/game-state';
 import { MemoryStore, type KeyValueStore } from '../src/logic/key-value-store';
 import { mapEnemyRespawnMs } from '../src/logic/respawn';
@@ -20,6 +21,7 @@ function playedGame(): GameState {
   state.respawning.push({ index: 3, msLeft: 12_345 });
   state.hp = 20;
   state.lastTown = 'tampere';
+  state.eyeColor = 'black';
   return state;
 }
 
@@ -72,6 +74,25 @@ describe('tallennusmuoto', () => {
       { index: 0, msLeft: mapEnemyRespawnMs(0) },
       { index: 3, msLeft: mapEnemyRespawnMs(3) },
     ]);
+  });
+
+  it('versio 2: vanha tallennus saa sankarin oletussilmät', () => {
+    const raw = JSON.parse(encodeSave(playedGame(), meta)) as Record<string, unknown>;
+    const oldState = raw['state'] as Record<string, unknown>;
+    delete oldState['eyeColor'];
+    const old = { ...raw, version: 2, state: oldState };
+    const state = decodeSave(JSON.stringify(old))?.state;
+    expect(state?.eyeColor).toBe(PLAYER.eyeColor);
+    expect(state?.xp).toBe(40);
+  });
+
+  it('silmien väri tallentuu, tuntematon väri vaihtuu oletusväriksi', () => {
+    expect(decodeSave(encodeSave(playedGame(), meta))?.state.eyeColor).toBe('black');
+    const raw = JSON.parse(encodeSave(playedGame(), meta)) as { state: Record<string, unknown> };
+    for (const bad of ['purple', 'toString', 7, null]) {
+      raw.state['eyeColor'] = bad;
+      expect(decodeSave(JSON.stringify(raw))?.state.eyeColor).toBe(PLAYER.eyeColor);
+    }
   });
 
   it('palautusajat tarkistetaan: rajoissa, vain voitetut, vain kerran', () => {

@@ -3,7 +3,7 @@ import { SCENES, WORLD_VIEW } from '../config/game-config';
 import { getEnemy } from '../data';
 import { PLAYER } from '../data/player';
 import { createBattle, enemyFighter } from '../logic/battle';
-import { playerFighter, type GameState } from '../logic/game-state';
+import { playerFighter, playerSprite, type GameState } from '../logic/game-state';
 import { reviveAtLastTown } from '../logic/town-visits';
 import { BattleDirector, type FinishedOutcome } from '../systems/battle-director';
 import { TEXT } from '../i18n/fi';
@@ -38,7 +38,7 @@ export class BattleScene extends Phaser.Scene {
     const view = new BattleView(this, {
       playerName: PLAYER.name,
       playerXp: data.state.xp,
-      playerSprite: PLAYER.sprite,
+      playerSprite: playerSprite(data.state),
       enemyName: enemy.name,
       enemySprite: enemy.sprite,
     });
