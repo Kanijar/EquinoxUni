@@ -75,6 +75,20 @@ describe('pelin tila', () => {
     expect(state.hp).toBe(PLAYER.stats.maxHp);
   });
 
+  it('väijytyksen voitto antaa kokemusta ja varastetut esineet takaisin', () => {
+    const state = createNewGame();
+    const robber = getEnemy('robber');
+    const battle = createBattle(playerFighter(state), { hp: 0, ...robber.stats }, state.inventory);
+    state.inventory['potion'] = 1;
+    battle.stolen['potion'] = 2;
+    battle.outcome = 'won';
+    const reward = applyBattleResult(state, battle, null, robber);
+    expect(reward?.recovered).toEqual([{ id: 'potion', count: 2 }]);
+    expect(state.inventory['potion']).toBe(3);
+    expect(state.xp).toBe(robber.xp);
+    expect(state.defeated).toEqual([]);
+  });
+
   it('taistelun jälkeen elämä tallentuu, vaikka pelaaja pakeni', () => {
     const state = createNewGame();
     const battle = createBattle(

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { SCENES, WORLD_VIEW } from '../config/game-config';
-import { getEnemy, MAP_ENEMIES } from '../data';
+import { getEnemy } from '../data';
 import { PLAYER } from '../data/player';
 import { createBattle } from '../logic/battle';
 import { playerFighter, type GameState } from '../logic/game-state';
@@ -8,13 +8,16 @@ import { BattleDirector, type FinishedOutcome } from '../systems/battle-director
 import { BattleView } from '../ui/battle-view';
 import type { WorldSceneData } from './world-scene';
 
-// Vuoropohjainen taistelu. Alkaa, kun kartalla vihollinen koskettaa pelaajaa.
+// Vuoropohjainen taistelu. Alkaa, kun kartalla vihollinen koskettaa pelaajaa
+// tai kun vihollinen hyökkää väijytyksestä (esim. ryöstäjä metsässä).
 // Kulku on systems/battle-director.ts:ssä ja säännöt logic/battle.ts:ssä.
 
 export interface BattleSceneData {
   readonly state: GameState;
-  /** Vihollisen järjestysnumero data/map-enemies.ts:ssä. */
-  readonly mapEnemyIndex: number;
+  /** Vihollisen tunniste (data/enemies.ts). */
+  readonly enemyId: string;
+  /** Vihollisen järjestysnumero data/map-enemies.ts:ssä, tai null väijytyksessä. */
+  readonly mapEnemyIndex: number | null;
 }
 
 export class BattleScene extends Phaser.Scene {
@@ -23,15 +26,12 @@ export class BattleScene extends Phaser.Scene {
   }
 
   create(data: BattleSceneData): void {
-    const spawn = MAP_ENEMIES[data.mapEnemyIndex];
-    if (!spawn) {
-      throw new Error(`Tuntematon karttavihollinen: ${data.mapEnemyIndex}`);
-    }
-    const enemy = getEnemy(spawn.enemy);
+    const enemy = getEnemy(data.enemyId);
     const battle = createBattle(
       playerFighter(data.state),
       { hp: enemy.stats.maxHp, ...enemy.stats },
       data.state.inventory,
+      enemy.stealChance,
     );
     const view = new BattleView(this, {
       playerName: PLAYER.name,

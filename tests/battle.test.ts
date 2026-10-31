@@ -6,6 +6,7 @@ import {
   firstHealItem,
   healItemCount,
   rollDamage,
+  recoverStolen,
   takeTurn,
   type Rng,
 } from '../src/logic/battle';
@@ -124,6 +125,31 @@ describe('taistelu', () => {
     expect(rollDamage(attacker, target, sequence(0, 0.5), rules).damage).toBe(8);
     expect(rollDamage(attacker, target, sequence(0.999, 0.5), rules).damage).toBe(12);
     expect(rollDamage(fighter(1, 1, 0), fighter(1, 0, 50), middle, rules).damage).toBe(1);
+  });
+
+  it('varas nappaa juoman lyönnin sijaan', () => {
+    const battle = createBattle(fighter(30, 7, 2), fighter(30, 5, 0), { potion: 2 }, 0.35);
+    const events = takeTurn(battle, { kind: 'defend' }, sequence(0.1), rules);
+    expect(events[1]).toEqual({ kind: 'steal', itemId: 'potion' });
+    expect(battle.inventory['potion']).toBe(1);
+    expect(battle.stolen['potion']).toBe(1);
+    expect(battle.player.hp).toBe(30);
+  });
+
+  it('varas lyö, jos arpa ei osu tai varastettavaa ei ole', () => {
+    const battle = createBattle(fighter(30, 7, 2), fighter(30, 5, 0), { potion: 1 }, 0.35);
+    expect(takeTurn(battle, { kind: 'defend' }, middle, rules)[1]?.kind).toBe('hit');
+    const empty = createBattle(fighter(30, 7, 2), fighter(30, 5, 0), {}, 1);
+    expect(takeTurn(empty, { kind: 'defend' }, middle, rules)[1]?.kind).toBe('hit');
+  });
+
+  it('varastetut esineet saa takaisin', () => {
+    const battle = createBattle(fighter(30, 7, 2), fighter(30, 5, 0), { potion: 1 }, 1);
+    takeTurn(battle, { kind: 'defend' }, middle, rules);
+    expect(battle.inventory['potion']).toBe(0);
+    expect(recoverStolen(battle)).toEqual([{ id: 'potion', count: 1 }]);
+    expect(battle.inventory['potion']).toBe(1);
+    expect(recoverStolen(battle)).toEqual([]);
   });
 
   it('löytää parannusesineen ja laskee niiden määrän', () => {

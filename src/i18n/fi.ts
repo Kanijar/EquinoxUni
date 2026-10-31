@@ -20,6 +20,7 @@ export const TEXT = {
   },
   battle: {
     appears: (enemy: string): string => `${enemy} hyökkää kimppuusi!`,
+    ambush: (enemy: string): string => `Väijytys! ${enemy} hyppää esiin puiden takaa!`,
     choose: 'Mitä teet?',
     attack: 'HYÖKKÄÄ',
     defend: 'PUOLUSTA',
@@ -36,6 +37,8 @@ export const TEXT = {
     fleeFail: 'Pako epäonnistui!',
     won: (enemy: string, xp: number): string => `Voitit: ${enemy}! Sait ${xp} KP.`,
     drop: (item: string): string => `Löysit: ${item}.`,
+    stole: (enemy: string, item: string): string => `${enemy} nappasi sinulta: ${item}!`,
+    recovered: (item: string, count: number): string => `Sait takaisin: ${item} ×${count}.`,
     levelUp: (level: number): string => `Nousit tasolle ${level}! Elämä palautui.`,
     lost: 'Kaaduit taistelussa...',
   },

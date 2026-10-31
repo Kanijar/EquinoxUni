@@ -1,3 +1,4 @@
+import { AMBUSHES } from './ambushes';
 import { ENEMIES } from './enemies';
 import { ITEMS } from './items';
 import { MAP_ENEMIES } from './map-enemies';
@@ -26,4 +27,4 @@ export const getItem = (id: string): ItemDef => findById(ITEMS, id, 'esine');
 export const getSprite = (id: string): SpriteDef => findById(SPRITES, id, 'sprite');
 export const getTown = (id: string): TownDef => findById(TOWNS, id, 'paikkakunta');
 
-export { ENEMIES, ITEMS, MAP_ENEMIES, SPRITES, TERRAINS, TOWNS, WORLD };
+export { AMBUSHES, ENEMIES, ITEMS, MAP_ENEMIES, SPRITES, TERRAINS, TOWNS, WORLD };

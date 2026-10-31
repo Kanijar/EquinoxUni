@@ -22,6 +22,11 @@ export function eventStep(event: BattleEvent, view: BattleView, enemyName: strin
       return { text: TEXT.battle.defending };
     case 'heal':
       return { text: TEXT.battle.heal(getItem(event.itemId).name, event.amount) };
+    case 'steal':
+      return {
+        text: TEXT.battle.stole(enemyName, getItem(event.itemId).name),
+        effect: () => view.playLunge('enemy'),
+      };
     case 'flee':
       return { text: event.success ? TEXT.battle.fleeOk : TEXT.battle.fleeFail };
   }
@@ -29,6 +34,9 @@ export function eventStep(event: BattleEvent, view: BattleView, enemyName: strin
 
 export function victorySteps(reward: VictoryReward, enemyName: string): BattleStep[] {
   const steps: BattleStep[] = [{ text: TEXT.battle.won(enemyName, reward.xp) }];
+  for (const stack of reward.recovered ?? []) {
+    steps.push({ text: TEXT.battle.recovered(getItem(stack.id).name, stack.count) });
+  }
   if (reward.drop) {
     steps.push({ text: TEXT.battle.drop(getItem(reward.drop).name) });
   }

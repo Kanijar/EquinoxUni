@@ -11,6 +11,7 @@ import {
   type GameState,
 } from '../logic/game-state';
 import { townTile } from '../logic/world-grid';
+import { AmbushWatch } from '../systems/ambush-watch';
 import { Controls } from '../systems/controls';
 import { MapEncounters } from '../systems/map-encounters';
 import { placeTownMarkers, TownTracker } from '../systems/town-markers';
@@ -34,6 +35,7 @@ export class WorldScene extends Phaser.Scene {
   private player!: Player;
   private controls!: Controls;
   private encounters!: MapEncounters;
+  private ambushes!: AmbushWatch;
   private towns!: TownTracker;
   private hud!: Hud;
   private toast!: Toast;
@@ -52,6 +54,7 @@ export class WorldScene extends Phaser.Scene {
     this.player = new Player(this, start, playerStats(this.state).speed);
     this.physics.add.collider(this.player.sprite, built.layer);
     this.encounters = new MapEncounters(this, this.state, built.layer);
+    this.ambushes = new AmbushWatch(getWorldGrid());
     this.towns = new TownTracker(start);
     this.cameras.main.setBounds(0, 0, built.widthPx, built.heightPx);
     this.cameras.main.startFollow(this.player.sprite, true);
@@ -78,11 +81,21 @@ export class WorldScene extends Phaser.Scene {
       this.scene.start(SCENES.gameOver, { won: true });
       return;
     }
-    const enemy = this.encounters.update(position, time >= this.encountersFrom);
+    const active = time >= this.encountersFrom;
+    const enemy = this.encounters.update(position, active);
     if (enemy) {
-      const data: BattleSceneData = { state: this.state, mapEnemyIndex: enemy.mapIndex };
-      this.scene.start(SCENES.battle, data);
+      this.startBattle(enemy.def.id, enemy.mapIndex);
+      return;
     }
+    const ambusher = active ? this.ambushes.update(position) : null;
+    if (ambusher) {
+      this.startBattle(ambusher, null);
+    }
+  }
+
+  private startBattle(enemyId: string, mapEnemyIndex: number | null): void {
+    const data: BattleSceneData = { state: this.state, enemyId, mapEnemyIndex };
+    this.scene.start(SCENES.battle, data);
   }
 
   private updateHud(): void {

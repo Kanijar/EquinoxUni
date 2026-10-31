@@ -37,4 +37,14 @@ export const ENEMIES: readonly EnemyDef[] = [
     xp: 35,
     drop: 'potion',
   },
+  {
+    // Ei kulje kartalla, vaan hyökkää väijytyksestä metsässä (data/ambushes.ts).
+    id: 'robber',
+    name: 'Ryöstäjä',
+    sprite: 'robber',
+    stats: { maxHp: 18, attack: 6, defense: 1, speed: 55 },
+    aggroRange: 0,
+    xp: 10,
+    stealChance: 0.35,
+  },
 ];

@@ -42,6 +42,11 @@ export interface EnemyDef {
   readonly xp: number;
   /** Esine, jonka pelaaja saa voitosta (valinnainen). */
   readonly drop?: string;
+  /**
+   * Todennäköisyys (0..1), jolla vihollinen varastaa esineen lyönnin sijaan (valinnainen).
+   * Varastetut esineet saa takaisin, kun vihollinen voitetaan.
+   */
+  readonly stealChance?: number;
 }
 
 export type ItemKind = 'heal' | 'weapon' | 'key';
@@ -125,6 +130,15 @@ export interface WorldDef {
 /** Kartalla kulkeva vihollinen. */
 export interface MapEnemyDef extends GeoPoint {
   readonly enemy: string;
+}
+
+/** Väijytys: tietyssä maastossa kulkiessa vihollinen voi hyökätä yllättäen. */
+export interface AmbushRule {
+  readonly terrain: TerrainId;
+  /** Viholliset, joista hyökkääjä arvotaan. */
+  readonly enemies: readonly string[];
+  /** Todennäköisyys (0..1) jokaista uutta ruutua kohti, jolle pelaaja astuu. */
+  readonly chancePerTile: number;
 }
 
 // --- Säännöt ---

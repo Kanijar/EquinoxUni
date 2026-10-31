@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { ENEMIES, ITEMS, MAP_ENEMIES, SPRITES, TERRAINS, TOWNS, getSprite } from '../src/data';
+import {
+  AMBUSHES,
+  ENEMIES,
+  ITEMS,
+  MAP_ENEMIES,
+  SPRITES,
+  TERRAINS,
+  TOWNS,
+  getSprite,
+} from '../src/data';
 import { PLAYER } from '../src/data/player';
 import { PROGRESSION } from '../src/data/rules';
 import { ROADS } from '../src/data/towns';
@@ -59,6 +68,26 @@ describe('sisältödata', () => {
     }
     for (const stack of PLAYER.startItems) {
       expect(ids(ITEMS)).toContain(stack.id);
+    }
+  });
+
+  it('väijytykset viittaavat olemassa oleviin vihollisiin ja kuljettavaan maastoon', () => {
+    for (const rule of AMBUSHES) {
+      expect(rule.enemies.length).toBeGreaterThan(0);
+      for (const id of rule.enemies) {
+        expect(ids(ENEMIES)).toContain(id);
+      }
+      expect(TERRAINS.find((t) => t.id === rule.terrain)?.walkable).toBe(true);
+      expect(rule.chancePerTile).toBeGreaterThan(0);
+      expect(rule.chancePerTile).toBeLessThan(1);
+    }
+  });
+
+  it('varastamistodennäköisyys on välillä 0..1', () => {
+    for (const enemy of ENEMIES) {
+      const chance = enemy.stealChance ?? 0;
+      expect(chance).toBeGreaterThanOrEqual(0);
+      expect(chance).toBeLessThanOrEqual(1);
     }
   });
 
