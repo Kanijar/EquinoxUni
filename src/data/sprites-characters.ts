@@ -5,6 +5,26 @@ import type { SpriteDef } from './types';
 
 const SKIN = '#f2c38f';
 
+/** Suden muoto: tavallinen susi ja alkuruudun henkisusi (data/rules.ts MENU_SECRET). */
+const WOLF_ROWS = [
+  '................',
+  '................',
+  '................',
+  '..a.a...........',
+  '..aaaa..........',
+  '.aaeaa..........',
+  'kaaaaaa.......b.',
+  '.wwaaaaaaaaaaab.',
+  '..waaaaaaaaaaab.',
+  '...aaaaaaaaaab..',
+  '...aaaaaaaaaa...',
+  '...aa.a...a.aa..',
+  '...aa.a...a.aa..',
+  '...bb.b...b.bb..',
+  '................',
+  '................',
+];
+
 export const CHARACTER_SPRITES: readonly SpriteDef[] = [
   {
     id: 'hero',
@@ -97,24 +117,12 @@ export const CHARACTER_SPRITES: readonly SpriteDef[] = [
   {
     id: 'wolf',
     palette: { a: '#8a8f99', b: '#5c616b', w: '#e8e8e8', e: '#ffdd33', k: '#1a1a1a' },
-    rows: [
-      '................',
-      '................',
-      '................',
-      '..a.a...........',
-      '..aaaa..........',
-      '.aaeaa..........',
-      'kaaaaaa.......b.',
-      '.wwaaaaaaaaaaab.',
-      '..waaaaaaaaaaab.',
-      '...aaaaaaaaaab..',
-      '...aaaaaaaaaa...',
-      '...aa.a...a.aa..',
-      '...aa.a...a.aa..',
-      '...bb.b...b.bb..',
-      '................',
-      '................',
-    ],
+    rows: WOLF_ROWS,
+  },
+  {
+    id: 'wolf-spirit',
+    palette: { a: '#c9d6ec', b: '#8fa3c8', w: '#ffffff', e: '#6ff7ff', k: '#3a4a6b' },
+    rows: WOLF_ROWS,
   },
   {
     id: 'troll',

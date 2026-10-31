@@ -50,6 +50,16 @@ export const SOUNDS = {
       { freq: 620, ms: 380, slideTo: 440 },
     ],
   },
+  'wolf-magic': {
+    wave: 'triangle',
+    gain: 0.3,
+    notes: [
+      { freq: 784, ms: 70 },
+      { freq: 988, ms: 70 },
+      { freq: 1175, ms: 70 },
+      { freq: 1568, ms: 260, slideTo: 1760 },
+    ],
+  },
   save: {
     wave: 'triangle',
     gain: 0.35,

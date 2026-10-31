@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { BUTTON, GAME_WIDTH, MENU_VIEW, SCENES } from '../config/game-config';
 import { TEXT } from '../i18n/fi';
-import { createMenuGame } from '../logic/menu-secret';
+import { MENU_SECRET } from '../data/rules';
+import { startFromMenu } from '../logic/menu-secret';
 import { enterFullscreenLandscape } from '../systems/fullscreen';
 import { makeHowlingWolf } from '../ui/howling-wolf';
 import { drawMenuBackdrop } from '../ui/menu-backdrop';
@@ -14,8 +15,9 @@ import type { WorldSceneData } from './world-scene';
 // Alkuruutu: PELAA aloittaa uuden pelin Valkeakoskelta, LATAA avaa tallennukset,
 // ASETUKSET avaa valon ja äänten säädöt ja LÄHDE lopettaa pelin.
 // Oikeassa alakulmassa näkyy pelin versio (data/game-info.ts).
-// Salaisuus: jos sutta napauttaa ennen PELAA-nappia, uusi peli alkaa kokemuspisteillä
-// (logic/menu-secret.ts). Siitä ei kerrota ruudulla, susi vain ulvahtaa.
+// Salaisuus: jos sutta napauttaa ennen PELAA-nappia, uusi peli alkaa kokemuspisteillä ja
+// lisäjuomilla (logic/menu-secret.ts). Alkuruudulla siitä ei kerrota: susi vain ulvahtaa
+// ja muuttuu hehkuvaksi henkisudeksi. Kartalla näkyy yllätysviesti.
 
 interface MenuEntry {
   readonly label: string;
@@ -33,7 +35,7 @@ export class MenuScene extends Phaser.Scene {
   create(): void {
     this.wolfTapped = false;
     const characters = drawMenuBackdrop(this);
-    makeHowlingWolf(this, characters.wolf, () => {
+    makeHowlingWolf(this, characters.wolf, MENU_SECRET.spiritSprite, () => {
       this.wolfTapped = true;
     });
     addTitle(this, MENU_VIEW.titleY, TEXT.gameTitle);
@@ -57,8 +59,8 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private play(): void {
-    const state = createMenuGame(this.wolfTapped);
-    this.open(SCENES.world, { state } satisfies WorldSceneData);
+    const start = startFromMenu(this.wolfTapped);
+    this.open(SCENES.world, start satisfies WorldSceneData);
   }
 
   /** Koko näytön tila ja vaakasuunta pyydetään napautuksesta (selain vaatii kosketuksen). */

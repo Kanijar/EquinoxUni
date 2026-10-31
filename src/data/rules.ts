@@ -32,9 +32,12 @@ export const PROGRESSION: Progression = {
 };
 
 /**
- * Salaisuus: napauta alkuruudun sutta ja sitten PELAA, niin uusi peli alkaa 30 KP:llä
- * (taso nousee ja kykypisteet tulevat heti). Tästä ei kerrota pelin teksteissä.
+ * Salaisuus: napauta alkuruudun sutta ja sitten PELAA. Susi muuttuu henkisudeksi, ja uusi
+ * peli alkaa 90 KP:llä (taso 5 ja 12 kykypistettä) ja kolmella ylimääräisellä juomalla.
+ * Alkuruudulla tästä ei kerrota, vasta kartalla näkyy "Susi siunasi sinut!".
  */
 export const MENU_SECRET: MenuSecretRules = {
-  wolfStartXp: 30,
+  wolfStartXp: 90,
+  bonusItems: [{ id: 'potion', count: 3 }],
+  spiritSprite: 'wolf-spirit',
 };

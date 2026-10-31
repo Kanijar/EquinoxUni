@@ -1,22 +1,35 @@
 import Phaser from 'phaser';
-import { MENU_VIEW } from '../config/game-config';
+import { MENU_VIEW, WOLF_MAGIC } from '../config/game-config';
 import { playSound } from '../systems/sound-fx';
+import { awakenSpiritWolf, burstStars } from './wolf-magic';
 
 // Alkuruudun susi, jota voi napauttaa: susi ulvahtaa ja nostaa päänsä.
+// Ensimmäinen napautus herättää henkisuden (välähdys, tähdet, hehkuvat silmät).
 // Mitä napautus tekee pelissä, päättää kutsuja (scenes/menu-scene.ts).
 
 /** Tekee kuvasta napautettavan. onTap kutsutaan joka napautuksella. */
 export function makeHowlingWolf(
   scene: Phaser.Scene,
   wolf: Phaser.GameObjects.Image,
+  spiritSprite: string,
   onTap: () => void,
 ): void {
   let howling: Phaser.Tweens.Tween | null = null;
+  let awake = false;
   wolf.setInteractive();
   wolf.on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, () => {
     playSound('howl');
     howling?.stop();
     howling = howl(scene, wolf);
+    const centerY = wolf.y - wolf.displayHeight / 2;
+    if (awake) {
+      burstStars(scene, wolf.x, centerY, WOLF_MAGIC.starCountSmall);
+    } else {
+      awake = true;
+      playSound('wolf-magic');
+      awakenSpiritWolf(scene, wolf, spiritSprite);
+      burstStars(scene, wolf.x, centerY, WOLF_MAGIC.starCount);
+    }
     onTap();
   });
 }
