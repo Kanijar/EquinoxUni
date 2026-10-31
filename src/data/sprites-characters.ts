@@ -28,7 +28,7 @@ const WOLF_ROWS = [
 export const CHARACTER_SPRITES: readonly SpriteDef[] = [
   {
     id: 'hero',
-    palette: { h: '#5a3a1a', s: SKIN, e: '#1a1a2e', b: '#2e6fd8', l: '#22355e', k: '#3b2a1a' },
+    palette: { h: '#5a3a1a', s: SKIN, e: '#ffd700', b: '#2e6fd8', l: '#22355e', k: '#3b2a1a' },
     rows: [
       '................',
       '.....hhhhhh.....',
