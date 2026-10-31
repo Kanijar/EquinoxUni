@@ -51,10 +51,10 @@ describe('alkuruudun suden salaisuus', () => {
     expect(secret.hp).toBe(PLAYER.stats.maxHp);
   });
 
-  it('500 KP vie suurimmalle tasolle 10 ja antaa 27 kykypistettä', () => {
+  it('500 KP vie tasolle 10 ja antaa 27 kykypistettä, mutta ei enää huipputasolle', () => {
     const state = createMenuGame(true, { ...rules, wolfStartXp: 500 });
-    expect(playerLevel(state)).toBe(PROGRESSION.xpForLevel.length);
     expect(playerLevel(state)).toBe(10);
+    expect(playerLevel(state)).toBeLessThan(PROGRESSION.xpForLevel.length);
     expect(unspentSkillPoints(state)).toBe(27);
     expect(startFromMenu(true, { ...rules, wolfStartXp: 500 }).message).toContain('Taso 10!');
   });

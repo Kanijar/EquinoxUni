@@ -204,8 +204,24 @@ export interface RespawnRules {
   readonly minPlayerDistancePx: number;
 }
 
+/**
+ * Kaava, jolla tasojen KP-rajat lasketaan (data/level-curve.ts). Kun n = taso − 1:
+ * KP-raja = cubic × n³ + quadratic × n² + linear × n, pyöristettynä kokonaisluvuksi.
+ * Kuutiollinen osa tekee korkeista tasoista selvästi työläämpiä kuin alkupään tasoista.
+ */
+export interface LevelCurve {
+  /** Suurin taso (huipputaso). */
+  readonly maxLevel: number;
+  readonly cubic: number;
+  readonly quadratic: number;
+  readonly linear: number;
+}
+
 export interface Progression {
-  /** Kokemuspisteet, jotka tarvitaan kullekin tasolle. Ensimmäinen on taso 1 (0 KP). */
+  /**
+   * Kokemuspisteet, jotka tarvitaan kullekin tasolle. Ensimmäinen on taso 1 (0 KP).
+   * Pelissä tämä lasketaan kaavasta (LevelCurve), testeissä voi antaa oman listan.
+   */
   readonly xpForLevel: readonly number[];
   /**
    * Kykypisteet, jotka pelaaja saa jokaisesta uudesta tasosta. Tämä on tason nousun
