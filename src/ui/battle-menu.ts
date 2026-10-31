@@ -9,7 +9,7 @@ import {
   type Battle,
   type BattleAction,
 } from '../logic/battle';
-import { TextButton } from './text-button';
+import { ActionButton, type ActionKind } from './battle/action-button';
 
 // Taistelun napit ruudun alareunassa: kaksi vasemmalle ja kaksi oikealle peukalolle.
 // Päävalikko: HYÖKKÄÄ, PUOLUSTA | JUOMA, PAKENE.
@@ -26,9 +26,9 @@ export interface BattleMenuCallbacks {
 type Slot = 0 | 1 | 2 | 3;
 
 export class BattleMenu {
-  private readonly main: readonly TextButton[];
-  private readonly attackMenu: readonly TextButton[];
-  private readonly item: TextButton;
+  private readonly main: readonly ActionButton[];
+  private readonly attackMenu: readonly ActionButton[];
+  private readonly item: ActionButton;
   private itemId: string = NO_ITEM;
   private attackMenuOpen = false;
   private enabled = false;
@@ -39,21 +39,21 @@ export class BattleMenu {
     callbacks: BattleMenuCallbacks,
   ) {
     const { onChoose, onAttackMenu } = callbacks;
-    this.item = this.button(2, TEXT.battle.item(0), () =>
+    this.item = this.button(2, 'item', TEXT.battle.item(0), () =>
       onChoose({ kind: 'item', itemId: this.itemId }),
     );
     this.main = [
-      this.button(0, TEXT.battle.attack, () => this.showAttackMenu(true, onAttackMenu)),
-      this.button(1, TEXT.battle.defend, () => onChoose({ kind: 'defend' })),
+      this.button(0, 'attack', TEXT.battle.attack, () => this.showAttackMenu(true, onAttackMenu)),
+      this.button(1, 'defend', TEXT.battle.defend, () => onChoose({ kind: 'defend' })),
       this.item,
-      this.button(3, TEXT.battle.flee, () => onChoose({ kind: 'flee' })),
+      this.button(3, 'flee', TEXT.battle.flee, () => onChoose({ kind: 'flee' })),
     ];
     this.attackMenu = [
-      this.button(0, TEXT.battle.punch, () => onChoose({ kind: 'attack' })),
-      this.button(1, TEXT.spellButtons[PLAYER.spell], () =>
+      this.button(0, 'punch', TEXT.battle.punch, () => onChoose({ kind: 'attack' })),
+      this.button(1, 'spell', TEXT.spellButtons[PLAYER.spell], () =>
         onChoose({ kind: 'spell', spellId: PLAYER.spell }),
       ),
-      this.button(3, TEXT.battle.back, () => this.showAttackMenu(false, onAttackMenu)),
+      this.button(3, 'back', TEXT.battle.back, () => this.showAttackMenu(false, onAttackMenu)),
     ];
     this.update();
   }
@@ -89,17 +89,18 @@ export class BattleMenu {
     this.item.setEnabled(this.enabled && !this.attackMenuOpen && canUseItem);
   }
 
-  private button(slot: Slot, label: string, onTap: () => void): TextButton {
+  private button(slot: Slot, kind: ActionKind, label: string, onTap: () => void): ActionButton {
     const { buttonWidth: w, buttonHeight: h, margin } = BATTLE_VIEW;
     const x =
       slot < 2
         ? margin + w / 2 + slot * (w + margin)
         : GAME_WIDTH - margin - w / 2 - (3 - slot) * (w + margin);
-    return new TextButton(this.scene, {
+    return new ActionButton(this.scene, {
       x,
       y: GAME_HEIGHT - margin - h / 2,
       width: w,
       height: h,
+      kind,
       label,
       onTap,
     });

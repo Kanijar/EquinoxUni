@@ -2,17 +2,21 @@ import Phaser from 'phaser';
 import { SCENES, WORLD_VIEW } from '../config/game-config';
 import { getEnemy } from '../data';
 import { PLAYER } from '../data/player';
+import type { TerrainId } from '../data/types';
 import { createBattle, enemyFighter } from '../logic/battle';
+import { backdropForTerrain } from '../logic/battle-look';
 import { playerFighter, playerSprite, type GameState } from '../logic/game-state';
 import { reviveAtLastTown } from '../logic/town-visits';
 import { BattleDirector, type FinishedOutcome } from '../systems/battle-director';
 import { TEXT } from '../i18n/fi';
 import { BattleView } from '../ui/battle-view';
+import { coverScreen, revealScreen } from '../ui/screen-wipe';
 import type { WorldSceneData } from './world-scene';
 
 // Vuoropohjainen taistelu. Alkaa, kun kartalla vihollinen koskettaa pelaajaa
 // tai kun vihollinen hyökkää väijytyksestä (esim. ryöstäjä metsässä).
-// Kulku on systems/battle-director.ts:ssä ja säännöt logic/battle.ts:ssä.
+// Kulku on systems/battle-director.ts:ssä, säännöt logic/battle.ts:ssä ja
+// grafiikka ui/battle-view.ts:ssä. Tausta valitaan maaston mukaan (data/battle-backdrops.ts).
 
 export interface BattleSceneData {
   readonly state: GameState;
@@ -20,6 +24,8 @@ export interface BattleSceneData {
   readonly enemyId: string;
   /** Vihollisen järjestysnumero data/map-enemies.ts:ssä, tai null väijytyksessä. */
   readonly mapEnemyIndex: number | null;
+  /** Maasto, jossa taistelu alkoi (valitsee taustan). Puuttuu = oletustausta. */
+  readonly terrain?: TerrainId;
 }
 
 export class BattleScene extends Phaser.Scene {
@@ -41,30 +47,33 @@ export class BattleScene extends Phaser.Scene {
       playerSprite: playerSprite(data.state),
       enemyName: enemy.name,
       enemySprite: enemy.sprite,
+      backdrop: backdropForTerrain(data.terrain),
     });
     const setup = { state: data.state, battle, enemy, mapEnemyIndex: data.mapEnemyIndex, view };
     new BattleDirector(this, setup, (outcome) => this.end(data.state, outcome));
+    revealScreen(this);
   }
 
+  /** Taistelun jälkeen ruutu pikselöityy ja kartta palaa. */
   private end(state: GameState, outcome: FinishedOutcome): void {
-    if (outcome === 'lost') {
-      this.revive(state);
-      return;
-    }
-    const graceMs =
-      outcome === 'fled' ? WORLD_VIEW.graceMs.afterFlee : WORLD_VIEW.graceMs.afterBattle;
-    const next: WorldSceneData = { state, graceMs };
-    this.scene.start(SCENES.world, next);
+    const next = outcome === 'lost' ? this.revive(state) : afterBattle(state, outcome);
+    coverScreen(this, () => this.scene.start(SCENES.world, next));
   }
 
   /** Kaatunut sankari herää viimeisimmässä paikkakunnassa, jossa hän kävi. */
-  private revive(state: GameState): void {
+  private revive(state: GameState): WorldSceneData {
     const town = reviveAtLastTown(state);
-    const next: WorldSceneData = {
+    return {
       state,
       graceMs: WORLD_VIEW.graceMs.afterRevive,
       message: TEXT.world.revived(town.nameAt),
+      fromBattle: true,
     };
-    this.scene.start(SCENES.world, next);
   }
+}
+
+function afterBattle(state: GameState, outcome: FinishedOutcome): WorldSceneData {
+  const graceMs =
+    outcome === 'fled' ? WORLD_VIEW.graceMs.afterFlee : WORLD_VIEW.graceMs.afterBattle;
+  return { state, graceMs, fromBattle: true };
 }

@@ -1,7 +1,6 @@
 import type Phaser from 'phaser';
 import { BATTLE_VIEW } from '../config/game-config';
 import { getItem } from '../data';
-import type { SoundId } from '../data/sounds';
 import { TEXT } from '../i18n/fi';
 import type { BattleEvent } from '../logic/battle';
 import type { VictoryReward } from '../logic/game-state';
@@ -22,30 +21,30 @@ export function eventStep(event: BattleEvent, view: BattleView, enemyName: strin
     case 'hit':
       return {
         text: hitText(event, enemyName),
-        effect: () => {
-          view.playHit(event.attacker, event.crit);
-          playSound(hitSound(event));
-        },
+        effect: () => view.playHit(event),
       };
     case 'spell':
       return {
         text: spellText(event, enemyName),
-        effect: () => {
-          view.playSpell(event.crit);
-          playSound(event.crit ? 'crit' : 'spell');
-        },
+        effect: () => view.playSpell(event.damage, event.crit),
       };
     case 'defend':
-      return { text: TEXT.battle.defending };
+      return { text: TEXT.battle.defending, effect: () => view.playDefend() };
     case 'heal':
-      return { text: TEXT.battle.heal(getItem(event.itemId).name, event.amount) };
+      return {
+        text: TEXT.battle.heal(getItem(event.itemId).name, event.amount),
+        effect: () => view.playHeal(event.amount),
+      };
     case 'steal':
       return {
         text: TEXT.battle.stole(enemyName, getItem(event.itemId).name),
-        effect: () => view.playLunge('enemy'),
+        effect: () => view.playSteal(getItem(event.itemId).sprite),
       };
     case 'flee':
-      return { text: event.success ? TEXT.battle.fleeOk : TEXT.battle.fleeFail };
+      return {
+        text: event.success ? TEXT.battle.fleeOk : TEXT.battle.fleeFail,
+        effect: () => view.playFlee(event.success),
+      };
   }
 }
 
@@ -60,6 +59,7 @@ export function victorySteps(
       text: TEXT.battle.won(enemyName, reward.xp),
       effect: () => {
         view.updateXp(reward.totalXp);
+        view.playVictory();
         playSound('victory');
       },
     },
@@ -71,7 +71,13 @@ export function victorySteps(
     steps.push({ text: TEXT.battle.drop(getItem(reward.drop).name) });
   }
   if (reward.leveledUp) {
-    steps.push({ text: TEXT.battle.levelUp(reward.level), effect: () => playSound('level-up') });
+    steps.push({
+      text: TEXT.battle.levelUp(reward.level),
+      effect: () => {
+        view.playLevelUp();
+        playSound('level-up');
+      },
+    });
   }
   if (reward.skillPoints > 0) {
     steps.push({ text: TEXT.battle.skillPoints(reward.skillPoints) });
@@ -96,13 +102,6 @@ export function playSteps(
   view.say(first.text);
   first.effect?.();
   scene.time.delayedCall(BATTLE_VIEW.messageMs, () => playSteps(scene, view, rest, done));
-}
-
-function hitSound(event: Extract<BattleEvent, { kind: 'hit' }>): SoundId {
-  if (event.crit) {
-    return 'crit';
-  }
-  return event.attacker === 'player' ? 'hit' : 'hurt';
 }
 
 function hitText(event: Extract<BattleEvent, { kind: 'hit' }>, enemyName: string): string {

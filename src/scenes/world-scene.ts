@@ -12,14 +12,16 @@ import {
   type GameState,
 } from '../logic/game-state';
 import { lastVisitedTown, visitTown } from '../logic/town-visits';
-import { townTile } from '../logic/world-grid';
+import { terrainAt, townTile } from '../logic/world-grid';
 import { AmbushWatch } from '../systems/ambush-watch';
 import { Controls } from '../systems/controls';
 import { MapEncounters } from '../systems/map-encounters';
 import { placeTownMarkers, TownTracker } from '../systems/town-markers';
-import { buildWorldMap, getWorldGrid, tileToWorld } from '../systems/world-map';
+import { playSound } from '../systems/sound-fx';
+import { buildWorldMap, getWorldGrid, tileToWorld, worldToTile } from '../systems/world-map';
 import { TEXT } from '../i18n/fi';
 import { Hud } from '../ui/hud';
+import { coverScreen, revealScreen } from '../ui/screen-wipe';
 import { addPlayerCountLabel } from '../ui/player-count-label';
 import { SaveButton } from '../ui/save-button';
 import { SkillButton } from '../ui/skill-button';
@@ -39,6 +41,8 @@ export interface WorldSceneData {
   readonly graceMs?: number;
   /** Ilmoitus, joka näytetään kartalle palatessa (esim. kaatumisen tai latauksen jälkeen). */
   readonly message?: string;
+  /** true = tultiin taistelusta: kartta paljastuu pikseliruutujen alta. */
+  readonly fromBattle?: boolean;
 }
 
 export class WorldScene extends Phaser.Scene {
@@ -53,6 +57,8 @@ export class WorldScene extends Phaser.Scene {
   private saveButton!: SaveButton;
   private toast!: Toast;
   private encountersFrom = 0;
+  /** Taistelu on alkamassa: kartta pysähtyy siirtymäefektin ajaksi. */
+  private leaving = false;
 
   constructor() {
     super(SCENES.world);
@@ -60,6 +66,9 @@ export class WorldScene extends Phaser.Scene {
 
   create(data: WorldSceneData): void {
     this.state = data.state ?? createNewGame();
+    this.leaving = false;
+    // Taisteluun lähtiessä fysiikka pysäytettiin; se jatkuu, kun kartta avautuu uudelleen.
+    this.physics.resume();
     const isNewGame = this.state.position === null && data.message === undefined;
     const built = buildWorldMap(this, getWorldGrid());
     placeTownMarkers(this);
@@ -83,9 +92,15 @@ export class WorldScene extends Phaser.Scene {
     if (message) {
       this.toast.show(message);
     }
+    if (data.fromBattle) {
+      revealScreen(this);
+    }
   }
 
   override update(time: number, delta: number): void {
+    if (this.leaving) {
+      return;
+    }
     this.player.move(this.controls.read().move);
     const position = this.player.position;
     this.state.position = position;
@@ -132,9 +147,15 @@ export class WorldScene extends Phaser.Scene {
     this.scene.start(SCENES.saves, data);
   }
 
+  /** Kartta pysähtyy ja hajoaa pikseleiksi, sitten taistelu alkaa. */
   private startBattle(enemyId: string, mapEnemyIndex: number | null): void {
-    const data: BattleSceneData = { state: this.state, enemyId, mapEnemyIndex };
-    this.scene.start(SCENES.battle, data);
+    const position = this.player.position;
+    const terrain = terrainAt(getWorldGrid(), worldToTile(position));
+    const data: BattleSceneData = { state: this.state, enemyId, mapEnemyIndex, terrain };
+    this.leaving = true;
+    this.physics.pause();
+    playSound('battle-start');
+    coverScreen(this, () => this.scene.start(SCENES.battle, data));
   }
 
   private updateHud(): void {
