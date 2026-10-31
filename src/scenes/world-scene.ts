@@ -3,7 +3,13 @@ import { SCENES, WORLD_VIEW } from '../config/game-config';
 import { getTown, WORLD } from '../data';
 import { Player } from '../entities/player';
 import { healItemCount } from '../logic/battle';
-import { createNewGame, playerStats, restoreHp, type GameState } from '../logic/game-state';
+import {
+  createNewGame,
+  playerStats,
+  restoreHp,
+  unspentSkillPoints,
+  type GameState,
+} from '../logic/game-state';
 import { townTile } from '../logic/world-grid';
 import { AmbushWatch } from '../systems/ambush-watch';
 import { Controls } from '../systems/controls';
@@ -12,11 +18,14 @@ import { placeTownMarkers, TownTracker } from '../systems/town-markers';
 import { buildWorldMap, getWorldGrid, tileToWorld } from '../systems/world-map';
 import { TEXT } from '../i18n/fi';
 import { Hud } from '../ui/hud';
+import { SkillButton } from '../ui/skill-button';
 import { Toast } from '../ui/toast';
 import type { BattleSceneData } from './battle-scene';
+import type { SkillsSceneData } from './skills-scene';
 
 // Suomen kartta. Pelaaja kulkee virtuaalitikulla, lepää paikkakunnissa ja
-// joutuu taisteluun, kun vihollinen saa hänet kiinni. Tämä scene vain kokoaa osat.
+// joutuu taisteluun, kun vihollinen saa hänet kiinni. Paikkakunnassa voi jakaa
+// kykypisteet KYKYPISTEET-napista. Tämä scene vain kokoaa osat.
 
 export interface WorldSceneData {
   readonly state?: GameState;
@@ -32,6 +41,7 @@ export class WorldScene extends Phaser.Scene {
   private ambushes!: AmbushWatch;
   private towns!: TownTracker;
   private hud!: Hud;
+  private skillButton!: SkillButton;
   private toast!: Toast;
   private encountersFrom = 0;
 
@@ -54,6 +64,7 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player.sprite, true);
     this.controls = new Controls(this);
     this.hud = new Hud(this);
+    this.skillButton = new SkillButton(this, () => this.openSkills());
     this.toast = new Toast(this);
     this.encountersFrom = this.time.now + (data.graceMs ?? WORLD_VIEW.graceMs.start);
     if (isNewGame) {
@@ -67,8 +78,7 @@ export class WorldScene extends Phaser.Scene {
     this.state.position = position;
     const arrived = this.towns.update(position);
     if (arrived) {
-      restoreHp(this.state);
-      this.toast.show(TEXT.world.rest(arrived.nameAt));
+      this.rest(arrived.nameAt);
     }
     this.updateHud();
     if (this.encounters.enemiesLeft === 0) {
@@ -87,6 +97,19 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
+  /** Paikkakuntaan saapuessa elämä palautuu, ja käyttämättömistä kykypisteistä muistutetaan. */
+  private rest(townAt: string): void {
+    restoreHp(this.state);
+    const points = unspentSkillPoints(this.state);
+    const reminder = points > 0 ? `\n${TEXT.world.skillPointsWaiting(points)}` : '';
+    this.toast.show(TEXT.world.rest(townAt) + reminder);
+  }
+
+  private openSkills(): void {
+    const data: SkillsSceneData = { state: this.state };
+    this.scene.start(SCENES.skills, data);
+  }
+
   private startBattle(enemyId: string, mapEnemyIndex: number | null): void {
     const data: BattleSceneData = { state: this.state, enemyId, mapEnemyIndex };
     this.scene.start(SCENES.battle, data);
@@ -101,5 +124,6 @@ export class WorldScene extends Phaser.Scene {
       enemiesLeft: this.encounters.enemiesLeft,
       townName: this.towns.town?.name ?? '',
     });
+    this.skillButton.update(this.towns.town !== undefined, unspentSkillPoints(this.state));
   }
 }

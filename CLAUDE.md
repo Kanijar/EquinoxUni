@@ -38,6 +38,7 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
 | Kartan muoto, järvet, maasto          | `src/data/finland.ts` (+ ruutujen kuvat `src/data/sprites-tiles.ts`)                                                    |
 | Pelaajan arvot (elämä, nopeus, isku)  | `src/data/player.ts`                                                                                                    |
 | Kokemustasot, taistelun vaikeus       | `src/data/rules.ts`                                                                                                     |
+| Kykypisteet (mitä piste antaa)        | `src/data/skills.ts`, säännöt `src/logic/skill-points.ts` + testi                                                       |
 | Taistelun säännöt (vuorot, toiminnot) | `src/logic/battle.ts` + testi                                                                                           |
 | Taistelukaavat                        | `src/logic/combat.ts` + testi                                                                                           |
 | Vihollisten käyttäytyminen kartalla   | `src/logic/enemy-ai.ts` + testi                                                                                         |

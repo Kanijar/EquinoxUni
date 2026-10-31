@@ -14,4 +14,5 @@ export const BATTLE_RULES: BattleRules = {
 export const PROGRESSION: Progression = {
   xpForLevel: [0, 12, 30, 55, 90, 140, 200, 280, 380, 500],
   perLevel: { maxHp: 6, attack: 2, defense: 1 },
+  skillPointsPerLevel: 3,
 };

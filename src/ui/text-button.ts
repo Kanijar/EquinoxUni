@@ -50,6 +50,11 @@ export class TextButton {
     this.text.setText(label);
   }
 
+  setVisible(visible: boolean): void {
+    this.box.setVisible(visible);
+    this.text.setVisible(visible);
+  }
+
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
     this.box.setAlpha(enabled ? 1 : DISABLED_ALPHA);

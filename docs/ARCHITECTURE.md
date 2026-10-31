@@ -75,8 +75,8 @@ scenes  →  systems / ui  →  entities  →  logic
   Ruutukoko 16 px, hahmot 16 × 16 px.
 - **Scenet:** `BootScene` (luo/lataa grafiikat) → `MenuScene` (koko näyttö + vaakasuunta
   ensimmäisestä kosketuksesta) → `WorldScene` (Suomen kartta) ⇄ `BattleScene` (vuoropohjainen
-  taistelu) → `GameOverScene`. Pelin tila (`logic/game-state.ts`: elämä, KP, esineet, sijainti,
-  voitetut viholliset) annetaan scenejen välillä `scene.start(key, data)` -datana.
+  taistelu) → `GameOverScene`. Paikkakunnassa `WorldScene` ⇄ `SkillsScene` (kykypisteiden jako).
+  Pelin tila (`logic/game-state.ts`: elämä, KP, kykypisteet, esineet, sijainti, voitetut viholliset) annetaan scenejen välillä `scene.start(key, data)` -datana.
 - **Suomen kartta:** `logic/world-grid.ts` rakentaa ruudukon `data/finland.ts`:n rajoista
   (oikeat koordinaatit, 1 ruutu = 8 km), järvistä ja maastovyöhykkeistä sekä vetää tiet
   paikkakuntien välille. `systems/world-map.ts` piirtää ruudukon Phaserin tilemapiksi, jossa meri
@@ -85,6 +85,10 @@ scenes  →  systems / ui  →  entities  →  logic
   Pelaaja valitsee HYÖKKÄÄ, PUOLUSTA, JUOMA tai PAKENE, sitten vihollinen vastaa.
   Säännöt ovat `logic/battle.ts`:ssä (palauttaa tapahtumalistan), näyttäminen
   `systems/battle-director.ts`:ssä ja `ui/battle-*.ts`:ssä.
+- **Kykypisteet:** jokaisesta uudesta tasosta saa `PROGRESSION.skillPointsPerLevel` (3) pistettä.
+  Ne jaetaan paikkakunnassa KYKYPISTEET-napista hyökkäykseen, puolustukseen tai elinvoimaan
+  (maksimielämä). Pisteen arvo on `data/skills.ts`:ssä, säännöt `logic/skill-points.ts`:ssä.
+  Pelaajan tilaan tallennetaan vain käytetyt pisteet; käyttämättömät lasketaan tasosta.
 - **Ohjaus:** kartalla kelluva virtuaalitikku (missä tahansa kohtaa ruutua), taistelussa neljä
   nappia ruudun alareunassa. Tietokoneella nuolet/WASD. Kartan liike luetaan
   `Controls.read()`-metodista.

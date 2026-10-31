@@ -158,4 +158,21 @@ export interface Progression {
   readonly xpForLevel: readonly number[];
   /** Arvojen kasvu jokaista tasoa kohti. */
   readonly perLevel: { readonly maxHp: number; readonly attack: number; readonly defense: number };
+  /** Kykypisteet, jotka pelaaja saa jokaisesta uudesta tasosta. */
+  readonly skillPointsPerLevel: number;
+}
+
+// --- Kykypisteet ---
+
+/** Kyky, johon pelaaja voi laittaa kykypisteitä paikkakunnassa. */
+export type SkillId = 'attack' | 'defense' | 'vitality';
+
+/** Arvo, jota kyky kasvattaa. Elinvoima kasvattaa maksimielämää. */
+export type SkillStat = 'attack' | 'defense' | 'maxHp';
+
+export interface SkillDef {
+  readonly id: SkillId;
+  readonly stat: SkillStat;
+  /** Paljonko arvo kasvaa jokaisesta kykyyn laitetusta pisteestä. */
+  readonly perPoint: number;
 }

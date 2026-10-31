@@ -41,6 +41,7 @@ export const SCENES = {
   world: 'world',
   battle: 'battle',
   gameOver: 'game-over',
+  skills: 'skills',
 } as const;
 
 /** Karttanäkymän asetukset. */
@@ -51,6 +52,24 @@ export const WORLD_VIEW = {
   graceMs: { start: 1000, afterBattle: 1000, afterFlee: 2500 },
   /** Ilmoitusten näkymisaika. */
   toastMs: 2500,
+  /** Paikkakunnassa näkyvä KYKYPISTEET-nappi oikeassa alakulmassa. */
+  skillButton: { width: 150, height: 40, margin: 6 },
+} as const;
+
+/** Kykypistenäkymän asetukset. */
+export const SKILLS_VIEW = {
+  titleY: 20,
+  pointsLeftY: 46,
+  firstRowY: 84,
+  rowGap: 48,
+  nameX: 40,
+  valueX: 190,
+  perPointX: 210,
+  addButtonX: 420,
+  buttonHeight: 40,
+  addButtonWidth: 56,
+  doneButtonWidth: 120,
+  margin: 6,
 } as const;
 
 /** Taistelunäkymän asetukset. */

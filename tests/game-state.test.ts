@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getEnemy } from '../src/data';
 import { PLAYER } from '../src/data/player';
+import { PROGRESSION } from '../src/data/rules';
 import { createBattle } from '../src/logic/battle';
 import {
   applyBattleResult,
@@ -16,6 +17,7 @@ import type { Progression } from '../src/data/types';
 const progression: Progression = {
   xpForLevel: [0, 10, 30],
   perLevel: { maxHp: 5, attack: 2, defense: 1 },
+  skillPointsPerLevel: 3,
 };
 
 describe('kokemustasot', () => {
@@ -81,7 +83,14 @@ describe('pelin tila', () => {
     expect(state.xp).toBe(12);
     expect(state.defeated).toEqual([4]);
     expect(state.inventory['potion']).toBe(4);
-    expect(reward).toEqual({ xp: 12, totalXp: 12, leveledUp: true, level: 2, drop: 'potion' });
+    expect(reward).toEqual({
+      xp: 12,
+      totalXp: 12,
+      leveledUp: true,
+      level: 2,
+      skillPoints: PROGRESSION.skillPointsPerLevel,
+      drop: 'potion',
+    });
   });
 
   it('tason noustessa elämä palautuu uuteen maksimiin', () => {

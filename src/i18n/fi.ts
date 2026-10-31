@@ -19,6 +19,19 @@ export const TEXT = {
   world: {
     intro: 'Seikkailu alkaa Valkeakoskelta!',
     rest: (townAt: string): string => `Lepäsit ${townAt}. Elämä palautui!`,
+    skillPointsWaiting: (points: number): string =>
+      `Sinulla on ${points} kykypistettä. Paina KYKYPISTEET.`,
+  },
+  skills: {
+    button: (points: number): string => `KYKYPISTEET ${points}`,
+    title: 'Kykypisteet',
+    left: (points: number): string => `Käyttämättä: ${points}`,
+    hint: (points: number): string => `Jokaisesta uudesta tasosta saat ${points} kykypistettä.`,
+    names: { attack: 'Hyökkäys', defense: 'Puolustus', vitality: 'Elinvoima' },
+    perPoint: (amount: number, stat: string): string => `+${amount} ${stat} / piste`,
+    statNames: { attack: 'hyökkäys', defense: 'puolustus', maxHp: 'maksimielämä' },
+    add: '+',
+    done: 'VALMIS',
   },
   battle: {
     appears: (enemy: string): string => `${enemy} hyökkää kimppuusi!`,
@@ -44,6 +57,8 @@ export const TEXT = {
     levelUp: (level: number): string => `Nousit tasolle ${level}! Elämä palautui.`,
     xpToNext: (missing: number): string => `Seuraavaan tasoon tarvitset vielä ${missing} KP.`,
     maxLevel: 'Olet huipputasolla!',
+    skillPoints: (points: number): string =>
+      `Sait ${points} kykypistettä! Käytä ne paikkakunnassa.`,
     lost: 'Kaaduit taistelussa...',
   },
   gameOver: {

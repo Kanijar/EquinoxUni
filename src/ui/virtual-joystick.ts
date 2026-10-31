@@ -3,6 +3,7 @@ import { clampLength, ZERO, type Vec2 } from '../logic/vector';
 
 // Kelluva virtuaalitikku: ilmestyy kohtaan, jota pelaaja koskettaa (missä tahansa
 // kohdassa ruutua, joten sopii kummallekin peukalolle). value on vektori, pituus 0..1.
+// Napin päältä aloitettu kosketus ei liikuta tikkua.
 
 const RADIUS = 28;
 const ALPHA = 0.35;
@@ -34,8 +35,12 @@ export class VirtualJoystick {
     return { x: clamped.x / RADIUS, y: clamped.y / RADIUS };
   }
 
-  private onDown(pointer: Phaser.Input.Pointer): void {
-    if (this.pointerId !== null) {
+  /** currentlyOver: napit tms. kosketuskohdassa. Niiden päällä tikku ei aktivoidu. */
+  private onDown(
+    pointer: Phaser.Input.Pointer,
+    currentlyOver: readonly Phaser.GameObjects.GameObject[],
+  ): void {
+    if (this.pointerId !== null || currentlyOver.length > 0) {
       return;
     }
     this.pointerId = pointer.id;

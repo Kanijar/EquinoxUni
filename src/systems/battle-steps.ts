@@ -51,6 +51,9 @@ export function victorySteps(
   if (reward.leveledUp) {
     steps.push({ text: TEXT.battle.levelUp(reward.level) });
   }
+  if (reward.skillPoints > 0) {
+    steps.push({ text: TEXT.battle.skillPoints(reward.skillPoints) });
+  }
   const missing = xpToNextLevel(reward.totalXp);
   steps.push({ text: missing === null ? TEXT.battle.maxLevel : TEXT.battle.xpToNext(missing) });
   return steps;
