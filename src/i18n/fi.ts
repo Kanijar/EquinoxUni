@@ -82,6 +82,8 @@ export const TEXT = {
     potions: (count: number): string => `Juomat ${count}`,
     /** Viholliset, joita ei ole vielä voitettu kertaakaan (voitetut palaavat kartalle). */
     enemiesLeft: (count: number): string => `Voittamatta ${count}`,
+    /** Montako ihmistä pelaa juuri nyt (pelaaja itse mukaan lukien). */
+    players: (count: number): string => `Pelaajia nyt: ${count}`,
   },
   world: {
     intro: 'Seikkailu alkaa Valkeakoskelta!',

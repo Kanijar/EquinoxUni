@@ -1,0 +1,47 @@
+name: Julkaise pelaajalaskuri Cloudflareen
+
+# Julkaisee pelaajalaskurin palvelimen (worker/presence) Cloudflare Workersiin.
+# Vaatii kerran repon salaisuudet CLOUDFLARE_API_TOKEN ja CLOUDFLARE_ACCOUNT_ID
+# (ohje: docs/PELAAJALASKURI.md). Ilman niitä työ ohitetaan, eikä mikään mene rikki.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'worker/presence/**'
+      - 'src/config/presence.ts'
+      - 'src/logic/presence-message.ts'
+      - '.github/workflows/presence-worker.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: presence-worker
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Tarkista Cloudflare-avaimet
+        id: keys
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Cloudflare-avaimia ei ole lisätty, joten pelaajalaskuria ei julkaista."
+          fi
+      - if: steps.keys.outputs.ready == 'true'
+        uses: actions/checkout@v4
+      - if: steps.keys.outputs.ready == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - if: steps.keys.outputs.ready == 'true'
+        working-directory: worker/presence
+        run: npx --yes wrangler@4 deploy

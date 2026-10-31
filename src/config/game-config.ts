@@ -105,6 +105,15 @@ export const WOLF_MAGIC = {
   twinkleMs: 900,
 } as const;
 
+/** Pelaajalaskuri ("Pelaajia nyt: 3") alkuruudun ja kartan vasemmassa alakulmassa. */
+export const PLAYER_COUNT_VIEW = {
+  margin: 4,
+  alpha: 0.7,
+  stroke: 3,
+  /** Kartan yllä, mutta ilmoitusten (toast) alla. */
+  depth: 900,
+} as const;
+
 /** Asetusnäkymän asetukset. */
 export const SETTINGS_VIEW = {
   titleY: 24,

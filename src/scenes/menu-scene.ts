@@ -6,6 +6,7 @@ import { startFromMenu } from '../logic/menu-secret';
 import { enterFullscreenLandscape } from '../systems/fullscreen';
 import { makeHowlingWolf } from '../ui/howling-wolf';
 import { drawMenuBackdrop } from '../ui/menu-backdrop';
+import { addPlayerCountLabel } from '../ui/player-count-label';
 import { TextButton } from '../ui/text-button';
 import { addTitle } from '../ui/title-text';
 import { addVersionLabel } from '../ui/version-label';
@@ -14,7 +15,7 @@ import type { WorldSceneData } from './world-scene';
 
 // Alkuruutu: PELAA aloittaa uuden pelin Valkeakoskelta, LATAA avaa tallennukset,
 // ASETUKSET avaa valon ja äänten säädöt ja LÄHDE lopettaa pelin.
-// Oikeassa alakulmassa näkyy pelin versio (data/game-info.ts).
+// Oikeassa alakulmassa näkyy pelin versio (data/game-info.ts), vasemmassa pelaajamäärä.
 // Salaisuus: jos sutta napauttaa ennen PELAA-nappia, uusi peli alkaa kokemuspisteillä ja
 // lisäjuomilla (logic/menu-secret.ts). Alkuruudulla siitä ei kerrota: susi vain ulvahtaa
 // ja muuttuu hehkuvaksi henkisudeksi. Kartalla näkyy yllätysviesti.
@@ -40,6 +41,7 @@ export class MenuScene extends Phaser.Scene {
     });
     addTitle(this, MENU_VIEW.titleY, TEXT.gameTitle);
     addVersionLabel(this);
+    addPlayerCountLabel(this);
     const entries: MenuEntry[] = [
       { label: TEXT.menu.play, onTap: () => this.play() },
       { label: TEXT.menu.load, onTap: () => this.open(SCENES.saves, {} satisfies SavesSceneData) },
