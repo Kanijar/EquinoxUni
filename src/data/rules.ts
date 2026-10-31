@@ -1,4 +1,4 @@
-import type { BattleRules, MagicRules, Progression, RespawnRules } from './types';
+import type { BattleRules, MagicRules, MenuSecretRules, Progression, RespawnRules } from './types';
 
 // Taistelun ja kokemustasojen säännöt. Muuta näitä, kun haluat pelistä
 // helpomman tai vaikeamman.
@@ -29,4 +29,12 @@ export const RESPAWN_RULES: RespawnRules = {
 export const PROGRESSION: Progression = {
   xpForLevel: [0, 12, 30, 55, 90, 140, 200, 280, 380, 500],
   skillPointsPerLevel: 3,
+};
+
+/**
+ * Salaisuus: napauta alkuruudun sutta ja sitten PELAA, niin uusi peli alkaa 30 KP:llä
+ * (taso nousee ja kykypisteet tulevat heti). Tästä ei kerrota pelin teksteissä.
+ */
+export const MENU_SECRET: MenuSecretRules = {
+  wolfStartXp: 30,
 };

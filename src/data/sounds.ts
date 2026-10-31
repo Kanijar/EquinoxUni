@@ -42,6 +42,14 @@ export const SOUNDS = {
       { freq: 1047, ms: 200 },
     ],
   },
+  howl: {
+    wave: 'triangle',
+    gain: 0.3,
+    notes: [
+      { freq: 330, ms: 120, slideTo: 620 },
+      { freq: 620, ms: 380, slideTo: 440 },
+    ],
+  },
   save: {
     wave: 'triangle',
     gain: 0.35,

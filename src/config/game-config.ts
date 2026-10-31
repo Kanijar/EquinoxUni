@@ -76,6 +76,10 @@ export const MENU_VIEW = {
   groundScale: 2,
   bobPx: 3,
   bobMs: 600,
+  /** Napautettu susi nostaa päänsä ulvomaan: kallistus asteina, kesto ja pullistus. */
+  wolfHowlAngle: 14,
+  wolfHowlMs: 220,
+  wolfHowlScale: 1.1,
   /** Versioteksti oikeassa alakulmassa: etäisyys reunoista ja himmennys. */
   versionMargin: 4,
   versionAlpha: 0.7,
