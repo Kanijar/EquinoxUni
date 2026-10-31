@@ -4,9 +4,15 @@ import { WOLF_MAGIC } from '../config/game-config';
 // Alkuruudun suden salaisuuden taikaefektit: tähtisäihke, välähdys ja tuikkivat tähdet.
 // Efektit kertovat pelaajalle, että jotain tapahtui, mutta eivät kerro mitä.
 
-/** Pikselitähdet lentävät kohdasta (x, y) joka suuntaan ja himmenevät. */
-export function burstStars(scene: Phaser.Scene, x: number, y: number, count: number): void {
-  const { starSizePx, starColors, starMinPx, starMaxPx, starMs, starDepth } = WOLF_MAGIC;
+/** Pikselitähdet lentävät kohdasta at joka suuntaan ja himmenevät. */
+export function burstStars(
+  scene: Phaser.Scene,
+  at: { readonly x: number; readonly y: number },
+  count: number,
+  starColors: readonly number[] = WOLF_MAGIC.starColors,
+): void {
+  const { starSizePx, starMinPx, starMaxPx, starMs, starDepth } = WOLF_MAGIC;
+  const { x, y } = at;
   for (let i = 0; i < count; i++) {
     const angle = (Math.PI * 2 * i) / count + Phaser.Math.FloatBetween(-0.2, 0.2);
     const distance = Phaser.Math.Between(starMinPx, starMaxPx);

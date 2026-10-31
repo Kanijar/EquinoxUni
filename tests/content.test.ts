@@ -30,7 +30,7 @@ describe('sisältödata', () => {
 
   it('kaikki viitatut spritet ovat olemassa', () => {
     const used = [
-      PLAYER.sprite,
+      ...Object.values(PLAYER.eyeSprites),
       'town',
       ...ENEMIES.map((e) => e.sprite),
       ...ITEMS.map((i) => i.sprite),

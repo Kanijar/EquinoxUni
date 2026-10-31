@@ -58,9 +58,11 @@ export const PROGRESSION: Progression = {
  * peli alkaa 500 KP:llä (taso 10 ja 27 kykypistettä, huipputasoon 50 on vielä matkaa) ja kolmella
  * ylimääräisellä juomalla.
  * Alkuruudulla tästä ei kerrota, vasta kartalla näkyy "Susi siunasi sinut!".
+ * Toinen salaisuus: alkuruudun liman napautus muuttaa sankarin silmät mustiksi (slimeEyeColor).
  */
 export const MENU_SECRET: MenuSecretRules = {
   wolfStartXp: 500,
   bonusItems: [{ id: 'potion', count: 3 }],
   spiritSprite: 'wolf-spirit',
+  slimeEyeColor: 'black',
 };
