@@ -15,9 +15,10 @@ export const SAVE_SLOT_COUNT = 3;
  * ettei vanha tallennus enää kelpaa sellaisenaan, ja lisää muunnos
  * tiedostoon logic/save-format.ts (SAVE_MIGRATIONS).
  * Versio 2: voitetut viholliset palaavat kartalle (GameState.respawning).
- * Versio 3: reppu ja varusteet (GameState.equipped).
+ * Versio 3: sankarin silmien väri (GameState.eyeColor).
+ * Versio 4: reppu ja varusteet (GameState.equipped).
  */
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 /** Säädettävän asetuksen rajat prosentteina. */
 export interface SettingRange {

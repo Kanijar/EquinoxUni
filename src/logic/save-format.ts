@@ -1,4 +1,5 @@
 import { SAVE_VERSION } from '../config/persistence';
+import { PLAYER } from '../data/player';
 import type { GameState } from './game-state';
 import { parseJson } from './key-value-store';
 import { mapEnemyRespawnMs } from './respawn';
@@ -29,7 +30,8 @@ type RawSave = Record<string, unknown>;
  */
 export const SAVE_MIGRATIONS: Readonly<Record<number, (save: RawSave) => RawSave>> = {
   1: addRespawnTimers,
-  2: addEquipment,
+  2: addEyeColor,
+  3: addEquipment,
 };
 
 /**
@@ -49,7 +51,19 @@ function addRespawnTimers(save: RawSave): RawSave {
 }
 
 /**
- * Versio 2 → 3. Versiossa 3 tuli reppu ja varusteet (GameState.equipped). Vanhassa
+ * Versio 2 → 3. Vanhoissa tallennuksissa ei ole silmien väriä: sankari saa pelin
+ * oletusvärin (data/player.ts). Rikkinäiset arvot jätetään readGameState()-tarkistukselle.
+ */
+function addEyeColor(save: RawSave): RawSave {
+  const state = save['state'];
+  if (!isRecord(state)) {
+    return save;
+  }
+  return { ...save, state: { eyeColor: PLAYER.eyeColor, ...state } };
+}
+
+/**
+ * Versio 3 → 4. Versiossa 4 tuli reppu ja varusteet (GameState.equipped). Vanhassa
  * tallennuksessa ei ole varusteita käytössä, joten paikat ovat tyhjiä. Repun esineet säilyvät.
  */
 function addEquipment(save: RawSave): RawSave {

@@ -43,7 +43,8 @@ export class BattleDirector {
       onChoose: (action) => this.choose(action),
       onAttackMenu: (open) => setup.view.say(open ? TEXT.battle.chooseAttack : TEXT.battle.choose),
     });
-    setup.view.updateHp(setup.battle);
+    setup.view.syncHp(setup.battle, false);
+    setup.view.intro();
     const intro = setup.mapEnemyIndex === null ? TEXT.battle.ambush : TEXT.battle.appears;
     setup.view.say(intro(setup.enemy.name));
     this.menu.refresh(setup.battle, true);
@@ -62,7 +63,8 @@ export class BattleDirector {
       return;
     }
     view.playBurn(tick.damage);
-    view.updateHp(battle);
+    view.syncHp(battle);
+    view.setBurning(battle.enemyBurn !== null);
     if (battle.outcome === 'won' && !this.busy) {
       this.busy = true;
       this.menu.refresh(battle, false);
@@ -78,20 +80,13 @@ export class BattleDirector {
     this.busy = true;
     this.menu.refresh(battle, false);
     const events = takeTurn(battle, action, Math.random);
-    const steps: BattleStep[] = events.map((event) => {
-      const step = eventStep(event, view, enemy.name);
-      return { ...step, effect: () => this.showStep(step) };
-    });
+    const steps = events.map((event) => eventStep(event, view, enemy.name));
     playSteps(this.scene, view, steps, () => this.afterTurn());
-  }
-
-  private showStep(step: BattleStep): void {
-    step.effect?.();
-    this.setup.view.updateHp(this.setup.battle);
   }
 
   private afterTurn(): void {
     const { battle, view } = this.setup;
+    view.syncHp(battle);
     if (battle.outcome === 'ongoing') {
       this.busy = false;
       view.say(TEXT.battle.choose);

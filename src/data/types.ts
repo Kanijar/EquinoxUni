@@ -29,9 +29,15 @@ export interface ItemStack {
   readonly count: number;
 }
 
+/** Sankarin silmien väri. Uusi väri: lisää tähän ja PLAYER.eyeSprites-listaan (data/player.ts). */
+export type EyeColor = 'yellow' | 'black';
+
 export interface PlayerDef {
   readonly name: string;
-  readonly sprite: string;
+  /** Silmien väri pelin alussa. */
+  readonly eyeColor: EyeColor;
+  /** Sankarin sprite kullekin silmien värille (data/sprites-characters.ts). */
+  readonly eyeSprites: Readonly<Record<EyeColor, string>>;
   /** Arvot pelin alussa. Kasvavat vain kykypisteillä (data/skills.ts). */
   readonly stats: PlayerStats;
   /** Loitsu, joka on HYÖKKÄÄ-valikon TULIPALLO-napissa (data/spells.ts). */
@@ -222,6 +228,8 @@ export interface MenuSecretRules {
   readonly bonusItems: readonly ItemStack[];
   /** Sprite, joksi alkuruudun susi muuttuu napautuksesta (hehkuvat silmät). */
   readonly spiritSprite: string;
+  /** Silmien väri, joksi sankarin silmät muuttuvat, kun alkuruudun limaa napautetaan. */
+  readonly slimeEyeColor: EyeColor;
 }
 
 export interface MagicRules {
@@ -243,8 +251,24 @@ export interface RespawnRules {
   readonly minPlayerDistancePx: number;
 }
 
+/**
+ * Kaava, jolla tasojen KP-rajat lasketaan (data/level-curve.ts). Kun n = taso − 1:
+ * KP-raja = cubic × n³ + quadratic × n² + linear × n, pyöristettynä kokonaisluvuksi.
+ * Kuutiollinen osa tekee korkeista tasoista selvästi työläämpiä kuin alkupään tasoista.
+ */
+export interface LevelCurve {
+  /** Suurin taso (huipputaso). */
+  readonly maxLevel: number;
+  readonly cubic: number;
+  readonly quadratic: number;
+  readonly linear: number;
+}
+
 export interface Progression {
-  /** Kokemuspisteet, jotka tarvitaan kullekin tasolle. Ensimmäinen on taso 1 (0 KP). */
+  /**
+   * Kokemuspisteet, jotka tarvitaan kullekin tasolle. Ensimmäinen on taso 1 (0 KP).
+   * Pelissä tämä lasketaan kaavasta (LevelCurve), testeissä voi antaa oman listan.
+   */
   readonly xpForLevel: readonly number[];
   /**
    * Kykypisteet, jotka pelaaja saa jokaisesta uudesta tasosta. Tämä on tason nousun
@@ -314,4 +338,70 @@ export interface SoundDef {
   /** Äänen voimakkuus 0..1 ennen pelaajan äänenvoimakkuusasetusta. */
   readonly gain: number;
   readonly notes: readonly SoundNote[];
+}
+
+// --- Taistelun ulkoasu ---
+
+/** Taistelun tausta. Valitaan maaston mukaan (data/battle-backdrops.ts). */
+export type BattleBackdropId = 'field' | 'forest' | 'snow' | 'village';
+
+/** Taustan sää: hiutaleet putoavat ylhäältä tai hiukkaset leijuvat ilmassa. */
+export interface BattleWeatherDef {
+  readonly kind: 'fall' | 'float';
+  readonly colors: readonly number[];
+  /** Kuinka monta hiukkasta on yhtä aikaa ruudulla (pidä pienenä puhelimen takia). */
+  readonly count: number;
+}
+
+/**
+ * Taistelun tausta pikselitaiteena. Värit ovat CSS-värejä ('#rrggbb'). Tausta piirretään
+ * puolikkaalla resoluutiolla, joten yksi taustan pikseli on kaksi pelin pikseliä.
+ */
+export interface BattleBackdropDef {
+  readonly id: BattleBackdropId;
+  /** Taivaan värit ylhäältä horisonttiin. */
+  readonly sky: readonly string[];
+  readonly sun: {
+    readonly x: number;
+    readonly y: number;
+    readonly radius: number;
+    readonly color: string;
+  };
+  /** Kaukaiset kukkulat (peaks = terävät tunturit, cap = lumihuippujen väri). */
+  readonly hills: {
+    readonly color: string;
+    readonly height: number;
+    readonly peaks: boolean;
+    readonly cap?: string;
+  };
+  /** Puurivi horisontissa: kuuset tai koivut. count = puiden määrä. */
+  readonly trees: {
+    readonly kind: 'pine' | 'birch';
+    readonly color: string;
+    readonly shade: string;
+    readonly count: number;
+  } | null;
+  /** Punaiset mökit horisontissa (kylä). */
+  readonly houses: number;
+  /** Maan raidat horisontista alas. */
+  readonly ground: readonly string[];
+  /** Ruohotupsujen, kukkien tai kimalluksen värit maassa. */
+  readonly speckles: readonly string[];
+  /** Hiekkatie keskellä (kylätie), tai null. */
+  readonly path: string | null;
+  readonly weather: BattleWeatherDef | null;
+}
+
+/** Hiukkasräjähdys (osuma, tulipallo, kuolema). Arvot pelin pikseleinä ja millisekunteina. */
+export interface ParticleBurstDef {
+  readonly count: number;
+  readonly colors: readonly number[];
+  readonly speed: { readonly min: number; readonly max: number };
+  readonly lifeMs: number;
+  /** Hiukkasen koko pikseleinä (neliö). */
+  readonly size: number;
+  /** Painovoima alaspäin (negatiivinen = hiukkaset nousevat). */
+  readonly gravity: number;
+  /** Suunta asteina (0 = oikea, -90 = ylös) ja hajonta. Puuttuu = joka suuntaan. */
+  readonly angle?: { readonly min: number; readonly max: number };
 }

@@ -4,11 +4,12 @@ import { PLAYER } from '../data/player';
 
 // Alkuruudun pixelart-tausta: metsää ja peltoa ruudun alareunassa,
 // sankari vasemmalla ja viholliset oikealla. Hahmot keinuvat hiljaa.
-// Palauttaa vihollishahmot tunnisteittain (esim. susi, jota voi napauttaa).
+// Palauttaa hahmot (esim. susi ja lima, joita voi napauttaa).
 
 const GROUND_TILES = ['tile-forest', 'tile-field'] as const;
 
 export interface MenuCharacters {
+  readonly hero: Phaser.GameObjects.Image;
   readonly slime: Phaser.GameObjects.Image;
   readonly wolf: Phaser.GameObjects.Image;
 }
@@ -25,9 +26,9 @@ export function drawMenuBackdrop(scene: Phaser.Scene): MenuCharacters {
     }
   });
   const feetY = groundTop + tile / 2;
-  addCharacter(scene, MENU_VIEW.heroX, feetY, PLAYER.sprite);
   const [slimeX, wolfX] = MENU_VIEW.enemyXs;
   return {
+    hero: addCharacter(scene, MENU_VIEW.heroX, feetY, PLAYER.eyeSprites[PLAYER.eyeColor]),
     slime: addCharacter(scene, slimeX, feetY, 'slime'),
     wolf: addCharacter(scene, wolfX, feetY, 'wolf'),
   };

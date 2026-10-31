@@ -54,6 +54,7 @@ src/
   entities/             Kartan hahmot: Phaser-sprite (Player, Enemy)
   systems/              Pelin järjestelmät: ohjaus, kartan piirto, kohtaamiset, taistelun kulku
   ui/                   Käyttöliittymäpalat: virtuaalitikku, napit, HUD, taistelunäkymä
+    battle/             Taistelunäkymän osat: tausta, hahmot, nimikyltit, napit, efektit
   net/                  Verkkoyhteydet rajapinnan takana (pelaajalaskuri, docs/PELAAJALASKURI.md)
   scenes/               Phaserin näkymät: Boot, Menu, World, Battle, GameOver
 tests/                  Vitest-testit (logiikka + sisällön eheys)
@@ -111,6 +112,22 @@ scenes  →  systems / ui  →  entities  →  logic
   Uusi tulipallo aloittaa palamisen alusta. `BattleDirector` kutsuu `burnTick()`ia ajastimella.
   Säännöt ovat `logic/battle.ts`:ssä (palauttaa tapahtumalistan), näyttäminen
   `systems/battle-director.ts`:ssä ja `ui/battle-*.ts`:ssä.
+- **Tasot:** tasoja on 1–50 (taso 50 on huipputaso). KP-rajoja ei kirjoiteta käsin, vaan ne
+  lasketaan kaavasta `LEVEL_CURVE` (`data/rules.ts`, laskenta `data/level-curve.ts`):
+  raja = cubic × n³ + quadratic × n² + linear × n, kun n = taso − 1. Tasot 1–10 eivät vaadi
+  enempää kuin vanha käsin kirjoitettu taulukko, joten vanhojen tallennusten taso ei laske.
+  Tallennukseen menee vain KP; taso lasketaan siitä aina uudelleen (`logic/progression.ts`).
+- **Taistelun ulkoasu:** taustakuva valitaan maaston mukaan, jossa taistelu alkaa
+  (`data/battle-backdrops.ts`: pelto, kuusimetsä, lumiset tunturit, kylätie punaisine
+  mökkeineen). Tausta maalataan koodilla canvasille kerran (`ui/battle/backdrop-painter.ts`),
+  joten se ei maksa mitään ruudunpäivityksessä. Hahmot ovat viisinkertaisia, hengittävät,
+  hyppäävät hyökätessä, horjahtavat osumasta ja hajoavat voitettuina pölyksi
+  (`ui/battle/fighter-sprite.ts`). Elämäpalkit muuttuvat vasta iskun osuessa: `BattleView`
+  pitää kirjaa näytetystä elämästä ja tarkistaa sen vuoron lopuksi (`syncHp`). Hiukkaset
+  (`data/battle-effects.ts`) käyttävät Phaserin emittereitä, joilla on katto
+  (`PARTICLE_LIMITS`), jotta keskitason puhelin pysyy 60 kuvassa sekunnissa. Kartalta
+  taisteluun ja takaisin siirrytään pikselöidyllä pyyhkäisyllä (`ui/screen-wipe.ts`).
+  Mitat ja ajat ovat `config/battle-config.ts`:ssä.
 - **Kykypisteet:** jokaisesta uudesta tasosta saa `PROGRESSION.skillPointsPerLevel` (3) pistettä.
   Ne ovat tason nousun ainoa palkinto (lisäksi elämä täyttyy): taso ei itse nosta arvoja.
   Ne jaetaan paikkakunnassa KYKYPISTEET-napista hyökkäykseen, puolustukseen, elinvoimaan

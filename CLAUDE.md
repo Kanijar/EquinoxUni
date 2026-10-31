@@ -46,7 +46,8 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
 | Taistelukaavat                        | `src/logic/combat.ts` + testi                                                                                                           |
 | Vihollisten käyttäytyminen kartalla   | `src/logic/enemy-ai.ts` + testi                                                                                                         |
 | Vihollisten paluu (respawn)           | aika `src/data/rules.ts` (`RESPAWN_RULES`) tai `respawnMs` vihollisella, säännöt `src/logic/respawn.ts` + testi                         |
-| Taistelunäkymän ulkoasu ja napit      | `src/ui/battle-view.ts`, `src/ui/battle-menu.ts`                                                                                        |
+| Taistelunäkymän ulkoasu ja napit      | `src/ui/battle-view.ts` (kokoaa osat `src/ui/battle/`), `src/ui/battle-menu.ts`, mitat ja ajat `src/config/battle-config.ts`            |
+| Taistelun taustat ja hiukkasefektit   | `src/data/battle-backdrops.ts` (tausta maaston mukaan), `src/data/battle-effects.ts`, säännöt `src/logic/battle-look.ts` + testi        |
 | Liikkumisen ohjaus                    | `src/systems/controls.ts` (+ `src/ui/`)                                                                                                 |
 | Ruudulla näkyvät tiedot kartalla      | `src/ui/hud.ts`                                                                                                                         |
 | Pelin nimi (alkuruutu, otsikko, PWA)  | `src/data/game-info.ts` (ei muualle: muut paikat lukevat nimen sieltä)                                                                  |

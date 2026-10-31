@@ -1,4 +1,12 @@
-import type { BattleRules, MagicRules, MenuSecretRules, Progression, RespawnRules } from './types';
+import { buildXpTable } from './level-curve';
+import type {
+  BattleRules,
+  LevelCurve,
+  MagicRules,
+  MenuSecretRules,
+  Progression,
+  RespawnRules,
+} from './types';
 
 // Taistelun ja kokemustasojen säännöt. Muuta näitä, kun haluat pelistä
 // helpomman tai vaikeamman.
@@ -26,18 +34,35 @@ export const RESPAWN_RULES: RespawnRules = {
   minPlayerDistancePx: 160,
 };
 
+/**
+ * Tasot 1–50. KP-raja = 0,2 × n³ + 3,5 × n² + 5 × n, kun n = taso − 1.
+ * Esimerkkejä: taso 2 = 9 KP, taso 10 = 474 KP, taso 20 = 2730 KP, taso 30 = 7966 KP,
+ * taso 50 = 32178 KP. Tasot 1–10 ovat lähellä vanhoja rajoja (0, 12, 30, 55, 90, 140, 200,
+ * 280, 380, 500) eivätkä missään kohtaa vaadi niitä enempää, joten vanhan tallennuksen
+ * taso ei laske. Helpompi huipputaso: pienennä cubic-arvoa (0,1 → taso 50 = noin 20 400 KP).
+ */
+export const LEVEL_CURVE: LevelCurve = {
+  maxLevel: 50,
+  cubic: 0.2,
+  quadratic: 3.5,
+  linear: 5,
+};
+
 export const PROGRESSION: Progression = {
-  xpForLevel: [0, 12, 30, 55, 90, 140, 200, 280, 380, 500],
+  xpForLevel: buildXpTable(LEVEL_CURVE),
   skillPointsPerLevel: 3,
 };
 
 /**
  * Salaisuus: napauta alkuruudun sutta ja sitten PELAA. Susi muuttuu henkisudeksi, ja uusi
- * peli alkaa 500 KP:llä (suurin taso 10 ja 27 kykypistettä) ja kolmella ylimääräisellä juomalla.
+ * peli alkaa 500 KP:llä (taso 10 ja 27 kykypistettä, huipputasoon 50 on vielä matkaa) ja kolmella
+ * ylimääräisellä juomalla.
  * Alkuruudulla tästä ei kerrota, vasta kartalla näkyy "Susi siunasi sinut!".
+ * Toinen salaisuus: alkuruudun liman napautus muuttaa sankarin silmät mustiksi (slimeEyeColor).
  */
 export const MENU_SECRET: MenuSecretRules = {
   wolfStartXp: 500,
   bonusItems: [{ id: 'potion', count: 3 }],
   spiritSprite: 'wolf-spirit',
+  slimeEyeColor: 'black',
 };

@@ -25,28 +25,38 @@ const WOLF_ROWS = [
   '................',
 ];
 
+/** Sankarin muoto. Silmien väri (e) vaihtelee: data/player.ts eyeSprites. */
+const HERO_ROWS = [
+  '................',
+  '.....hhhhhh.....',
+  '....hhhhhhhh....',
+  '....hssssssh....',
+  '....sesssses....',
+  '....ssssssss....',
+  '.....ssssss.....',
+  '....bbbbbbbb....',
+  '...bbbbbbbbbb...',
+  '...sbbbbbbbbs...',
+  '...sbbbbbbbbs...',
+  '....llllllll....',
+  '....lll..lll....',
+  '....lll..lll....',
+  '....kkk..kkk....',
+  '................',
+];
+
+const HERO_COLORS = { h: '#5a3a1a', s: SKIN, b: '#2e6fd8', l: '#22355e', k: '#3b2a1a' };
+
 export const CHARACTER_SPRITES: readonly SpriteDef[] = [
   {
     id: 'hero',
-    palette: { h: '#5a3a1a', s: SKIN, e: '#ffd700', b: '#2e6fd8', l: '#22355e', k: '#3b2a1a' },
-    rows: [
-      '................',
-      '.....hhhhhh.....',
-      '....hhhhhhhh....',
-      '....hssssssh....',
-      '....sesssses....',
-      '....ssssssss....',
-      '.....ssssss.....',
-      '....bbbbbbbb....',
-      '...bbbbbbbbbb...',
-      '...sbbbbbbbbs...',
-      '...sbbbbbbbbs...',
-      '....llllllll....',
-      '....lll..lll....',
-      '....lll..lll....',
-      '....kkk..kkk....',
-      '................',
-    ],
+    palette: { ...HERO_COLORS, e: '#ffd700' },
+    rows: HERO_ROWS,
+  },
+  {
+    id: 'hero-black-eyes',
+    palette: { ...HERO_COLORS, e: '#1a1a2e' },
+    rows: HERO_ROWS,
   },
   {
     id: 'slime',
