@@ -186,6 +186,13 @@ describe('taistelu', () => {
     expect(takeTurn(empty, { kind: 'defend' }, middle, rules)[1]?.kind).toBe('hit');
   });
 
+  it('varas ei vie repun varusteita, vain juomia', () => {
+    const battle = createBattle(fighter(30, 7, 2), fighter(30, 5, 0), { club: 1, potion: 1 }, 1);
+    const events = takeTurn(battle, { kind: 'defend' }, middle, rules);
+    expect(events[1]).toEqual({ kind: 'steal', itemId: 'potion' });
+    expect(battle.inventory['club']).toBe(1);
+  });
+
   it('varastetut esineet saa takaisin', () => {
     const battle = createBattle(fighter(30, 7, 2), fighter(30, 5, 0), { potion: 1 }, 1);
     takeTurn(battle, { kind: 'defend' }, middle, rules);

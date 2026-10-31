@@ -1,6 +1,6 @@
 import type { SpriteDef } from './types';
 
-// Hahmojen ja esineiden pikselispritet (16x16). Korvataan myöhemmin oikeilla PNG-kuvilla
+// Hahmojen pikselispritet (16x16). Esineet: sprites-items.ts. Korvataan myöhemmin oikeilla PNG-kuvilla
 // (public/assets/), mutta tunniste (id) pysyy samana, joten muu koodi ei muutu.
 
 const SKIN = '#f2c38f';
@@ -66,28 +66,6 @@ export const CHARACTER_SPRITES: readonly SpriteDef[] = [
       '..gggddddddggg..',
       '..dggggggggggd..',
       '...dddddddddd...',
-      '................',
-      '................',
-    ],
-  },
-  {
-    id: 'potion',
-    palette: { c: '#c9a46a', g: '#cfe8ff', r: '#e0303a', h: '#ff8a8f' },
-    rows: [
-      '................',
-      '................',
-      '......cccc......',
-      '......cccc......',
-      '.......gg.......',
-      '.......gg.......',
-      '......gggg......',
-      '.....grrrrg.....',
-      '....grhrrrrg....',
-      '....grrrrrrg....',
-      '....grrrrrrg....',
-      '....grrrrrrg....',
-      '.....grrrrg.....',
-      '......gggg......',
       '................',
       '................',
     ],

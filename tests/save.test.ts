@@ -200,3 +200,37 @@ describe('tallennuspaikat', () => {
     expect(listSlots(full)[0]?.kind).toBe('empty');
   });
 });
+
+describe('tallennus: reppu ja varusteet', () => {
+  it('käytössä olevat varusteet ja repun varusteet tallentuvat', () => {
+    const state = playedGame();
+    state.equipped.hand = 'club';
+    state.equipped.neck = 'tooth-necklace';
+    state.inventory['knife'] = 1;
+    expect(decodeSave(encodeSave(state, meta))?.state).toEqual(state);
+  });
+
+  it('versio 2: vanha tallennus latautuu ilman varusteita, repun juomat säilyvät', () => {
+    const raw = JSON.parse(encodeSave(playedGame(), meta)) as Record<string, unknown>;
+    const oldState = raw['state'] as Record<string, unknown>;
+    delete oldState['equipped'];
+    const state = decodeSave(JSON.stringify({ ...raw, version: 2, state: oldState }))?.state;
+    expect(state?.equipped).toEqual({});
+    expect(state?.inventory['potion']).toBe(5);
+  });
+
+  it('tuntematon varuste tai varuste väärässä paikassa jätetään pois', () => {
+    const raw = JSON.parse(encodeSave(playedGame(), meta)) as { state: Record<string, unknown> };
+    raw.state['equipped'] = { hand: 'tooth-necklace', body: 'robber-clothes', neck: 'kruunu' };
+    expect(decodeSave(JSON.stringify(raw))?.state.equipped).toEqual({ body: 'robber-clothes' });
+    raw.state['equipped'] = 'paljon';
+    expect(decodeSave(JSON.stringify(raw))?.state.equipped).toEqual({});
+  });
+
+  it('hammaskorun elämä säilyy latauksessa', () => {
+    const state = playedGame();
+    state.equipped.neck = 'tooth-necklace';
+    state.hp = playerStats(state).maxHp;
+    expect(decodeSave(encodeSave(state, meta))?.state.hp).toBe(state.hp);
+  });
+});

@@ -185,12 +185,17 @@ function enemyAct(battle: Battle, defended: boolean, rng: Rng, rules: BattleRule
   return { kind: 'hit', attacker: 'enemy', damage, crit: roll.crit, defended };
 }
 
-/** Vihollinen yrittää varastaa ensimmäisen esineen, jota pelaajalla on. */
+/**
+ * Vihollinen yrittää varastaa ensimmäisen parannusjuoman, jota pelaajalla on.
+ * Repussa olevia varusteita ei varasteta.
+ */
 function trySteal(battle: Battle, rng: Rng): BattleEvent | null {
   if (battle.enemyStealChance <= 0) {
     return null;
   }
-  const found = Object.entries(battle.inventory).find(([, count]) => count > 0);
+  const found = Object.entries(battle.inventory).find(
+    ([id, count]) => count > 0 && getItem(id).kind === 'heal',
+  );
   if (!found || rng() >= battle.enemyStealChance) {
     return null;
   }

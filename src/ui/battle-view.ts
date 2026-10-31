@@ -5,6 +5,7 @@ import { TEXT } from '../i18n/fi';
 import type { Battle, Side } from '../logic/battle';
 import type { Fighter } from '../logic/combat';
 import { showCritPopup } from './crit-popup';
+import { showLootPopup } from './loot-popup';
 import { showBurnPopup, showFireball } from './spell-effect';
 import { XpBar } from './xp-bar';
 
@@ -126,6 +127,12 @@ export class BattleView {
       duration: ANIM_MS,
       yoyo: true,
     });
+  }
+
+  /** Pudonnut esine (sprite) nousee kaatuneen vihollisen kohdalta. */
+  showLoot(spriteKey: string): void {
+    const { x, y } = this.enemy.sprite;
+    showLootPopup(this.scene, spriteKey, { x, y });
   }
 
   /** Voitettu vihollinen häviää näkyvistä. */

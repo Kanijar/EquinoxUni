@@ -2,8 +2,10 @@ import { MAP_ENEMIES } from '../data/map-enemies';
 import { PLAYER } from '../data/player';
 import { WORLD } from '../data/world';
 import type { EnemyDef, ItemStack, PlayerStats, SkillId } from '../data/types';
-import { recoverStolen, type Battle } from './battle';
+import { recoverStolen, type Battle, type Rng } from './battle';
 import type { Fighter } from './combat';
+import { rollDrops } from './drops';
+import { applyGear, ownsItem, type Equipped } from './equipment';
 import { levelForXp } from './progression';
 import { respawnDelayMs, startRespawn, type RespawnTimer } from './respawn';
 import {
@@ -18,7 +20,7 @@ import {
 import type { Vec2 } from './vector';
 
 // Pelin eteneminen, joka säilyy kartan ja taistelun välillä:
-// elämä, kokemus, kykypisteet, esineet, sijainti, voitetut viholliset ja niiden paluu.
+// elämä, kokemus, kykypisteet, esineet ja varusteet, sijainti, voitetut viholliset ja niiden paluu.
 // Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
 // tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
@@ -27,8 +29,10 @@ export interface GameState {
   xp: number;
   /** Kuhunkin kykyyn käytetyt kykypisteet. Käyttämättömät: unspentSkillPoints(). */
   readonly skills: SkillPoints;
-  /** Esineiden määrät tunnisteittain. */
+  /** Repun esineiden määrät tunnisteittain (käytössä olevat varusteet eivät ole täällä). */
   readonly inventory: Record<string, number>;
+  /** Käytössä olevat varusteet paikoittain (logic/equipment.ts). */
+  readonly equipped: Equipped;
   /** Sijainti kartalla pikseleinä. null = paikkakunnassa lastTown (esim. pelin alussa). */
   position: Vec2 | null;
   /**
@@ -59,6 +63,7 @@ export function createNewGame(startXp = 0): GameState {
     xp: Math.max(0, Math.floor(startXp)),
     skills: noSkillPoints(),
     inventory,
+    equipped: {},
     position: null,
     lastTown: WORLD.startTown,
     defeated: [],
@@ -83,8 +88,14 @@ export function playerLevel(state: GameState): number {
   return levelForXp(state.xp);
 }
 
-export function playerStats(state: GameState): PlayerStats {
+/** Arvot kykypisteineen mutta ilman varusteita (kyvyn yläraja koskee näitä). */
+export function skillStats(state: GameState): PlayerStats {
   return applySkillPoints(PLAYER.stats, state.skills);
+}
+
+/** Pelaajan arvot: perusarvot, kykypisteet ja käytössä olevat varusteet. */
+export function playerStats(state: GameState): PlayerStats {
+  return applyGear(skillStats(state), state.equipped);
 }
 
 /** Kykypisteet, joita pelaaja ei ole vielä käyttänyt. */
@@ -94,7 +105,7 @@ export function unspentSkillPoints(state: GameState): number {
 
 /** Voiko kykyyn laittaa pisteen: pisteitä on jäljellä eikä kyky ole ylärajallaan. */
 export function canSpendSkillPoint(state: GameState, id: SkillId): boolean {
-  return unspentSkillPoints(state) > 0 && !isSkillMaxed(getSkill(id), playerStats(state));
+  return unspentSkillPoints(state) > 0 && !isSkillMaxed(getSkill(id), skillStats(state));
 }
 
 /**
@@ -131,28 +142,45 @@ export interface VictoryReward {
   readonly level: number;
   /** Tason noususta saadut uudet kykypisteet (0, jos taso ei noussut). */
   readonly skillPoints: number;
-  readonly drop?: string;
+  /** Esineet, jotka vihollinen pudotti (logic/drops.ts). Puuttuu, jos mitään ei pudonnut. */
+  readonly drops?: readonly string[];
   /** Esineet, jotka vihollinen oli varastanut ja jotka saatiin takaisin. */
   readonly recovered?: readonly ItemStack[];
 }
 
+/** Karttavihollinen tai väijyjä, jonka kanssa taisteltiin. */
+export interface Foe {
+  readonly enemy: EnemyDef;
+  /** Järjestysnumero data/map-enemies.ts:ssä, tai null, kun vihollinen ei ollut kartalla. */
+  readonly mapEnemyIndex: number | null;
+}
+
+/** Arpoo vihollisen pudotukset ja laittaa ne reppuun. */
+function collectDrops(state: GameState, enemy: EnemyDef, rng: Rng): string[] {
+  const owns = (id: string): boolean => ownsItem(state.inventory, state.equipped, id);
+  const drops = rollDrops(enemy.drops ?? [], owns, rng);
+  for (const id of drops) {
+    state.inventory[id] = (state.inventory[id] ?? 0) + 1;
+  }
+  return drops;
+}
+
 /**
- * Voitto vihollisesta: kokemus, mahdollinen esine ja tason nousu (ja siitä kykypisteet).
+ * Voitto vihollisesta: kokemus, mahdolliset pudotukset ja tason nousu (ja siitä kykypisteet).
  * mapEnemyIndex on null, kun vihollinen ei ollut kartalla (esim. väijytys).
  */
 export function grantVictory(
   state: GameState,
   mapEnemyIndex: number | null,
   enemy: EnemyDef,
+  rng: Rng = Math.random,
 ): VictoryReward {
   const before = playerLevel(state);
   state.xp += enemy.xp;
   if (mapEnemyIndex !== null) {
     markDefeated(state, mapEnemyIndex, enemy);
   }
-  if (enemy.drop) {
-    state.inventory[enemy.drop] = (state.inventory[enemy.drop] ?? 0) + 1;
-  }
+  const drops = collectDrops(state, enemy, rng);
   const level = playerLevel(state);
   const leveledUp = level > before;
   if (leveledUp) {
@@ -160,7 +188,7 @@ export function grantVictory(
   }
   const skillPoints = skillPointsEarned(level) - skillPointsEarned(before);
   const reward = { xp: enemy.xp, totalXp: state.xp, leveledUp, level, skillPoints };
-  return enemy.drop ? { ...reward, drop: enemy.drop } : reward;
+  return drops.length > 0 ? { ...reward, drops } : reward;
 }
 
 /**
@@ -170,14 +198,14 @@ export function grantVictory(
 export function applyBattleResult(
   state: GameState,
   battle: Battle,
-  mapEnemyIndex: number | null,
-  enemy: EnemyDef,
+  foe: Foe,
+  rng: Rng = Math.random,
 ): VictoryReward | null {
   state.hp = Math.max(0, battle.player.hp);
   if (battle.outcome !== 'won') {
     return null;
   }
-  const reward = grantVictory(state, mapEnemyIndex, enemy);
+  const reward = grantVictory(state, foe.mapEnemyIndex, foe.enemy, rng);
   const recovered = recoverStolen(battle);
   return recovered.length > 0 ? { ...reward, recovered } : reward;
 }

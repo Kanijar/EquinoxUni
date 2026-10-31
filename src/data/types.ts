@@ -50,8 +50,8 @@ export interface EnemyDef {
   readonly aggroRange: number;
   /** Kokemuspisteet voitosta. */
   readonly xp: number;
-  /** Esine, jonka pelaaja saa voitosta (valinnainen). */
-  readonly drop?: string;
+  /** Esineet, joita vihollinen voi pudottaa kaatuessaan (valinnainen, ks. DropDef). */
+  readonly drops?: readonly DropDef[];
   /**
    * Todennäköisyys (0..1), jolla vihollinen varastaa esineen lyönnin sijaan (valinnainen).
    * Varastetut esineet saa takaisin, kun vihollinen voitetaan.
@@ -69,17 +69,56 @@ export interface EnemyDef {
   readonly respawnMs?: number;
 }
 
-export type ItemKind = 'heal' | 'weapon' | 'key';
+/** Pudotus: esine, jonka vihollinen voi jättää jälkeensä kaatuessaan. */
+export interface DropDef {
+  /** Esineen tunniste (data/items.ts). */
+  readonly item: string;
+  /** Todennäköisyys 0..1, esim. 0.4 = 40 %. 1 = putoaa aina. */
+  readonly chance: number;
+}
 
-export interface ItemDef {
+/**
+ * Esineen tyyppi: parannusjuoma (juodaan taistelussa tai repusta), varuste (laitetaan
+ * käyttöön repussa, logic/equipment.ts) tai avain (tallessa repussa, ei vielä käyttöä).
+ */
+export type ItemKind = 'heal' | 'gear' | 'key';
+
+/** Varustepaikka: jokaisessa paikassa voi olla yksi varuste kerrallaan. */
+export type GearSlot = 'hand' | 'body' | 'neck';
+
+/**
+ * Arvo, jota varuste kasvattaa. Samat arvot kuin kykypisteillä (SkillStat):
+ * hyökkäys, puolustus, maksimielämä, tarkkuus (kriittinen osuma %) ja tulivoima.
+ */
+export type GearStat = SkillStat;
+
+/** Varusteen tuomat lisäykset arvoihin, esim. { attack: 6 }. */
+export type StatBonus = Partial<Record<GearStat, number>>;
+
+interface ItemBase {
   readonly id: string;
   readonly name: string;
   readonly description: string;
-  readonly kind: ItemKind;
   readonly sprite: string;
-  /** Tyypistä riippuva arvo: parannuksen määrä, aseen hyökkäysbonus jne. */
+}
+
+export interface HealItemDef extends ItemBase {
+  readonly kind: 'heal';
+  /** Paljonko elämää juoma palauttaa. */
   readonly value: number;
 }
+
+export interface GearItemDef extends ItemBase {
+  readonly kind: 'gear';
+  readonly slot: GearSlot;
+  readonly bonus: StatBonus;
+}
+
+export interface KeyItemDef extends ItemBase {
+  readonly kind: 'key';
+}
+
+export type ItemDef = HealItemDef | GearItemDef | KeyItemDef;
 
 // --- Suomen kartta ---
 

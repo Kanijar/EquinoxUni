@@ -19,17 +19,20 @@ import { placeTownMarkers, TownTracker } from '../systems/town-markers';
 import { buildWorldMap, getWorldGrid, tileToWorld } from '../systems/world-map';
 import { TEXT } from '../i18n/fi';
 import { Hud } from '../ui/hud';
+import { addBackpackButton } from '../ui/backpack-button';
 import { addPlayerCountLabel } from '../ui/player-count-label';
 import { SaveButton } from '../ui/save-button';
 import { SkillButton } from '../ui/skill-button';
 import { Toast } from '../ui/toast';
+import type { BackpackSceneData } from './backpack-scene';
 import type { BattleSceneData } from './battle-scene';
 import type { SavesSceneData } from './saves-scene';
 import type { SkillsSceneData } from './skills-scene';
 
 // Suomen kartta. Pelaaja kulkee virtuaalitikulla, lepää paikkakunnissa ja
-// joutuu taisteluun, kun vihollinen saa hänet kiinni. Paikkakunnassa voi jakaa
-// kykypisteet KYKYPISTEET-napista ja tallentaa pelin TALLENNA-napista.
+// joutuu taisteluun, kun vihollinen saa hänet kiinni. REPPU-napista (aina näkyvissä) avautuu
+// reppu, jossa varusteita laitetaan käyttöön. Paikkakunnassa voi jakaa kykypisteet
+// KYKYPISTEET-napista ja tallentaa pelin TALLENNA-napista.
 // Tämä scene vain kokoaa osat.
 
 export interface WorldSceneData {
@@ -75,6 +78,7 @@ export class WorldScene extends Phaser.Scene {
     addPlayerCountLabel(this);
     this.skillButton = new SkillButton(this, () => this.openSkills());
     this.saveButton = new SaveButton(this, () => this.openSaves());
+    addBackpackButton(this, () => this.openBackpack());
     this.toast = new Toast(this);
     this.encountersFrom = this.time.now + (data.graceMs ?? WORLD_VIEW.graceMs.start);
     const message = isNewGame ? TEXT.world.intro : data.message;
@@ -122,6 +126,19 @@ export class WorldScene extends Phaser.Scene {
   private openSkills(): void {
     const data: SkillsSceneData = { state: this.state };
     this.scene.start(SCENES.skills, data);
+  }
+
+  /**
+   * Reppu avautuu kartan päälle. Kartta nukkuu sillä aikaa (viholliset ja ajastimet odottavat)
+   * ja herää samaan kohtaan. Herätessä viholliset odottavat hetken ennen kuin voivat hyökätä.
+   */
+  private openBackpack(): void {
+    this.events.once(Phaser.Scenes.Events.WAKE, () => {
+      this.encountersFrom = this.time.now + WORLD_VIEW.graceMs.afterBattle;
+    });
+    const data: BackpackSceneData = { state: this.state };
+    this.scene.sleep();
+    this.scene.launch(SCENES.backpack, data);
   }
 
   private openSaves(): void {
