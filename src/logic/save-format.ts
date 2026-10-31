@@ -1,6 +1,7 @@
 import { SAVE_VERSION } from '../config/persistence';
 import type { GameState } from './game-state';
 import { parseJson } from './key-value-store';
+import { mapEnemyRespawnMs } from './respawn';
 import { isRecord, readGameState } from './save-validate';
 
 // Tallennuksen muoto. Tallennus on JSON-teksti, jossa on versio, tallennushetki,
@@ -26,7 +27,25 @@ type RawSave = Record<string, unknown>;
  * Muunnokset vanhasta versiosta seuraavaan: SAVE_MIGRATIONS[n] muuttaa version n
  * tallennuksen versioksi n + 1. Kun nostat SAVE_VERSIONia, lisää tänne muunnos.
  */
-export const SAVE_MIGRATIONS: Readonly<Record<number, (save: RawSave) => RawSave>> = {};
+export const SAVE_MIGRATIONS: Readonly<Record<number, (save: RawSave) => RawSave>> = {
+  1: addRespawnTimers,
+};
+
+/**
+ * Versio 1 → 2. Ennen versiota 2 voitetut viholliset katosivat pysyvästi. Nyt ne palaavat:
+ * jokainen aiemmin voitettu vihollinen saa täyden palautusajan, kuin se olisi juuri voitettu.
+ * Rikkinäiset arvot jätetään readGameState()-tarkistukselle.
+ */
+function addRespawnTimers(save: RawSave): RawSave {
+  const state = save['state'];
+  if (!isRecord(state) || !Array.isArray(state['defeated'])) {
+    return save;
+  }
+  const respawning = state['defeated']
+    .filter((index): index is number => typeof index === 'number')
+    .map((index) => ({ index, msLeft: mapEnemyRespawnMs(index) }));
+  return { ...save, state: { ...state, respawning } };
+}
 
 export function encodeSave(state: GameState, meta: SaveMeta): string {
   const file: SaveFile = { version: SAVE_VERSION, savedAt: meta.savedAt, place: meta.place, state };

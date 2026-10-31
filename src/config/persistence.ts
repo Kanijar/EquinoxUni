@@ -14,8 +14,9 @@ export const SAVE_SLOT_COUNT = 3;
  * Tallennusmuodon versio. Nosta tätä, kun GameStaten rakenne muuttuu niin,
  * ettei vanha tallennus enää kelpaa sellaisenaan, ja lisää muunnos
  * tiedostoon logic/save-format.ts (SAVE_MIGRATIONS).
+ * Versio 2: voitetut viholliset palaavat kartalle (GameState.respawning).
  */
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 
 /** Säädettävän asetuksen rajat prosentteina. */
 export interface SettingRange {

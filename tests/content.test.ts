@@ -10,7 +10,7 @@ import {
   getSprite,
 } from '../src/data';
 import { PLAYER } from '../src/data/player';
-import { BATTLE_RULES, PROGRESSION } from '../src/data/rules';
+import { BATTLE_RULES, PROGRESSION, RESPAWN_RULES } from '../src/data/rules';
 import { SOUNDS } from '../src/data/sounds';
 import { ROADS } from '../src/data/towns';
 
@@ -99,6 +99,14 @@ describe('sisältödata', () => {
       expect(chance).toBeLessThanOrEqual(1);
     }
     expect(BATTLE_RULES.critMultiplier).toBeGreaterThan(1);
+  });
+
+  it('vihollisten palautusajat ovat positiivisia', () => {
+    const delays = [RESPAWN_RULES.delayMs, ...ENEMIES.flatMap((e) => e.respawnMs ?? [])];
+    for (const delay of delays) {
+      expect(delay).toBeGreaterThan(0);
+    }
+    expect(RESPAWN_RULES.minPlayerDistancePx).toBeGreaterThan(0);
   });
 
   it('tiet yhdistävät olemassa olevia paikkakuntia', () => {
