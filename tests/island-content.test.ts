@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ENEMIES, ITEMS } from '../src/data';
+import { ENEMIES, ITEMS, QUESTS } from '../src/data';
 import { FINAL_BOSS } from '../src/data/boss';
 
 // Saaren hirviöiden ja varusteiden sisältötestit.
@@ -12,6 +12,8 @@ const MAX_DESCRIPTION_LENGTH = 45;
 
 const gearIds = new Set(ITEMS.filter((item) => item.kind === 'gear').map((item) => item.id));
 const dropped = new Set(ENEMIES.flatMap((enemy) => enemy.drops ?? []).map((drop) => drop.item));
+/** Jussi Ketolan tehtävien palkinnot (data/quests.ts). */
+const rewarded = new Set(QUESTS.flatMap((quest) => quest.reward.items).map((stack) => stack.id));
 
 describe('saaren hirviöt ja varusteet', () => {
   it.each(ISLAND_MONSTERS)('%s pudottaa varusteen', (id) => {
@@ -19,9 +21,9 @@ describe('saaren hirviöt ja varusteet', () => {
     expect(enemy?.drops?.some((drop) => gearIds.has(drop.item))).toBe(true);
   });
 
-  it('jokaisen varusteen voi saada joltain viholliselta', () => {
+  it('jokaisen varusteen voi saada joltain viholliselta tai tehtävän palkintona', () => {
     for (const id of gearIds) {
-      expect(dropped.has(id), id).toBe(true);
+      expect(dropped.has(id) || rewarded.has(id), id).toBe(true);
     }
   });
 

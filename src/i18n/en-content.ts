@@ -1,4 +1,4 @@
-import type { EnemyDef, ItemDef, TownDef } from '../data/types';
+import type { EnemyDef, ItemDef, NpcDef, QuestDef, TownDef } from '../data/types';
 
 // Vihollisten ja esineiden nimet englanniksi. Suomenkieliset nimet ovat data-tiedostoissa
 // (data/enemies.ts, data/items.ts). Uusi vihollinen tai esine: lisää sen englanninkielinen
@@ -50,6 +50,94 @@ export const ITEM_TEXTS_EN: Readonly<
     description: "Forged from a dragon's fang. Best weapon!",
   },
   'dragon-charm': { name: 'Dragon Charm', description: "A dragon's eye. Toughness and fire!" },
+  'jussi-sword': { name: "Jussi's Old Sword", description: 'A bit rusty, but sharp.' },
+  'leather-vest': { name: 'Leather Vest', description: 'A thick vest that softens blows.' },
+  'lucky-charm': {
+    name: 'Lucky Charm',
+    description: "Jussi's lucky charm. You hit more accurately!",
+  },
+  'fire-staff': { name: 'Fire Staff', description: 'A flame glows at the tip of the staff.' },
+  'ketola-armor': {
+    name: 'Ketola Armor',
+    description: 'Old family armor. It can take a hard hit!',
+  },
+  'wolf-tuft': { name: 'Wolf Fur Tuft', description: 'Soft fur. Take it to Jussi Ketola.' },
+};
+
+/** Tehtävän tekstit: nimi, tarjous (story) ja kiitos palautettaessa. */
+export interface QuestTexts {
+  readonly title: string;
+  readonly story: string;
+  readonly thanks: string;
+}
+
+/** Tehtävien tekstit englanniksi tunnisteen (QuestDef.id) mukaan (suomeksi data/quests.ts). */
+export const QUEST_TEXTS_EN: Readonly<Record<string, QuestTexts>> = {
+  'slime-hunt': {
+    title: 'Slime Trouble',
+    story: 'Slimes have made a mess of my whole yard! Can you defeat three slimes?',
+    thanks: 'Thanks! The yard is clean again. Take these potions.',
+  },
+  'goblin-trouble': {
+    title: 'Goblins in the Forest',
+    story: 'Forest goblins keep hiding the berry buckets. Defeat four goblins!',
+    thanks: 'Now we can pick berries again. This leather vest will protect you.',
+  },
+  'robber-chase': {
+    title: 'On the Robbers’ Trail',
+    story: 'Robbers lurk in the forest. Defeat two robbers to make the roads safe.',
+    thanks: 'Great! Traders dare to travel again. Here are potions for the road.',
+  },
+  'troll-trouble': {
+    title: 'Troll Trouble',
+    story: 'The mountain trolls of the north throw rocks at the roads. Defeat three trolls!',
+    thanks: 'Unbelievable! Take this fire staff, it makes your fireball stronger.',
+  },
+  'wisp-lights': {
+    title: 'Lights in the Bog',
+    story: 'Wisps float over the eastern bog and lead travellers astray. Defeat three wisps!',
+    thanks: 'The bog is safe to cross again. Here are potions, and thank you!',
+  },
+  'rock-giants': {
+    title: 'Rock Giants',
+    story: 'Rock giants walk the fells and the ground shakes. Defeat three rock giants!',
+    thanks: 'You are a true hero! Take my old family armor.',
+  },
+  'fire-lizards': {
+    title: 'Volcano Lizards',
+    story: 'Fire lizards are crawling from the volcano towards the villages. Defeat four!',
+    thanks: 'Phew, the villages are safe! Take some potions, you will need them.',
+  },
+  'lizard-watch': {
+    title: 'Lizard Watch',
+    story: 'The fire lizards always come back. Defeat five lizards again and I will pay well!',
+    thanks: 'Peaceful again. Come back tomorrow if you feel like it!',
+  },
+  'letter-peltola': {
+    title: 'A Letter to Peltola',
+    story: 'Could someone take this letter to Peltola? Go there and the letter is delivered.',
+    thanks: 'The letter arrived! Take my old sword, I do not need it any more.',
+  },
+  'wolf-fur': {
+    title: 'Wolf Fur',
+    story: 'I need wolf fur for warm mittens. Bring me three fur tufts from wolves.',
+    thanks: 'Lovely and warm! This lucky charm will bring you luck.',
+  },
+  'kuurala-message': {
+    title: 'A Message to Kuurala',
+    story: 'My cousin lives on the fells in Kuurala. Go and tell my cousin I am doing fine.',
+    thanks: 'My cousin must be happy! Here are potions for the long journey.',
+  },
+  'northern-lights': {
+    title: 'The Northernmost Village',
+    story: 'Have you been to Revontula, the northernmost village on the island? Go there!',
+    thanks: 'What a trip! Did you see the northern lights? Here are some potions.',
+  },
+  'volcano-trip': {
+    title: 'At the Foot of the Volcano',
+    story: 'Tuhkala is a village at the foot of the volcano. Do you dare to go there?',
+    thanks: 'A mighty trip! You have travelled across the whole island.',
+  },
 };
 
 /** TEXT.names englanniksi. Jos käännös puuttuu, näytetään suomenkielinen nimi. */
@@ -61,4 +149,6 @@ export const EN_CONTENT = {
   itemDescription: (item: ItemDef): string =>
     ITEM_TEXTS_EN[item.id]?.description ?? item.description,
   town: (town: TownDef): string => town.name,
+  npc: (npc: NpcDef): string => npc.name,
+  quest: (quest: QuestDef): QuestTexts => QUEST_TEXTS_EN[quest.id] ?? quest,
 };

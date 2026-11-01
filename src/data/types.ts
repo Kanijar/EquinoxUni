@@ -122,11 +122,17 @@ export interface DropDef {
   readonly item: string;
   /** Todennäköisyys 0..1, esim. 0.4 = 40 %. 1 = putoaa aina. */
   readonly chance: number;
+  /**
+   * Tehtävä (data/quests.ts), jota varten esine putoaa (valinnainen). Silloin esine putoaa
+   * vain, kun tehtävä on kesken ja esineitä tarvitaan vielä lisää.
+   */
+  readonly quest?: string;
 }
 
 /**
  * Esineen tyyppi: parannusjuoma (juodaan taistelussa tai repusta), varuste (laitetaan
- * käyttöön repussa, logic/equipment.ts) tai avain (tallessa repussa, ei vielä käyttöä).
+ * käyttöön repussa, logic/equipment.ts) tai avain/tehtäväesine (tallessa repussa, esim. tuodaan
+ * tehtävänantajalle, data/quests.ts).
  */
 export type ItemKind = 'heal' | 'gear' | 'key';
 
@@ -336,3 +342,7 @@ export type {
   TownDef,
   WorldDef,
 } from './types-world';
+
+// --- Tehtävät (data/types-quests.ts) ---
+
+export type { NpcDef, QuestDef, QuestGoal, QuestRewardDef } from './types-quests';

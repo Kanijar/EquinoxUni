@@ -29,7 +29,11 @@ export const ENEMIES: readonly EnemyDef[] = [
     stats: { maxHp: 26, attack: 9, defense: 2, speed: 62 },
     aggroRange: 90,
     xp: 18,
-    drops: [{ item: 'tooth-necklace', chance: 0.3 }],
+    // Sudenkarvatupsu putoaa vain Jussi Ketolan Sudenkarvaa-tehtävän aikana (data/quests.ts).
+    drops: [
+      { item: 'tooth-necklace', chance: 0.3 },
+      { item: 'wolf-tuft', chance: 0.6, quest: 'wolf-fur' },
+    ],
     // Terävät hampaat: susi lyö kriittisen osuman tavallista useammin.
     critChance: 0.12,
   },

@@ -136,6 +136,63 @@ export const ITEMS: readonly ItemDef[] = [
     slot: 'neck',
     bonus: { maxHp: 40, defense: 3, magic: 3 },
   },
+  // --- Jussi Ketolan tehtäväpalkinnot (data/quests.ts) ---
+  {
+    // Ensimmäinen ase: vähän parempi kuin paljaat nyrkit, Peikon nuija on myöhemmin parempi.
+    id: 'jussi-sword',
+    name: 'Jussin vanha miekka',
+    description: 'Vähän ruosteinen, mutta terävä.',
+    kind: 'gear',
+    sprite: 'jussi-sword',
+    slot: 'hand',
+    bonus: { attack: 3 },
+  },
+  {
+    id: 'leather-vest',
+    name: 'Nahkaliivi',
+    description: 'Paksu liivi, joka pehmentää iskuja.',
+    kind: 'gear',
+    sprite: 'leather-vest',
+    slot: 'body',
+    bonus: { defense: 2, maxHp: 6 },
+  },
+  {
+    id: 'lucky-charm',
+    name: 'Onnenamuletti',
+    description: 'Jussin onnenkalu. Osut tarkemmin!',
+    kind: 'gear',
+    sprite: 'lucky-charm',
+    slot: 'neck',
+    bonus: { critPercent: 5, magic: 1 },
+  },
+  {
+    // Maagiaan panostavan pelaajan ase: tulipallo vahvistuu, lyönti vain vähän.
+    id: 'fire-staff',
+    name: 'Tulisauva',
+    description: 'Sauvan päässä hehkuu liekki.',
+    kind: 'gear',
+    sprite: 'fire-staff',
+    slot: 'hand',
+    bonus: { magic: 3, attack: 1 },
+  },
+  {
+    // Vähän heikompi kuin bossin Kuninkaan viitta, jotta viitta pysyy harvinaisena aarteena.
+    id: 'ketola-armor',
+    name: 'Ketolan haarniska',
+    description: 'Vanha suvun haarniska. Kestää kovan iskun!',
+    kind: 'gear',
+    sprite: 'ketola-armor',
+    slot: 'body',
+    bonus: { defense: 3, maxHp: 15 },
+  },
+  {
+    // Tehtäväesine: putoaa susilta vain, kun Sudenkarvaa-tehtävä on kesken.
+    id: 'wolf-tuft',
+    name: 'Sudenkarvatupsu',
+    description: 'Pehmeää karvaa. Vie se Jussi Ketolalle.',
+    kind: 'key',
+    sprite: 'wolf-tuft',
+  },
 ];
 
 /** Varustepaikat repussa tässä järjestyksessä: käsi (ase), vartalo (vaatteet), kaula (koru). */

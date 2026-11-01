@@ -7,6 +7,7 @@ import { SKILLS } from '../data/skills';
 import { findGear, type Equipped } from './equipment';
 import { playerStats, type GameState } from './game-state';
 import { mapEnemyRespawnMs, type RespawnTimer } from './respawn';
+import { readQuests } from './save-quests';
 import { noSkillPoints, type SkillPoints } from './skill-points';
 import type { Vec2 } from './vector';
 
@@ -179,6 +180,7 @@ export function readGameState(value: unknown): GameState | null {
     eyeColor: readEyeColor(value['eyeColor']),
     ...readBoss(value),
     completed: value['completed'] === true,
+    quests: readQuests(value['quests']),
   };
   // Elämä pysyy rajoissa: vähintään 1, enintään maksimielämä.
   state.hp = Math.min(Math.max(1, state.hp), playerStats(state).maxHp);

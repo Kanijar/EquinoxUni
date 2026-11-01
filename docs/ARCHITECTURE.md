@@ -56,6 +56,7 @@ src/
     towns.ts            Paikkakunnat ja tiet
     map-enemies.ts      Viholliset kartalla
     rules.ts            Taistelun ja kokemustasojen säännöt
+    npcs.ts, quests.ts  Tehtävänantajat (Jussi Ketola) ja heidän tehtävänsä
   logic/                Puhdas pelilogiikka (vuoropohjainen taistelu, kartta, tasot). EI Phaseria.
   entities/             Kartan hahmot: Phaser-sprite (Player, Enemy)
   systems/              Pelin järjestelmät: ohjaus, kartan piirto, kohtaamiset, taistelun kulku
@@ -92,7 +93,7 @@ scenes  →  systems / ui  →  entities  →  logic
   (vuoropohjainen taistelu) → `VictoryScene` (voittoruutu: loppuboss voitettu tai jokainen
   karttavihollinen voitettu ainakin kerran) → takaisin kartalle. Peli ei lopu voittoon.
   Paikkakunnassa `WorldScene` ⇄ `SkillsScene` (kykypisteiden jako) ja `WorldScene` ⇄
-  `SavesScene` (tallennus). Alkuruudusta `SettingsScene` (valo ja äänet), `SavesScene` (lataus)
+  `SavesScene` (tallennus), ja Jussi Ketolan paikkakunnassa `WorldScene` ⇄ `QuestScene` (tehtävät). Alkuruudusta `SettingsScene` (valo ja äänet), `SavesScene` (lataus)
   ja `ExitScene` (LÄHDE).
   Pelin tila (`logic/game-state.ts`: elämä, KP, kykypisteet, esineet, sijainti, viimeisin paikkakunta, voitetut viholliset ja niiden palautusajat) annetaan scenejen välillä `scene.start(key, data)` -datana.
 - **Versio ja julkaisuaika:** alkuruudun oikeassa alakulmassa lukee esim. "Versio: 0.25 (alfa)"
@@ -217,6 +218,21 @@ scenes  →  systems / ui  →  entities  →  logic
   `playerStats()` = perusarvot + kykypisteet + varusteet. Kyvyn yläraja (tarkkuus 40 %) koskee
   vain kykypisteitä (`skillStats()`), varusteet tulevat päälle. Repusta voi myös juoda juoman.
   Ryöstäjä varastaa vain juomia, ei varusteita.
+- **Tehtävät (Jussi Ketola):** tehtävänantaja Jussi Ketola (`data/npcs.ts`) seisoo
+  aloituspaikkakunnan talon vieressä (paikkakunta luetaan `START_TOWN`ista, ei koordinaateista).
+  Pään päällä pomppii ! (uusi tehtävä) tai ? (valmis tehtävä). Hänen paikkakunnassaan oikean
+  alakulman pinoon tulee puhenappi "JUSSI KETOLA", josta (tai hahmoa napauttamalla) avautuu
+  `QuestScene` kartan päälle samalla tavalla kuin reppu. Tehtävät ovat dataa (`data/quests.ts`):
+  tavoite voita N vihollista, tuo N esinettä tai käy paikkakunnassa; palkintona KP:tä ja esineitä
+  (uudet varusteet `data/items.ts`). `requires` tekee ketjuja ja `minLevel` porrastaa tehtävät
+  tasoille 1–30; viimeinen tehtävä on toistettava (`repeatable`), joten huipputasolle riittää
+  tekemistä. Tehtäväesine putoaa vain tehtävän aikana (`DropDef.quest`). Tila on
+  `GameState.quests` (tehtäväkirja: kesken, edistyminen, palautuskerrat), säännöt
+  `logic/quest-log.ts` ja `logic/quests.ts`. Vanhassa tallennuksessa tehtäväkirja on tyhjä
+  (`logic/save-quests.ts`), joten `SAVE_VERSION`ia ei tarvinnut nostaa. Kartan vasemmassa
+  yläkulmassa näkyvät keskeneräiset tehtävät ("Limat kuriin 2/3"), ja voittoruudulla kerrotaan
+  tehtävän edistymisestä. Uusi tehtävä: olio `data/quests.ts`:ään ja englanninkieliset tekstit
+  `i18n/en-content.ts`:n `QUEST_TEXTS_EN`iin.
 - **Pudotukset:** vihollisella on `drops: [{ item, chance }]` (`data/enemies.ts`). Jokainen
   arvotaan voitossa erikseen (`logic/drops.ts`); varustetta, joka pelaajalla jo on, ei pudoteta
   uudelleen. Voittoruudulla esineen kuva ponnahtaa ja teksti "Löysit: Peikon nuija!".
@@ -306,7 +322,7 @@ kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 
 - Paikkakuntien sisänäkymät (kauppa, majatalo) omina sceneinä
 - Inventaario ja aseet ✓ (reppu, varusteet ja pudotukset), vihollisten erikoisiskut
-- NPC-hahmot ja dialogit (`data/dialogues.ts`)
+- NPC-hahmot ja tehtävät ✓ (Jussi Ketola, `data/npcs.ts`, `data/quests.ts`)
 - Tallennus `localStorage`en ✓ (alkuruutu, asetukset ja kolme tallennuspaikkaa)
 
 **Vaihe 3 – Sisältö ja viimeistely.**

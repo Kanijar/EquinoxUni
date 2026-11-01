@@ -1,13 +1,13 @@
-import { getItem } from '../data';
+import { getItem, getNpc, getQuest } from '../data';
 import { TEXT } from '../i18n/text';
 import { bossName, type BossNews } from '../logic/boss';
-import type { VictoryReward } from '../logic/game-state';
+import type { QuestNews, VictoryReward } from '../logic/game-state';
 import { xpToNextLevel } from '../logic/progression';
 import type { BattleView } from '../ui/battle-view';
 import type { BattleStep } from './battle-steps';
 import { playSound } from './sound-fx';
 
-// Voiton jälkeiset viestit: KP, saadut esineet, loppubossin eteneminen (peikkolaskuri),
+// Voiton jälkeiset viestit: KP, saadut esineet, tehtävien eteneminen, loppubossin eteneminen (peikkolaskuri),
 // tason nousu ja kykypisteet. KP-palkki täyttyy samalla, kun voittoviesti näkyy.
 
 export function victorySteps(
@@ -28,6 +28,7 @@ export function victorySteps(
   return [
     won,
     ...lootSteps(reward, view),
+    ...questSteps(reward.quests ?? []),
     ...bossSteps(reward.boss),
     ...levelSteps(reward, view),
     { text: next },
@@ -58,6 +59,21 @@ function dropSteps(drops: readonly string[], view: BattleView): BattleStep[] {
     steps.push({ text: TEXT.battle.gearHint });
   }
   return steps;
+}
+
+/** "Tehtävä Limat kuriin: 2/3." tai "Tehtävä Limat kuriin valmis! Palaa Jussi Ketolan luo." */
+function questSteps(news: readonly QuestNews[]): BattleStep[] {
+  return news.map(({ quest: id, have, need }) => {
+    const quest = getQuest(id);
+    const title = TEXT.names.quest(quest).title;
+    if (have < need) {
+      return { text: TEXT.quests.battleProgress(title, have, need) };
+    }
+    return {
+      text: TEXT.quests.readyReturn(title, getNpc(quest.giver)),
+      effect: () => playSound('loot'),
+    };
+  });
 }
 
 /** Peikkolaskuri, bossin herääminen tai bossin kukistuminen. */
