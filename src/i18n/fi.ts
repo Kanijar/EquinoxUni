@@ -1,5 +1,5 @@
 import { GAME_INFO } from '../data/game-info';
-import type { SkillStat } from '../data/types';
+import type { GearSlot, GearStat, PlayerStats, SkillStat, StatBonus } from '../data/types';
 
 // Kaikki pelaajalle näkyvät tekstit. Älä kirjoita tekstejä suoraan koodiin,
 // vaan lisää ne tänne ja käytä muodossa TEXT.menu.play.
@@ -12,6 +12,25 @@ const STAT_NAMES: Readonly<Record<SkillStat, string>> = {
   critPercent: 'kriittinen osuma',
   magic: 'tulivoima',
 };
+
+/** Varusteiden lisäysten nimet repussa ("+6 hyökkäys"). */
+const GEAR_STAT_NAMES: Readonly<Record<GearStat, string>> = {
+  attack: 'hyökkäys',
+  defense: 'puolustus',
+  maxHp: 'elämä',
+  critPercent: 'tarkkuus',
+  magic: 'tulivoima',
+};
+
+/** Varusteen lisäykset tekstinä, esim. "+8 % tarkkuus, +1 hyökkäys". */
+function bonusText(bonus: StatBonus): string {
+  return Object.entries(bonus)
+    .map(([stat, amount]) => {
+      const percent = stat === 'critPercent' ? ' %' : '';
+      return `+${amount}${percent} ${GEAR_STAT_NAMES[stat as GearStat]}`;
+    })
+    .join(', ');
+}
 
 /** Prosentteina näytettävä arvo (kriittisen osuman mahdollisuus). */
 const isPercent = (stat: SkillStat): boolean => stat === 'critPercent';
@@ -122,6 +141,32 @@ export const TEXT = {
     maxed: 'MAKS',
     done: 'VALMIS',
   },
+  backpack: {
+    /** Kartan nappi, josta reppu avautuu. */
+    button: 'REPPU',
+    title: 'Reppu',
+    equipped: 'Käytössä',
+    bag: 'Repussa',
+    bagEmpty: 'Reppu on tyhjä.',
+    slots: { hand: 'Käsi', body: 'Vartalo', neck: 'Koru' } satisfies Record<GearSlot, string>,
+    emptySlot: 'tyhjä',
+    count: (count: number): string => `×${count}`,
+    hint: 'Napauta esinettä nähdäksesi, mitä se tekee.',
+    bonus: bonusText,
+    /** Pelaajan arvot varusteineen kahdella rivillä. */
+    stats: (stats: PlayerStats, hp: number): readonly [string, string] => [
+      `Hyökkäys ${stats.attack}   Puolustus ${stats.defense}`,
+      `Tarkkuus ${stats.critPercent} %   Elämä ${hp}/${stats.maxHp}`,
+    ],
+    equip: 'LAITA KÄYTTÖÖN',
+    unequip: 'OTA POIS',
+    drink: 'JUO',
+    done: 'VALMIS',
+    equippedNow: (item: string): string => `${item} on nyt käytössä!`,
+    unequippedNow: (item: string): string => `${item} on taas repussa.`,
+    drank: (amount: number): string => `Joit juoman. Elämä +${amount}!`,
+    fullHp: 'Elämäsi on jo täynnä.',
+  },
   battle: {
     appears: (enemy: string): string => `${enemy} hyökkää kimppuusi!`,
     ambush: (enemy: string): string => `Väijytys! ${enemy} hyppää esiin puiden takaa!`,
@@ -149,7 +194,9 @@ export const TEXT = {
     fleeOk: 'Pääsit pakoon!',
     fleeFail: 'Pako epäonnistui!',
     won: (enemy: string, xp: number): string => `Voitit: ${enemy}! Sait ${xp} KP.`,
-    drop: (item: string): string => `Löysit: ${item}.`,
+    drop: (item: string): string => `Löysit: ${item}!`,
+    /** Vihollinen pudotti varusteen: kerrotaan, miten se laitetaan käyttöön. */
+    gearHint: 'Avaa REPPU ja laita varuste käyttöön!',
     stole: (enemy: string, item: string): string => `${enemy} nappasi sinulta: ${item}!`,
     recovered: (item: string, count: number): string => `Sait takaisin: ${item} ×${count}.`,
     levelUp: (level: number): string => `Nousit tasolle ${level}! Elämä palautui.`,

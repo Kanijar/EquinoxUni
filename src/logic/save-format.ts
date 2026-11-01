@@ -31,6 +31,7 @@ type RawSave = Record<string, unknown>;
 export const SAVE_MIGRATIONS: Readonly<Record<number, (save: RawSave) => RawSave>> = {
   1: addRespawnTimers,
   2: addEyeColor,
+  3: addEquipment,
 };
 
 /**
@@ -59,6 +60,15 @@ function addEyeColor(save: RawSave): RawSave {
     return save;
   }
   return { ...save, state: { eyeColor: PLAYER.eyeColor, ...state } };
+}
+
+/**
+ * Versio 3 → 4. Versiossa 4 tuli reppu ja varusteet (GameState.equipped). Vanhassa
+ * tallennuksessa ei ole varusteita käytössä, joten paikat ovat tyhjiä. Repun esineet säilyvät.
+ */
+function addEquipment(save: RawSave): RawSave {
+  const state = save['state'];
+  return isRecord(state) ? { ...save, state: { ...state, equipped: {} } } : save;
 }
 
 export function encodeSave(state: GameState, meta: SaveMeta): string {

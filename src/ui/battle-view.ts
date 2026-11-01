@@ -15,6 +15,7 @@ import { showFireball } from './battle/fireball';
 import { MessageBox } from './battle/message-box';
 import { StatusPanel } from './battle/status-panel';
 import { showCritPopup } from './crit-popup';
+import { showLootPopup } from './loot-popup';
 
 // Taistelunäkymän grafiikka yhdessä paikassa: tausta maaston mukaan, taistelijat,
 // nimikyltit elämäpalkkeineen, viestilaatikko ja kaikki efektit. Osat ovat
@@ -148,6 +149,11 @@ export class BattleView {
         shakeHit(this.scene);
       }
     });
+  }
+
+  /** Pudonnut esine (sprite) ponnahtaa kaatuneen vihollisen kohdalta. */
+  showLoot(spriteKey: string): void {
+    showLootPopup(this.scene, spriteKey, this.fighters.enemy.center);
   }
 
   /** Palava vihollinen välähtää liekin värisenä ja menettää elämää. */

@@ -67,9 +67,7 @@ export function victorySteps(
   for (const stack of reward.recovered ?? []) {
     steps.push({ text: TEXT.battle.recovered(getItem(stack.id).name, stack.count) });
   }
-  if (reward.drop) {
-    steps.push({ text: TEXT.battle.drop(getItem(reward.drop).name) });
-  }
+  steps.push(...dropSteps(reward.drops ?? [], view));
   if (reward.leveledUp) {
     steps.push({
       text: TEXT.battle.levelUp(reward.level),
@@ -84,6 +82,24 @@ export function victorySteps(
   }
   const missing = xpToNextLevel(reward.totalXp);
   steps.push({ text: missing === null ? TEXT.battle.maxLevel : TEXT.battle.xpToNext(missing) });
+  return steps;
+}
+
+/** "Löysit: Peikon nuija!" jokaisesta pudotuksesta ja vihje reppuun, jos joukossa oli varuste. */
+function dropSteps(drops: readonly string[], view: BattleView): BattleStep[] {
+  const steps: BattleStep[] = drops.map((id) => {
+    const item = getItem(id);
+    return {
+      text: TEXT.battle.drop(item.name),
+      effect: () => {
+        view.showLoot(item.sprite);
+        playSound('loot');
+      },
+    };
+  });
+  if (drops.some((id) => getItem(id).kind === 'gear')) {
+    steps.push({ text: TEXT.battle.gearHint });
+  }
   return steps;
 }
 

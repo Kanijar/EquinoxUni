@@ -9,6 +9,7 @@ import {
   TOWNS,
   getSprite,
 } from '../src/data';
+import { GEAR_SLOTS } from '../src/data/items';
 import { PLAYER } from '../src/data/player';
 import { BATTLE_RULES, PROGRESSION, RESPAWN_RULES } from '../src/data/rules';
 import { SOUNDS } from '../src/data/sounds';
@@ -71,8 +72,8 @@ describe('sisältödata', () => {
       expect(ids(ENEMIES)).toContain(spawn.enemy);
     }
     for (const enemy of ENEMIES) {
-      if (enemy.drop) {
-        expect(ids(ITEMS)).toContain(enemy.drop);
+      for (const drop of enemy.drops ?? []) {
+        expect(ids(ITEMS)).toContain(drop.item);
       }
     }
     for (const stack of PLAYER.startItems) {
@@ -89,6 +90,30 @@ describe('sisältödata', () => {
       expect(TERRAINS.find((t) => t.id === rule.terrain)?.walkable).toBe(true);
       expect(rule.chancePerTile).toBeGreaterThan(0);
       expect(rule.chancePerTile).toBeLessThan(1);
+    }
+  });
+
+  it('pudotusten todennäköisyys on välillä 0..1 eikä sama esine ole kahdesti', () => {
+    for (const enemy of ENEMIES) {
+      const drops = enemy.drops ?? [];
+      for (const drop of drops) {
+        expect(drop.chance, enemy.id).toBeGreaterThan(0);
+        expect(drop.chance, enemy.id).toBeLessThanOrEqual(1);
+      }
+      expect(unique(drops.map((drop) => drop.item)), enemy.id).toBe(true);
+    }
+  });
+
+  it('varusteilla on paikka ja vähintään yksi positiivinen lisäys', () => {
+    const gear = ITEMS.filter((item) => item.kind === 'gear');
+    expect(gear.length).toBeGreaterThan(0);
+    for (const item of gear) {
+      expect(GEAR_SLOTS, item.id).toContain(item.slot);
+      const bonuses = Object.values(item.bonus);
+      expect(bonuses.length, item.id).toBeGreaterThan(0);
+      for (const amount of bonuses) {
+        expect(amount, item.id).toBeGreaterThan(0);
+      }
     }
   });
 

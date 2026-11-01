@@ -140,6 +140,16 @@ export const SOUNDS = {
       { freq: 420, ms: 90 },
     ],
   },
+  /** Vihollinen pudotti esineen (voittoruudun "Löysit: ..."). */
+  loot: {
+    wave: 'square',
+    gain: 0.18,
+    notes: [
+      { freq: 988, ms: 60 },
+      { freq: 1319, ms: 60 },
+      { freq: 1976, ms: 180 },
+    ],
+  },
 } as const satisfies Record<string, SoundDef>;
 
 /** Äänen tunniste, esim. playSound('hit'). Kirjoitusvirhe huomataan jo käännöksessä. */

@@ -25,6 +25,8 @@ export const COLORS = {
   battlePlatform: 0x3d6e28,
   hurt: 0xff4444,
   slotPanel: 0x1c2438,
+  /** Repussa valittu esine: ruudun reunus. */
+  selected: 0xffe066,
   notice: '#ffe066',
   hitFlash: 0xffffff,
   /** Kriittisen osuman välähdys ja teksti. */
@@ -52,6 +54,7 @@ export const SCENES = {
   skills: 'skills',
   settings: 'settings',
   saves: 'saves',
+  backpack: 'backpack',
   exit: 'exit',
 } as const;
 
@@ -158,10 +161,47 @@ export const WORLD_VIEW = {
   toastMs: 2500,
   /** Kartalle palaava voitettu vihollinen ilmestyy näkyviin näin monessa millisekunnissa. */
   respawnFadeMs: 800,
-  /** Paikkakunnassa näkyvä KYKYPISTEET-nappi oikeassa alakulmassa. */
-  skillButton: { width: 150, height: 40, margin: 6 },
-  /** Paikkakunnassa näkyvä TALLENNA-nappi KYKYPISTEET-napin yläpuolella. */
-  saveButton: { width: 150, height: 40, gap: 6 },
+  /**
+   * Napit oikeassa alakulmassa päällekkäin: alimpana REPPU (aina näkyvissä), sen yllä
+   * paikkakunnassa KYKYPISTEET ja TALLENNA. height ja gap koskevat kaikkia (ui/corner-stack.ts).
+   */
+  cornerButtons: { height: 40, margin: 6, gap: 6 },
+  backpackButton: { width: 96 },
+  skillButton: { width: 150 },
+  saveButton: { width: 150 },
+} as const;
+
+/** Reppunäkymän asetukset: varusteet vasemmalla, repun esineet oikealla, tiedot alhaalla. */
+export const BACKPACK_VIEW = {
+  titleY: 18,
+  headingY: 58,
+  margin: 6,
+  doneButtonWidth: 120,
+  /** Esineruutu (kosketettava) ja kuvan skaalaus 16 px → 32 px. */
+  tileSize: 40,
+  iconScale: 2,
+  /** Varustepaikat: rivit vasemmalla. */
+  slotX: 32,
+  slotTextX: 58,
+  slotFirstY: 88,
+  slotGap: 46,
+  slotRowWidth: 202,
+  /** Repun esineet ruudukkona oikealla. */
+  bagX: 244,
+  bagFirstY: 88,
+  bagColumns: 5,
+  bagRows: 2,
+  bagGap: 48,
+  /** Pelaajan arvot kahdella rivillä repun esineiden alla. */
+  statsFirstY: 172,
+  statsGap: 16,
+  /** Valitun esineen tiedot ja toimintonappi alareunassa. */
+  infoX: 12,
+  infoNameY: 222,
+  infoTextY: 240,
+  infoBonusY: 256,
+  actionButtonWidth: 150,
+  actionButtonY: 240,
 } as const;
 
 /** Kykypistenäkymän asetukset. Viisi riviä, VALMIS-nappi oikeassa yläkulmassa. */
@@ -204,4 +244,6 @@ export const BATTLE_VIEW = {
   },
   /** Kriittinen osuma: ruutu tärähtää ja kohteen yläpuolelle nousee teksti. */
   crit: { shakeMs: 200, shakeIntensity: 0.012, popupMs: 800, popupRisePx: 24, popupOffsetY: 84 },
+  /** Pudonnut esine nousee kaatuneen vihollisen kohdalta (ui/loot-popup.ts). */
+  loot: { scale: 3, offsetY: 30, risePx: 26, popMs: 250, holdMs: 500, fadeMs: 300 },
 } as const;
