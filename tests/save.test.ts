@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { SAVE_SLOT_COUNT, SAVE_VERSION } from '../src/config/persistence';
+import { FINLAND_MAP_TROLLS, SAVE_SLOT_COUNT, SAVE_VERSION } from '../src/config/persistence';
 import { MAP_ENEMIES, WORLD } from '../src/data';
 import { FINAL_BOSS } from '../src/data/boss';
 import { PLAYER } from '../src/data/player';
 import { createNewGame, playerStats, type GameState } from '../src/logic/game-state';
 import { MemoryStore, type KeyValueStore } from '../src/logic/key-value-store';
 import { mapEnemyRespawnMs } from '../src/logic/respawn';
-import { decodeSave, encodeSave, migrateSave } from '../src/logic/save-format';
+import { decodeSave, encodeSave, migrateSave, SAVE_MIGRATIONS } from '../src/logic/save-format';
 import { deleteSlot, listSlots, loadFromSlot, saveToSlot, slotKey } from '../src/logic/save-slots';
 
-const meta = { savedAt: 1_700_000_000_000, place: 'Tampere' };
+const meta = { savedAt: 1_700_000_000_000, place: 'Kuusela' };
 
 function playedGame(): GameState {
   const state = createNewGame();
@@ -21,7 +21,7 @@ function playedGame(): GameState {
   state.defeated.push(0, 3);
   state.respawning.push({ index: 3, msLeft: 12_345 });
   state.hp = 20;
-  state.lastTown = 'tampere';
+  state.lastTown = 'kuusela';
   state.eyeColor = 'black';
   state.bossProgress = 2;
   return state;
@@ -33,7 +33,7 @@ describe('tallennusmuoto', () => {
     const save = decodeSave(encodeSave(state, meta));
     expect(save).not.toBeNull();
     expect(save?.state).toEqual(state);
-    expect(save?.place).toBe('Tampere');
+    expect(save?.place).toBe('Kuusela');
     expect(save?.savedAt).toBe(meta.savedAt);
     expect(save?.version).toBe(SAVE_VERSION);
   });
@@ -69,10 +69,10 @@ describe('tallennusmuoto', () => {
     const raw = JSON.parse(encodeSave(playedGame(), meta)) as Record<string, unknown>;
     const oldState = raw['state'] as Record<string, unknown>;
     delete oldState['respawning'];
-    const old = { ...raw, version: 1, state: oldState };
-    const state = decodeSave(JSON.stringify(old))?.state;
-    expect(state?.defeated).toEqual([0, 3]);
-    expect(state?.respawning).toEqual([
+    const migrate = SAVE_MIGRATIONS[1];
+    const state = migrate?.({ ...raw, version: 1, state: oldState })['state'] as GameState;
+    expect(state.defeated).toEqual([0, 3]);
+    expect(state.respawning).toEqual([
       { index: 0, msLeft: mapEnemyRespawnMs(0) },
       { index: 3, msLeft: mapEnemyRespawnMs(3) },
     ]);
@@ -89,13 +89,12 @@ describe('tallennusmuoto', () => {
   });
 
   it('versio 4: peikkolaskuri alkaa jo voitetuista tunturipeikoista', () => {
-    const trolls = MAP_ENEMIES.flatMap((spawn, index) => (spawn.enemy === 'troll' ? [index] : []));
     const raw = JSON.parse(encodeSave(playedGame(), meta)) as Record<string, unknown>;
     const oldState = raw['state'] as Record<string, unknown>;
     delete oldState['bossProgress'];
     delete oldState['bossDefeated'];
     delete oldState['completed'];
-    oldState['defeated'] = [0, ...trolls.slice(0, 2)];
+    oldState['defeated'] = [0, ...FINLAND_MAP_TROLLS.slice(0, 2)];
     oldState['respawning'] = [];
     const state = decodeSave(JSON.stringify({ ...raw, version: 4, state: oldState }))?.state;
     expect(state?.bossProgress).toBe(2);
@@ -230,7 +229,7 @@ describe('tallennuspaikat', () => {
       kind: 'saved',
       level: 3,
       xp: 40,
-      place: 'Tampere',
+      place: 'Kuusela',
       savedAt: meta.savedAt,
     });
     expect(loadFromSlot(store, 2)).toEqual(state);

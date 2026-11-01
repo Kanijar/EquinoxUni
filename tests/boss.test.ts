@@ -22,7 +22,7 @@ import {
 // Loppuboss: viisi tunturipeikkoa herättää Peikkokuninkaan, voitettu boss ei palaa
 // ja peli jatkuu voiton jälkeen.
 
-const boss: BossDef = { enemy: 'king', unlockEnemy: 'troll', unlockCount: 3, lon: 0, lat: 0 };
+const boss: BossDef = { enemy: 'king', unlockEnemy: 'troll', unlockCount: 3, x: 0, y: 0 };
 const fresh = (): BossProgress => ({ bossProgress: 0, bossDefeated: false });
 
 describe('loppubossin herääminen', () => {

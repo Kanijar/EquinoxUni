@@ -1,13 +1,13 @@
 import type Phaser from 'phaser';
 import { WORLD_VIEW } from '../config/game-config';
-import { getEnemy, MAP_ENEMIES, WORLD } from '../data';
+import { getEnemy, MAP_ENEMIES } from '../data';
 import { FINAL_BOSS } from '../data/boss';
 import { Enemy } from '../entities/enemy';
 import { isBossOnMap } from '../logic/boss';
 import type { GameState } from '../logic/game-state';
-import { geoToTile } from '../logic/geo';
 import { isFarEnough, isRespawning, tickRespawns } from '../logic/respawn';
 import type { Vec2 } from '../logic/vector';
+import { pointTile } from '../logic/world-grid';
 import { BossAura } from '../ui/boss-aura';
 import { tileToWorld } from './world-map';
 
@@ -28,7 +28,7 @@ export class MapEncounters {
     private readonly state: GameState,
     private readonly layer: Phaser.Tilemaps.TilemapLayer,
   ) {
-    this.spawnPoints = MAP_ENEMIES.map((spawn) => tileToWorld(geoToTile(spawn, WORLD.projection)));
+    this.spawnPoints = MAP_ENEMIES.map((spawn) => tileToWorld(pointTile(spawn)));
     MAP_ENEMIES.forEach((_, index) => {
       if (!isRespawning(state.respawning, index)) {
         this.spawn(index);
@@ -68,7 +68,7 @@ export class MapEncounters {
   }
 
   private spawnBoss(): Enemy {
-    const point = tileToWorld(geoToTile(FINAL_BOSS, WORLD.projection));
+    const point = tileToWorld(pointTile(FINAL_BOSS));
     const boss = new Enemy(this.scene, point, getEnemy(FINAL_BOSS.enemy), null);
     this.scene.physics.add.collider(boss.sprite, this.layer);
     this.enemies.push(boss);

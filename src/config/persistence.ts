@@ -18,8 +18,15 @@ export const SAVE_SLOT_COUNT = 3;
  * Versio 3: sankarin silmien väri (GameState.eyeColor).
  * Versio 4: reppu ja varusteet (GameState.equipped).
  * Versio 5: loppuboss (GameState.bossProgress, bossDefeated) ja läpäisyn voittoruutu (completed).
+ * Versio 6: Suomen kartta vaihtui saareksi (sijainti, paikkakunta ja voitetut viholliset alusta).
  */
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
+
+/**
+ * Vanhan Suomen kartan (tallennusversiot 1–5) tunturipeikkojen järjestysnumerot
+ * vihollislistassa. Muunnos 4 → 5 laskee niistä peikkolaskurin.
+ */
+export const FINLAND_MAP_TROLLS: readonly number[] = [13, 14, 15, 16];
 
 /** Säädettävän asetuksen rajat prosentteina. */
 export interface SettingRange {

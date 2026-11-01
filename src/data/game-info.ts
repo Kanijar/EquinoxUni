@@ -10,8 +10,7 @@ export const GAME_INFO = {
   /** Lyhyt nimi puhelimen aloitusnäytön kuvakkeen alle (enintään noin 12 merkkiä). */
   shortName: 'Equinox',
   /** Lyhyt kuvaus, jonka puhelin voi näyttää asennuksen yhteydessä. */
-  description:
-    'Pikseliseikkailu Suomen kartalla: tutki paikkakuntia ja taistele hirviöitä vastaan.',
+  description: 'Pikseliseikkailu isolla saarella: tutki kyliä ja taistele hirviöitä vastaan.',
   /**
    * Pelin kehitysvaihe, joka näkyy versionumeron perässä ("Versio: 0.25 (alfa)").
    * Kun peli etenee, vaihda tähän esim. 'beta'.

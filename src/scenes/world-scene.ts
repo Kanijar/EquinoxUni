@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { SCENES, WORLD_VIEW } from '../config/game-config';
-import { WORLD } from '../data';
 import { Player } from '../entities/player';
 import { healItemCount } from '../logic/battle';
 import { bossHudText } from '../logic/boss';
@@ -36,9 +35,9 @@ import type { SavesSceneData } from './saves-scene';
 import type { SkillsSceneData } from './skills-scene';
 import type { VictorySceneData } from './victory-scene';
 
-// Suomen kartta. Pelaaja kulkee virtuaalitikulla, lepää paikkakunnissa ja
+// Saaren kartta. Pelaaja kulkee virtuaalitikulla, lepää paikkakunnissa ja
 // joutuu taisteluun, kun vihollinen saa hänet kiinni. Herännyt loppuboss odottaa
-// Lapissa, ja ruudun reunan nuoli näyttää suunnan. REPPU-napista (aina näkyvissä) avautuu
+// tuntureilla, ja ruudun reunan nuoli näyttää suunnan. REPPU-napista (aina näkyvissä) avautuu
 // reppu, jossa varusteita laitetaan käyttöön. Paikkakunnassa voi jakaa kykypisteet
 // KYKYPISTEET-napista ja tallentaa pelin TALLENNA-napista.
 // Tämä scene vain kokoaa osat.
@@ -83,7 +82,7 @@ export class WorldScene extends Phaser.Scene {
     const isNewGame = this.state.position === null && data.message === undefined;
     const built = buildWorldMap(this, getWorldGrid());
     placeTownMarkers(this);
-    const start = this.state.position ?? tileToWorld(townTile(WORLD, lastVisitedTown(this.state)));
+    const start = this.state.position ?? tileToWorld(townTile(lastVisitedTown(this.state)));
     const speed = playerStats(this.state).speed;
     this.player = new Player(this, start, speed, playerSprite(this.state));
     this.physics.add.collider(this.player.sprite, built.layer);

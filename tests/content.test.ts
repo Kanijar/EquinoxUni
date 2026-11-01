@@ -195,7 +195,8 @@ describe('sisältödata', () => {
         const { chargeChance, specialChance, chargeMultiplier, specialPower } = enemy.moves;
         expect(chargeChance + specialChance).toBeLessThan(1);
         expect(chargeMultiplier).toBeGreaterThan(1);
-        expect(specialPower).toBeGreaterThan(0);
+        // Erikoisliike voi puuttua (specialChance 0, esim. lohikäärme), muuten sillä on voimaa.
+        expect(specialChance === 0 || specialPower > 0).toBe(true);
       }
       if (enemy.backdrop) {
         expect(BATTLE_BACKDROPS[enemy.backdrop]).toBeDefined();
