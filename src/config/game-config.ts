@@ -88,6 +88,8 @@ export const MENU_VIEW = {
   /** Versioteksti oikeassa alakulmassa: etäisyys reunoista ja himmennys. */
   versionMargin: 4,
   versionAlpha: 0.7,
+  /** ASENNA-napin leveys oikeassa yläkulmassa (näkyy vain, kun Chrome tarjoaa asennusta). */
+  installWidth: 96,
 } as const;
 
 /** Alkuruudun suden salaisuuden taikaefektit (ui/wolf-magic.ts). */

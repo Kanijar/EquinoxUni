@@ -61,6 +61,8 @@ export const TEXT = {
     released: (date: string, clock: string): string => `Julkaistu ${date} klo ${clock}`,
     /** Omalla koneella (npm run dev) ajettava peli ei ole julkaistu versio. */
     devBuild: 'Kehitysversio',
+    /** Oikean yläkulman nappi: asentaa pelin puhelimen aloitusnäytölle (PWA). */
+    install: 'ASENNA',
   },
   settings: {
     title: 'Asetukset',

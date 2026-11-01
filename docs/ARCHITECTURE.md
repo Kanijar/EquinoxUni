@@ -10,7 +10,7 @@ koodin siistinä, vaikka sitä kirjoittaisi pääosin tekoäly.
   Nimi on määritelty vain tiedostossa `src/data/game-info.ts` (ks. luku 3).
 - **Pelaajat:** 12–15-vuotiaat suomalaiset pojat. Pelin kieli on suomi.
 - **Alusta:** Android-puhelimen verkkoselain (Chrome), vaakasuunta, kosketusohjaus.
-  Asennus ei ole pakollista, mutta peli voidaan lisätä aloitusnäytölle (PWA).
+  Asennus ei ole pakollista, mutta pelin voi asentaa Chromella aloitusnäytölle (PWA, luku 4).
 - **Kehitystapa:** pelin suunnittelija (Väinö) kertoo Claudelle uusista ominaisuuksista
   tavallisella kielellä, ja Claude toteuttaa ne. Rakenne on suunniteltu niin, että
   tekoäly löytää oikean paikan muutokselle nopeasti eikä riko muuta peliä.
@@ -36,7 +36,7 @@ tekoälyn on vaikeampi muokata editoritiedostoja), React (ei sovi pelisilmukkaan
 
 ```
 index.html              Sivu, jolle peli piirretään (mobiiliasetukset, otsikko %GAME_NAME%)
-vite.config.ts          Build-asetukset; kirjoittaa pelin nimen sivun otsikkoon ja PWA-manifestiin
+vite.config.ts          Build-asetukset; kirjoittaa pelin nimen sivun otsikkoon, PWA-manifestin ja kuvakkeet
 public/                 Staattiset tiedostot sellaisenaan (myöhemmin kuvat ja äänet)
 src/
   main.ts               Käynnistää Phaserin ja listaa scenet
@@ -45,6 +45,7 @@ src/
   data/                 Pelisisältö datana: viholliset, esineet, Suomen kartta, spritet
     types.ts            Sisällön tyypit (muokkaa ensin tätä, kun lisäät uuden kentän)
     game-info.ts        Pelin nimi, kehitysvaihe ja PWA-manifestin sisältö (niiden ainoa määrittelypaikka)
+    app-icon.ts         Pelin kuvake (pikselikuva) puhelimen aloitusnäytölle, PNG:t tehdään buildissa
     index.ts            getEnemy(), getItem(), getTown() ... hakufunktiot
     finland.ts          Suomen rajat, järvet ja maastovyöhykkeet oikeina koordinaatteina
     towns.ts            Paikkakunnat ja tiet
@@ -96,6 +97,16 @@ scenes  →  systems / ui  →  entities  →  logic
   (`logic/release-info.ts`). Arvot kulkevat peliin `import.meta.env.VITE_RELEASE_*`-muuttujina.
   `npm run dev` näyttää "Kehitysversio". `vite.config.ts` tarkistetaan Noden tyypeillä
   (`tsconfig.node.json`), peli ilman niitä.
+- **Asennus puhelimeen (PWA):** julkaistun pelin voi asentaa Androidin Chromella aloitusnäytölle.
+  Asennettu peli aukeaa koko näytölle ja vaakatasoon ilman osoiteriviä. Chrome vaatii HTTPS:n,
+  manifestin (`data/game-info.ts` `webManifest`) ja kuvakkeet 192 ja 512 px. Kuvakkeet piirretään
+  buildissa pikselikuvasta `data/app-icon.ts` (`logic/pixel-icon.ts`, `logic/png-encode.ts`),
+  joten kuvatiedostoja ei tarvitse piirtää käsin. Alkuruudun oikeaan yläkulmaan tulee ASENNA-nappi,
+  kun Chrome tarjoaa asennusta (`systems/install-prompt.ts`, `logic/install-offer.ts`,
+  `ui/install-button.ts`). Offline-tukea (service worker) ei ole: peli ladataan aina verkosta,
+  joten uusi versio näkyy heti. Tallennukset ovat samassa `localStorage`ssa kuin selaimessa.
+  Tiedostot, jotka `vite.config.ts` lukee suoraan (`app-icon.ts`, `pixel-icon.ts`,
+  `png-encode.ts`, `game-info.ts`, `release-number.ts`), eivät tuo muita tiedostoja.
 - **Kaatuminen:** taistelussa kaatunut sankari herää viimeisimmässä paikkakunnassa, jossa hän
   kävi (`GameState.lastTown`, aluksi aloituspaikkakunta), täysin elämin. KP, kykypisteet, esineet
   ja voitetut viholliset säilyvät. Säännöt `logic/town-visits.ts`.
@@ -257,7 +268,7 @@ kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 
 - Pomotaistelut ✓ (loppuboss Peikkokuningas, erikoisliikkeet `EnemyDef.moves`)
 - Oikeat pikselikuvat ja musiikki
-- PWA-offline-tila (`vite-plugin-pwa`), musiikki (asetukset ✓)
+- Asennus puhelimeen (PWA) ✓, offline-tila (`vite-plugin-pwa`) myöhemmin, musiikki (asetukset ✓)
 
 ## 8. Turvallisuus ja kohderyhmä
 

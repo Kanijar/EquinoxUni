@@ -9,6 +9,9 @@ export const GAME_INFO = {
   name: 'Equinox Universe',
   /** Lyhyt nimi puhelimen aloitusnäytön kuvakkeen alle (enintään noin 12 merkkiä). */
   shortName: 'Equinox',
+  /** Lyhyt kuvaus, jonka puhelin voi näyttää asennuksen yhteydessä. */
+  description:
+    'Pikseliseikkailu Suomen kartalla: tutki paikkakuntia ja taistele hirviöitä vastaan.',
   /**
    * Pelin kehitysvaihe, joka näkyy versionumeron perässä ("Versio: 0.25 (alfa)").
    * Kun peli etenee, vaihda tähän esim. 'beta'.
@@ -23,16 +26,51 @@ export const GAME_INFO = {
   timeZone: 'Europe/Helsinki',
 } as const;
 
-/** PWA-manifestin sisältö. vite.config.ts tarjoilee sen osoitteessa manifest.webmanifest. */
-export function webManifest(backgroundColor: string): Record<string, string> {
+/** Kuvakkeen rivi manifestissa (data/app-icon.ts manifestIcon). */
+export interface WebManifestIcon {
+  readonly src: string;
+  readonly sizes: string;
+  readonly type: string;
+  readonly purpose: string;
+}
+
+/** PWA-manifesti: Chrome tarvitsee nimen, kuvakkeet, aloitusosoitteen ja näyttötavan asennukseen. */
+export interface WebManifest {
+  readonly id: string;
+  readonly name: string;
+  readonly short_name: string;
+  readonly description: string;
+  readonly lang: string;
+  readonly start_url: string;
+  readonly scope: string;
+  readonly display: string;
+  readonly orientation: string;
+  readonly background_color: string;
+  readonly theme_color: string;
+  readonly icons: readonly WebManifestIcon[];
+}
+
+/**
+ * PWA-manifestin sisältö. vite.config.ts tarjoilee sen osoitteessa manifest.webmanifest.
+ * Polut ovat suhteessa manifestiin, joten ne toimivat julkaisuosoitteessa /EquinoxUni/.
+ * id pysyy samana, jotta asennettu peli tunnistetaan samaksi, vaikka start_url muuttuisi.
+ */
+export function webManifest(
+  backgroundColor: string,
+  icons: readonly WebManifestIcon[],
+): WebManifest {
   return {
+    id: './',
     name: GAME_INFO.name,
     short_name: GAME_INFO.shortName,
+    description: GAME_INFO.description,
     lang: 'fi',
     start_url: './',
+    scope: './',
     display: 'fullscreen',
     orientation: 'landscape',
     background_color: backgroundColor,
     theme_color: backgroundColor,
+    icons,
   };
 }
