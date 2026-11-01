@@ -8,6 +8,13 @@ import type { Fighter } from './combat';
 import { rollDrops } from './drops';
 import { applyGear, ownsItem, type Equipped } from './equipment';
 import { levelForXp } from './progression';
+import {
+  canQuestDrop,
+  questProgress,
+  questsWanting,
+  recordQuestDefeat,
+  type QuestLog,
+} from './quest-log';
 import { respawnDelayMs, startRespawn, type RespawnTimer } from './respawn';
 import {
   applySkillPoints,
@@ -21,7 +28,8 @@ import {
 import type { Vec2 } from './vector';
 
 // Pelin eteneminen, joka säilyy kartan ja taistelun välillä:
-// elämä, kokemus, kykypisteet, esineet ja varusteet, sijainti, voitetut viholliset ja niiden paluu.
+// elämä, kokemus, kykypisteet, esineet ja varusteet, sijainti, voitetut viholliset ja niiden paluu
+// sekä tehtävät.
 // Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
 // tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
@@ -55,6 +63,8 @@ export interface GameState extends BossProgress {
    * voittoruudulla. Peli jatkuu läpäisyn jälkeen, ja voittoruutu näytetään vain kerran.
    */
   completed: boolean;
+  /** Tehtäväkirja: otetut ja palautetut tehtävät (logic/quest-log.ts, data/quests.ts). */
+  readonly quests: QuestLog;
 }
 
 /**
@@ -80,6 +90,7 @@ export function createNewGame(startXp = 0): GameState {
     bossProgress: 0,
     bossDefeated: false,
     completed: false,
+    quests: {},
   };
 }
 
@@ -163,20 +174,47 @@ export function restoreHp(state: GameState): void {
   state.hp = playerStats(state).maxHp;
 }
 
-export interface VictoryReward {
+/** Kokemuksen saamisen tulos: nousiko taso ja paljonko kykypisteitä tuli. */
+export interface XpGain {
   readonly xp: number;
-  /** Pelaajan kokemuspisteet yhteensä voiton jälkeen. */
+  /** Pelaajan kokemuspisteet yhteensä lisäyksen jälkeen. */
   readonly totalXp: number;
   readonly leveledUp: boolean;
   readonly level: number;
   /** Tason noususta saadut uudet kykypisteet (0, jos taso ei noussut). */
   readonly skillPoints: number;
+}
+
+/** Lisää kokemusta (voitto tai tehtävä). Tason noustessa elämä palautuu täyteen. */
+export function gainXp(state: GameState, xp: number): XpGain {
+  const before = playerLevel(state);
+  state.xp += xp;
+  const level = playerLevel(state);
+  const leveledUp = level > before;
+  if (leveledUp) {
+    restoreHp(state);
+  }
+  const skillPoints = skillPointsEarned(level) - skillPointsEarned(before);
+  return { xp, totalXp: state.xp, leveledUp, level, skillPoints };
+}
+
+export interface VictoryReward extends XpGain {
   /** Esineet, jotka vihollinen pudotti (logic/drops.ts). Puuttuu, jos mitään ei pudonnut. */
   readonly drops?: readonly string[];
   /** Bossin eteneminen: peikkolaskuri kasvoi, boss heräsi tai boss voitettiin (logic/boss.ts). */
   readonly boss?: BossNews;
   /** Esineet, jotka vihollinen oli varastanut ja jotka saatiin takaisin. */
   readonly recovered?: readonly ItemStack[];
+  /** Tehtävät, jotka edistyivät voitosta tai pudotuksesta (data/quests.ts). */
+  readonly quests?: readonly QuestNews[];
+}
+
+/** Tehtävän edistyminen voitossa, esim. Limat kuriin 2/3. */
+export interface QuestNews {
+  /** Tehtävän tunniste (data/quests.ts). */
+  readonly quest: string;
+  readonly have: number;
+  readonly need: number;
 }
 
 /** Karttavihollinen tai väijyjä, jonka kanssa taisteltiin. */
@@ -186,10 +224,16 @@ export interface Foe {
   readonly mapEnemyIndex: number | null;
 }
 
-/** Arpoo vihollisen pudotukset ja laittaa ne reppuun. */
+/**
+ * Arpoo vihollisen pudotukset ja laittaa ne reppuun. Tehtävän esine putoaa vain, kun
+ * tehtävä on kesken (logic/quest-log.ts).
+ */
 function collectDrops(state: GameState, enemy: EnemyDef, rng: Rng): string[] {
   const owns = (id: string): boolean => ownsItem(state.inventory, state.equipped, id);
-  const drops = rollDrops(enemy.drops ?? [], owns, rng);
+  const allowed = (enemy.drops ?? []).filter((drop) =>
+    canQuestDrop(state.quests, state.inventory, drop),
+  );
+  const drops = rollDrops(allowed, owns, rng);
   for (const id of drops) {
     state.inventory[id] = (state.inventory[id] ?? 0) + 1;
   }
@@ -206,22 +250,26 @@ export function grantVictory(
   enemy: EnemyDef,
   rng: Rng = Math.random,
 ): VictoryReward {
-  const before = playerLevel(state);
-  state.xp += enemy.xp;
   if (mapEnemyIndex !== null) {
     markDefeated(state, mapEnemyIndex, enemy);
   }
   const drops = collectDrops(state, enemy, rng);
   const boss = recordBossVictory(state, enemy.id);
-  const level = playerLevel(state);
-  const leveledUp = level > before;
-  if (leveledUp) {
-    restoreHp(state);
-  }
-  const skillPoints = skillPointsEarned(level) - skillPointsEarned(before);
-  const reward = { xp: enemy.xp, totalXp: state.xp, leveledUp, level, skillPoints };
+  const quests = questUpdates(state, enemy.id, drops);
+  const reward: VictoryReward = gainXp(state, enemy.xp);
   const withDrops = drops.length > 0 ? { ...reward, drops } : reward;
-  return boss ? { ...withDrops, boss } : withDrops;
+  const withQuests = quests.length > 0 ? { ...withDrops, quests } : withDrops;
+  return boss ? { ...withQuests, boss } : withQuests;
+}
+
+/** Tehtävät, jotka edistyivät: voitetun vihollisen tehtävät ja pudonneita esineitä odottavat. */
+function questUpdates(state: GameState, enemyId: string, drops: readonly string[]): QuestNews[] {
+  const defeated = recordQuestDefeat(state.quests, enemyId);
+  const brought = drops.flatMap((id) => questsWanting(state.quests, id));
+  return [...new Set([...defeated, ...brought])].map((quest) => ({
+    quest: quest.id,
+    ...questProgress(state.quests, state.inventory, quest),
+  }));
 }
 
 /**

@@ -5,12 +5,15 @@ import type {
   GearSlot,
   GearStat,
   ItemDef,
+  NpcDef,
   PlayerStats,
+  QuestDef,
   SkillStat,
   StatBonus,
   TownDef,
 } from '../data/types';
 import { localDateParts, twoDigits, type DateParts } from './date-parts';
+import { FI_QUESTS } from './fi-quests';
 import type { Language } from './language';
 
 // Kaikki pelaajalle näkyvät tekstit suomeksi. Älä kirjoita tekstejä suoraan koodiin,
@@ -272,7 +275,12 @@ export const FI = {
     item: (item: ItemDef): string => item.name,
     itemDescription: (item: ItemDef): string => item.description,
     town: (town: TownDef): string => town.name,
+    npc: (npc: NpcDef): string => npc.name,
+    /** Tehtävän nimi, tarjous ja kiitos (data/quests.ts). */
+    quest: (quest: QuestDef): { title: string; story: string; thanks: string } => quest,
   },
+  /** Jussi Ketolan tehtävät (i18n/fi-quests.ts). */
+  quests: FI_QUESTS,
   /** Loitsujen nimet (data/spells.ts). */
   spells: {
     fireball: 'Tulipallo',

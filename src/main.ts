@@ -5,6 +5,7 @@ import { BattleScene } from './scenes/battle-scene';
 import { BootScene } from './scenes/boot-scene';
 import { ExitScene } from './scenes/exit-scene';
 import { MenuScene } from './scenes/menu-scene';
+import { QuestScene } from './scenes/quest-scene';
 import { SavesScene } from './scenes/saves-scene';
 import { SettingsScene } from './scenes/settings-scene';
 import { SkillsScene } from './scenes/skills-scene';
@@ -43,6 +44,7 @@ new Phaser.Game({
     SettingsScene,
     SavesScene,
     BackpackScene,
+    QuestScene,
     ExitScene,
   ],
 });

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { SCENES, WORLD_VIEW } from '../config/game-config';
+import { getNpc } from '../data';
 import { Player } from '../entities/player';
 import { healItemCount } from '../logic/battle';
 import { bossHudText } from '../logic/boss';
@@ -12,6 +13,8 @@ import {
   unspentSkillPoints,
   type GameState,
 } from '../logic/game-state';
+import { recordQuestVisit } from '../logic/quest-log';
+import { npcInTown, npcMarker } from '../logic/quests';
 import { isSlowTerrain, speedFactorAt } from '../logic/terrain-speed';
 import { lastVisitedTown, visitTown } from '../logic/town-visits';
 import { length } from '../logic/vector';
@@ -19,10 +22,11 @@ import { terrainAt, townTile } from '../logic/world-grid';
 import { AmbushWatch } from '../systems/ambush-watch';
 import { Controls } from '../systems/controls';
 import { MapEncounters } from '../systems/map-encounters';
+import { NpcMarkers } from '../systems/npc-markers';
 import { placeTownMarkers, TownTracker } from '../systems/town-markers';
 import { playSound } from '../systems/sound-fx';
 import { buildWorldMap, getWorldGrid, tileToWorld, worldToTile } from '../systems/world-map';
-import type { TownDef } from '../data/types';
+import type { NpcDef, TownDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import { Hud } from '../ui/hud';
 import { LeafRustle } from '../ui/leaf-rustle';
@@ -31,10 +35,13 @@ import { coverScreen, revealScreen } from '../ui/screen-wipe';
 import { addPlayerCountLabel } from '../ui/player-count-label';
 import { BossPointer } from '../ui/boss-pointer';
 import { SaveButton } from '../ui/save-button';
+import { QuestTracker } from '../ui/quest-tracker';
 import { SkillButton } from '../ui/skill-button';
+import { TalkButton } from '../ui/talk-button';
 import { Toast } from '../ui/toast';
 import type { BackpackSceneData } from './backpack-scene';
 import type { BattleSceneData } from './battle-scene';
+import type { QuestSceneData } from './quest-scene';
 import type { SavesSceneData } from './saves-scene';
 import type { SkillsSceneData } from './skills-scene';
 import type { VictorySceneData } from './victory-scene';
@@ -43,7 +50,8 @@ import type { VictorySceneData } from './victory-scene';
 // joutuu taisteluun, kun vihollinen saa hänet kiinni. Herännyt loppuboss odottaa
 // tuntureilla, ja ruudun reunan nuoli näyttää suunnan. REPPU-napista (aina näkyvissä) avautuu
 // reppu, jossa varusteita laitetaan käyttöön. Paikkakunnassa voi jakaa kykypisteet
-// KYKYPISTEET-napista ja tallentaa pelin TALLENNA-napista.
+// KYKYPISTEET-napista ja tallentaa pelin TALLENNA-napista. Jussi Ketola seisoo kotipaikkakuntansa
+// vieressä: hänen kanssaan puhutaan puhenapista tai napauttamalla häntä (tehtävät).
 // Tämä scene vain kokoaa osat.
 
 export interface WorldSceneData {
@@ -69,6 +77,9 @@ export class WorldScene extends Phaser.Scene {
   private hud!: Hud;
   private skillButton!: SkillButton;
   private saveButton!: SaveButton;
+  private talkButton!: TalkButton;
+  private npcs!: NpcMarkers;
+  private questTracker!: QuestTracker;
   private toast!: Toast;
   private bossPointer: BossPointer | null = null;
   private encountersFrom = 0;
@@ -87,6 +98,7 @@ export class WorldScene extends Phaser.Scene {
     const isNewGame = this.state.position === null && data.message === undefined;
     const built = buildWorldMap(this, getWorldGrid());
     placeTownMarkers(this);
+    this.npcs = new NpcMarkers(this, (npc) => this.talkTo(npc));
     const start = this.state.position ?? tileToWorld(townTile(lastVisitedTown(this.state)));
     const speed = playerStats(this.state).speed;
     this.player = new Player(this, start, speed, playerSprite(this.state));
@@ -102,6 +114,8 @@ export class WorldScene extends Phaser.Scene {
     addPlayerCountLabel(this);
     this.skillButton = new SkillButton(this, () => this.openSkills());
     this.saveButton = new SaveButton(this, () => this.openSaves());
+    this.talkButton = new TalkButton(this, (npc) => this.talkTo(npc));
+    this.questTracker = new QuestTracker(this);
     addBackpackButton(this, () => this.openBackpack());
     this.toast = new Toast(this);
     const boss = this.encounters.boss;
@@ -168,7 +182,26 @@ export class WorldScene extends Phaser.Scene {
     visitTown(this.state, town.id);
     const points = unspentSkillPoints(this.state);
     const reminder = points > 0 ? `\n${TEXT.world.skillPointsWaiting(points)}` : '';
-    this.toast.show(TEXT.world.rest(town) + reminder);
+    const quests = recordQuestVisit(this.state.quests, town.id).map(
+      (quest) => `\n${TEXT.quests.readyReturn(TEXT.names.quest(quest).title, getNpc(quest.giver))}`,
+    );
+    this.toast.show(TEXT.world.rest(town) + quests.join('') + reminder);
+  }
+
+  /**
+   * Tehtävänäkymä avautuu kartan päälle (kuten reppu), kun pelaaja on tehtävänantajan
+   * paikkakunnassa. Kauempaa napautettuna kerrotaan, että pitää kävellä lähemmäs.
+   */
+  private talkTo(npc: NpcDef): void {
+    if (this.leaving) {
+      return;
+    }
+    if (this.towns.town?.id !== npc.town) {
+      this.toast.show(TEXT.quests.tooFar(npc));
+      return;
+    }
+    const data: QuestSceneData = { state: this.state, npc: npc.id };
+    this.sleepUnder(SCENES.quests, data);
   }
 
   private openSkills(): void {
@@ -181,12 +214,17 @@ export class WorldScene extends Phaser.Scene {
    * ja herää samaan kohtaan. Herätessä viholliset odottavat hetken ennen kuin voivat hyökätä.
    */
   private openBackpack(): void {
+    const data: BackpackSceneData = { state: this.state };
+    this.sleepUnder(SCENES.backpack, data);
+  }
+
+  /** Kartta nukkuu toisen näkymän alla ja herää samaan kohtaan. */
+  private sleepUnder(key: string, data: BackpackSceneData | QuestSceneData): void {
     this.events.once(Phaser.Scenes.Events.WAKE, () => {
       this.encountersFrom = this.time.now + WORLD_VIEW.graceMs.afterBattle;
     });
-    const data: BackpackSceneData = { state: this.state };
     this.scene.sleep();
-    this.scene.launch(SCENES.backpack, data);
+    this.scene.launch(key, data);
   }
 
   private openSaves(): void {
@@ -220,5 +258,9 @@ export class WorldScene extends Phaser.Scene {
     const inTown = this.towns.town !== undefined;
     this.skillButton.update(inTown, unspentSkillPoints(this.state));
     this.saveButton.update(inTown);
+    const npc = npcInTown(this.towns.town?.id);
+    this.talkButton.update(npc, npc ? npcMarker(this.state, npc.id) : null);
+    this.npcs.update(this.state);
+    this.questTracker.update(this.state);
   }
 }

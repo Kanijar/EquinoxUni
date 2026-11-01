@@ -2,6 +2,7 @@ import { GAME_INFO } from '../data/game-info';
 import type { GearStat, PlayerStats, SkillStat, StatBonus } from '../data/types';
 import { localDateParts, twoDigits, type DateParts } from './date-parts';
 import { EN_CONTENT } from './en-content';
+import { EN_QUESTS } from './en-quests';
 import { LANGUAGE_NAMES, type Texts } from './fi';
 
 // Kaikki pelaajalle näkyvät tekstit englanniksi. Avaimet ovat samat kuin i18n/fi.ts:ssä:
@@ -228,6 +229,7 @@ export const EN: Texts = {
     levelUpPopup: 'LEVEL UP!',
   },
   names: EN_CONTENT,
+  quests: EN_QUESTS,
   spells: {
     fireball: 'Fireball',
   },

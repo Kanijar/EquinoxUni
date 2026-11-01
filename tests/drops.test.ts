@@ -26,7 +26,7 @@ describe('pudotukset', () => {
       'robber-clothes',
       'knife',
     ]);
-    expect(rollDrops(getEnemy('wolf').drops ?? [], nobodyOwns, always)).toEqual(['tooth-necklace']);
+    expect(rollDrops(getEnemy('wolf').drops ?? [], nobodyOwns, always)).toContain('tooth-necklace');
   });
 
   it('pudotus ei ole varma: arpa ratkaisee', () => {

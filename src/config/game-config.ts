@@ -57,6 +57,7 @@ export const SCENES = {
   settings: 'settings',
   saves: 'saves',
   backpack: 'backpack',
+  quests: 'quests',
   exit: 'exit',
 } as const;
 
@@ -170,7 +171,8 @@ export const WORLD_VIEW = {
   respawnFadeMs: 800,
   /**
    * Napit oikeassa alakulmassa päällekkäin: alimpana REPPU (aina näkyvissä), sen yllä
-   * paikkakunnassa KYKYPISTEET ja TALLENNA. height ja gap koskevat kaikkia (ui/corner-stack.ts).
+   * paikkakunnassa KYKYPISTEET ja TALLENNA (ja tehtävänantajan paikkakunnassa puhenappi,
+   * config/quest-config.ts). height ja gap koskevat kaikkia (ui/corner-stack.ts).
    */
   cornerButtons: { height: 40, margin: 6, gap: 6 },
   backpackButton: { width: 96 },
