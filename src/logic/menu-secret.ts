@@ -2,10 +2,11 @@ import { MENU_SECRET } from '../data/rules';
 import type { MenuSecretRules } from '../data/types';
 import { TEXT } from '../i18n/text';
 import { createNewGame, playerLevel, type GameState } from './game-state';
+import { minXpForLevel } from './progression';
 
 // Alkuruudun salaisuudet (data/rules.ts MENU_SECRET). Koskevat vain uutta peliä
 // PELAA-napista, eivät tallennuksen latausta. Molemmat voivat olla päällä yhtä aikaa.
-// - Susi: uusi peli alkaa kokemuspisteillä ja ylimääräisillä esineillä.
+// - Susi: uusi peli alkaa korkeammalta tasolta ja ylimääräisillä esineillä.
 // - Lima: sankarin silmät vaihtavat väriä.
 
 /** Mitä alkuruudulla napautettiin tällä käynnillä. */
@@ -24,7 +25,7 @@ export interface MenuStart {
 
 /** Uusi peli alkuruudun PELAA-napista alkuruudun napautusten mukaan. */
 export function createMenuGame(taps: MenuTaps, rules: MenuSecretRules = MENU_SECRET): GameState {
-  const state = createNewGame(taps.wolf ? rules.wolfStartXp : 0);
+  const state = createNewGame(taps.wolf ? minXpForLevel(rules.wolfStartLevel) : 0);
   if (taps.wolf) {
     for (const stack of rules.bonusItems) {
       state.inventory[stack.id] = (state.inventory[stack.id] ?? 0) + stack.count;

@@ -192,8 +192,11 @@ export interface BattleRules {
 
 /** Alkuruudun salaisuus (pääsiäismuna), data/rules.ts. */
 export interface MenuSecretRules {
-  /** Kokemuspisteet, joilla uusi peli alkaa, kun alkuruudun sutta on napautettu ennen PELAA-nappia. */
-  readonly wolfStartXp: number;
+  /**
+   * Taso, jolta uusi peli alkaa, kun alkuruudun sutta on napautettu ennen PELAA-nappia.
+   * Kokemuspisteet asetetaan tason rajaan, ja tasojen kykypisteet saa heti.
+   */
+  readonly wolfStartLevel: number;
   /** Esineet, jotka saa aloitusesineiden lisäksi (data/items.ts). */
   readonly bonusItems: readonly ItemStack[];
   /** Sprite, joksi alkuruudun susi muuttuu napautuksesta (hehkuvat silmät). */

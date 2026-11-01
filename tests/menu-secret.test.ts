@@ -11,10 +11,10 @@ import {
   unspentSkillPoints,
 } from '../src/logic/game-state';
 import { createMenuGame, NO_MENU_TAPS, startFromMenu } from '../src/logic/menu-secret';
-import { levelForXp } from '../src/logic/progression';
+import { minXpForLevel, xpProgress } from '../src/logic/progression';
 
 const rules: MenuSecretRules = {
-  wolfStartXp: 12,
+  wolfStartLevel: 2,
   bonusItems: [{ id: 'potion', count: 2 }],
   spiritSprite: 'wolf-spirit',
   slimeEyeColor: 'black',
@@ -32,16 +32,18 @@ describe('alkuruudun suden salaisuus', () => {
     expect(start.message).toBeUndefined();
   });
 
-  it('suden napautuksen jälkeen peli alkaa salaisuuden KP:llä', () => {
-    expect(createMenuGame(WOLF).xp).toBe(MENU_SECRET.wolfStartXp);
-    expect(createMenuGame(WOLF, rules).xp).toBe(12);
+  it('suden napautuksen jälkeen peli alkaa salaisuuden tasolta, KP tason rajassa', () => {
+    const state = createMenuGame(WOLF);
+    expect(playerLevel(state)).toBe(MENU_SECRET.wolfStartLevel);
+    expect(state.xp).toBe(minXpForLevel(MENU_SECRET.wolfStartLevel));
+    const small = createMenuGame(WOLF, rules);
+    expect(playerLevel(small)).toBe(2);
+    expect(small.xp).toBe(PROGRESSION.xpForLevel[1]);
   });
 
-  it('salaisuus nostaa useamman tason ja antaa niiden kykypisteet heti', () => {
+  it('salaisuus antaa tasojen kykypisteet heti', () => {
     const state = createMenuGame(WOLF);
-    const level = levelForXp(MENU_SECRET.wolfStartXp);
-    expect(level).toBeGreaterThanOrEqual(4);
-    expect(playerLevel(state)).toBe(level);
+    const level = MENU_SECRET.wolfStartLevel;
     expect(unspentSkillPoints(state)).toBe((level - 1) * PROGRESSION.skillPointsPerLevel);
   });
 
@@ -57,12 +59,19 @@ describe('alkuruudun suden salaisuus', () => {
     expect(secret.hp).toBe(PLAYER.stats.maxHp);
   });
 
-  it('500 KP vie tasolle 10 ja antaa 27 kykypistettä, mutta ei enää huipputasolle', () => {
-    const state = createMenuGame(WOLF, { ...rules, wolfStartXp: 500 });
-    expect(playerLevel(state)).toBe(10);
-    expect(playerLevel(state)).toBeLessThan(PROGRESSION.xpForLevel.length);
-    expect(unspentSkillPoints(state)).toBe(27);
-    expect(startFromMenu(WOLF, { ...rules, wolfStartXp: 500 }).message).toContain('Taso 10!');
+  it('susi vie huipputasolle 50: 147 kykypistettä ja KP-palkki täynnä', () => {
+    expect(MENU_SECRET.wolfStartLevel).toBe(50);
+    expect(PROGRESSION.xpForLevel.length).toBe(50);
+    const start = startFromMenu(WOLF);
+    expect(playerLevel(start.state)).toBe(50);
+    expect(unspentSkillPoints(start.state)).toBe(147);
+    expect(xpProgress(start.state.xp).nextLevelXp).toBeNull();
+    expect(start.message).toContain('Taso 50!');
+  });
+
+  it('liian suuri tai pieni salaisuuden taso rajataan tasotaulukkoon', () => {
+    expect(playerLevel(createMenuGame(WOLF, { ...rules, wolfStartLevel: 999 }))).toBe(50);
+    expect(createMenuGame(WOLF, { ...rules, wolfStartLevel: 0 }).xp).toBe(0);
   });
 
   it('kartalla näkyy yllätysviesti, jossa on uusi taso', () => {
@@ -102,7 +111,7 @@ describe('alkuruudun suden salaisuus', () => {
   it('suden ja liman salaisuudet toimivat yhtä aikaa', () => {
     const start = startFromMenu(BOTH);
     expect(start.state.eyeColor).toBe('black');
-    expect(start.state.xp).toBe(MENU_SECRET.wolfStartXp);
+    expect(playerLevel(start.state)).toBe(MENU_SECRET.wolfStartLevel);
     expect(start.message).toContain('Susi siunasi sinut!');
   });
 
