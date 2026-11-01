@@ -53,8 +53,14 @@ export const TEXT = {
     load: 'LATAA',
     settings: 'ASETUKSET',
     quit: 'LÄHDE',
-    /** Alakulman versioteksti. Vaihda versio tiedostossa data/game-info.ts, ei tässä. */
-    version: `Versio: ${GAME_INFO.version}`,
+    /** Alakulman versioteksti, esim. "Versio: 0.25 (alfa)". Vaihe: data/game-info.ts. */
+    version: (number: string): string => `Versio: ${number} (${GAME_INFO.version})`,
+    /** Versioteksti, kun numeroa ei saatu buildissa (esim. peli ladattu zip-tiedostona). */
+    versionStageOnly: `Versio: ${GAME_INFO.version}`,
+    /** Julkaisuaika versionumeron alla, esim. "Julkaistu 1.11.2026 klo 10.05". */
+    released: (date: string, clock: string): string => `Julkaistu ${date} klo ${clock}`,
+    /** Omalla koneella (npm run dev) ajettava peli ei ole julkaistu versio. */
+    devBuild: 'Kehitysversio',
   },
   settings: {
     title: 'Asetukset',
