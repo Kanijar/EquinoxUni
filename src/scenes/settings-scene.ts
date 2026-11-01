@@ -1,24 +1,31 @@
 import Phaser from 'phaser';
 import { BUTTON, GAME_HEIGHT, GAME_WIDTH, SCENES, SETTINGS_VIEW } from '../config/game-config';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
+import type { Language } from '../i18n/language';
 import {
   canStep,
+  chooseLanguage,
   stepSetting,
   toggleMute,
   type AdjustableSetting,
   type Settings,
 } from '../logic/settings';
 import { changeSettings, currentSettings } from '../systems/game-settings';
+import { addLanguageRow } from '../ui/language-row';
 import { SettingRow } from '../ui/setting-row';
 import { TextButton } from '../ui/text-button';
 import { addLabel, addTitle } from '../ui/title-text';
 
-// Asetukset: valon määrä (kirkkaus), äänenvoimakkuus ja äänet päälle/pois.
+// Asetukset: valon määrä (kirkkaus), äänenvoimakkuus, äänet päälle/pois ja kieli.
 // Muutos näkyy ja kuuluu heti, ja se tallentuu selaimeen (systems/game-settings.ts).
 
-const ADJUSTABLE: readonly { readonly key: AdjustableSetting; readonly label: string }[] = [
-  { key: 'brightness', label: TEXT.settings.brightness },
-  { key: 'volume', label: TEXT.settings.volume },
+/** Säädettävät asetukset. Nimi haetaan vasta piirrettäessä, jotta se on valitulla kielellä. */
+const ADJUSTABLE: readonly {
+  readonly key: AdjustableSetting;
+  readonly label: () => string;
+}[] = [
+  { key: 'brightness', label: () => TEXT.settings.brightness },
+  { key: 'volume', label: () => TEXT.settings.volume },
 ];
 
 export class SettingsScene extends Phaser.Scene {
@@ -36,7 +43,7 @@ export class SettingsScene extends Phaser.Scene {
       key,
       row: new SettingRow(this, {
         y: firstRowY + index * rowGap,
-        label,
+        label: label(),
         onStep: (direction) => this.change(stepSetting(currentSettings(), key, direction)),
       }),
     }));
@@ -49,6 +56,11 @@ export class SettingsScene extends Phaser.Scene {
       height: BUTTON.height,
       label: '',
       onTap: () => this.change(toggleMute(currentSettings())),
+    });
+    addLanguageRow(this, {
+      y: toggleY + rowGap,
+      selected: currentSettings().language,
+      onChoose: (language) => this.changeLanguage(language),
     });
     new TextButton(this, {
       x: GAME_WIDTH - BUTTON.margin - backButtonWidth / 2,
@@ -64,6 +76,13 @@ export class SettingsScene extends Phaser.Scene {
   private change(next: Settings): void {
     changeSettings(this.game, next);
     this.refresh(next);
+  }
+
+  /** Uusi kieli: näkymä piirretään alusta, jotta kaikki tekstit vaihtuvat heti. */
+  private changeLanguage(language: Language): void {
+    if (language === currentSettings().language) return;
+    changeSettings(this.game, chooseLanguage(currentSettings(), language));
+    this.scene.restart();
   }
 
   private refresh(settings: Settings): void {

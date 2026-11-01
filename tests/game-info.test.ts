@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import indexHtml from '../index.html?raw';
 import { GAME_INFO, webManifest } from '../src/data/game-info';
-import { TEXT } from '../src/i18n/fi';
+import { TEXT } from '../src/i18n/text';
 
 // Pelin nimi ja versio on määritelty vain tiedostossa src/data/game-info.ts.
 

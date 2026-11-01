@@ -12,12 +12,16 @@ import type { TerrainDef, WorldDef } from './types';
 
 // Koko pelimaailma yhdessä oliossa. Kartta rakennetaan tästä (logic/world-grid.ts).
 
-/** Maastotyypit. Järjestys määrää ruutujen numerot karttakuvassa: lisää uudet loppuun. */
+/**
+ * Maastotyypit. Järjestys määrää ruutujen numerot karttakuvassa: lisää uudet loppuun.
+ * speedFactor hidastaa sankaria: metsässä kuljet 60 % nopeudella (tiellä taas täysillä).
+ * Viholliset kulkevat aina omalla nopeudellaan.
+ */
 export const TERRAINS: readonly TerrainDef[] = [
   { id: 'sea', sprite: 'tile-sea', walkable: false },
   { id: 'lake', sprite: 'tile-lake', walkable: false },
   { id: 'field', sprite: 'tile-field', walkable: true },
-  { id: 'forest', sprite: 'tile-forest', walkable: true },
+  { id: 'forest', sprite: 'tile-forest', walkable: true, speedFactor: 0.6 },
   { id: 'snow', sprite: 'tile-snow', walkable: true },
   { id: 'road', sprite: 'tile-road', walkable: true },
   { id: 'sand', sprite: 'tile-sand', walkable: true },

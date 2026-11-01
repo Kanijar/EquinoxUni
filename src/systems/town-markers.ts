@@ -2,6 +2,7 @@ import type Phaser from 'phaser';
 import { COLORS, FONT } from '../config/game-config';
 import { WORLD } from '../data';
 import type { TownDef } from '../data/types';
+import { TEXT } from '../i18n/text';
 import { townAt, townTile } from '../logic/world-grid';
 import type { Vec2 } from '../logic/vector';
 import { tileToWorld, worldToTile } from './world-map';
@@ -16,7 +17,7 @@ export function placeTownMarkers(scene: Phaser.Scene): void {
     const pos = tileToWorld(townTile(town));
     scene.add.image(pos.x, pos.y, 'town').setDepth(MARKER_DEPTH);
     scene.add
-      .text(pos.x, pos.y + LABEL_OFFSET_Y, town.name, {
+      .text(pos.x, pos.y + LABEL_OFFSET_Y, TEXT.names.town(town), {
         fontFamily: FONT.family,
         fontSize: FONT.small,
         color: COLORS.text,

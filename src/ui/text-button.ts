@@ -15,6 +15,8 @@ export interface TextButtonOptions {
 }
 
 const DISABLED_ALPHA = 0.4;
+/** Valitun napin reunuksen paksuus. */
+const SELECTED_STROKE = 3;
 
 export class TextButton {
   private readonly box: Phaser.GameObjects.Rectangle;
@@ -61,6 +63,14 @@ export class TextButton {
     this.enabled = enabled;
     this.box.setAlpha(enabled ? 1 : DISABLED_ALPHA);
     this.text.setAlpha(enabled ? 1 : DISABLED_ALPHA);
+  }
+
+  /** Valittu nappi (esim. asetusten kieli) saa keltaisen reunuksen. */
+  setSelected(selected: boolean): void {
+    this.box.setStrokeStyle(
+      selected ? SELECTED_STROKE : 2,
+      selected ? COLORS.selected : COLORS.panelBorder,
+    );
   }
 
   private setPressed(pressed: boolean): void {

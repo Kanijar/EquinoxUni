@@ -36,6 +36,8 @@ export interface TerrainDef {
   readonly sprite: string;
   /** Voiko ruudulla kävellä. Meri, järvet ja laava estävät liikkumisen. */
   readonly walkable: boolean;
+  /** Liikkumisnopeuden kerroin tällä maastolla (1 = normaali, 0,6 = 60 %). Puuttuu = 1. */
+  readonly speedFactor?: number;
 }
 
 /** Maaston sekoitus: pääasiallinen maasto ja sen seassa toinen (esim. metsää ja peltoa). */

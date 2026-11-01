@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { BACKPACK_VIEW, COLORS, FONT } from '../config/game-config';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { playSound } from '../systems/sound-fx';
 
 // Repun kosketettava ruutu: esineen pikselikuva ja määrä (×3). Valittu ruutu saa

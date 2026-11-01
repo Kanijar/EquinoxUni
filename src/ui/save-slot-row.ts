@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 import { BUTTON, COLORS, FONT, GAME_WIDTH, SAVES_VIEW } from '../config/game-config';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import type { SlotInfo } from '../logic/save-slots';
 import { ConfirmButton } from './confirm-button';
 import { addLabel } from './title-text';

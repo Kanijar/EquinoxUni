@@ -51,7 +51,7 @@ export interface PlayerDef {
 
 export interface EnemyDef {
   readonly id: string;
-  /** Suomenkielinen nimi, näytetään pelaajalle. */
+  /** Suomenkielinen nimi, näytetään pelaajalle. Englanniksi i18n/en-content.ts. */
   readonly name: string;
   readonly sprite: string;
   readonly stats: CombatStats;

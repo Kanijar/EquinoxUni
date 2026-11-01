@@ -12,7 +12,9 @@ import {
   unspentSkillPoints,
   type GameState,
 } from '../logic/game-state';
+import { isSlowTerrain, speedFactorAt } from '../logic/terrain-speed';
 import { lastVisitedTown, visitTown } from '../logic/town-visits';
+import { length } from '../logic/vector';
 import { terrainAt, townTile } from '../logic/world-grid';
 import { AmbushWatch } from '../systems/ambush-watch';
 import { Controls } from '../systems/controls';
@@ -20,8 +22,10 @@ import { MapEncounters } from '../systems/map-encounters';
 import { placeTownMarkers, TownTracker } from '../systems/town-markers';
 import { playSound } from '../systems/sound-fx';
 import { buildWorldMap, getWorldGrid, tileToWorld, worldToTile } from '../systems/world-map';
-import { TEXT } from '../i18n/fi';
+import type { TownDef } from '../data/types';
+import { TEXT } from '../i18n/text';
 import { Hud } from '../ui/hud';
+import { LeafRustle } from '../ui/leaf-rustle';
 import { addBackpackButton } from '../ui/backpack-button';
 import { coverScreen, revealScreen } from '../ui/screen-wipe';
 import { addPlayerCountLabel } from '../ui/player-count-label';
@@ -57,6 +61,7 @@ export interface WorldSceneData {
 export class WorldScene extends Phaser.Scene {
   private state!: GameState;
   private player!: Player;
+  private leaves!: LeafRustle;
   private controls!: Controls;
   private encounters!: MapEncounters;
   private ambushes!: AmbushWatch;
@@ -86,6 +91,7 @@ export class WorldScene extends Phaser.Scene {
     const speed = playerStats(this.state).speed;
     this.player = new Player(this, start, speed, playerSprite(this.state));
     this.physics.add.collider(this.player.sprite, built.layer);
+    this.leaves = new LeafRustle(this, this.player.sprite);
     this.encounters = new MapEncounters(this, this.state, built.layer);
     this.ambushes = new AmbushWatch(getWorldGrid());
     this.towns = new TownTracker(start);
@@ -119,12 +125,12 @@ export class WorldScene extends Phaser.Scene {
     if (this.leaving) {
       return;
     }
-    this.player.move(this.controls.read().move);
+    this.walk();
     const position = this.player.position;
     this.state.position = position;
     const arrived = this.towns.update(position);
     if (arrived) {
-      this.rest(arrived.id, arrived.nameAt);
+      this.rest(arrived);
     }
     this.updateHud();
     this.bossPointer?.update();
@@ -146,15 +152,23 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
+  /** Sankari kävelee tikun suuntaan. Metsässä kulku hidastuu, ja jaloista lentää lehtiä. */
+  private walk(): void {
+    const move = this.controls.read().move;
+    const speedFactor = speedFactorAt(getWorldGrid(), worldToTile(this.player.position));
+    this.player.move(move, speedFactor);
+    this.leaves.update(isSlowTerrain(speedFactor) && length(move) > 0);
+  }
+
   /**
    * Paikkakuntaan saapuessa elämä palautuu ja paikkakunta muistetaan (siellä herätään
    * kaatumisen jälkeen). Käyttämättömistä kykypisteistä muistutetaan.
    */
-  private rest(townId: string, townAt: string): void {
-    visitTown(this.state, townId);
+  private rest(town: TownDef): void {
+    visitTown(this.state, town.id);
     const points = unspentSkillPoints(this.state);
     const reminder = points > 0 ? `\n${TEXT.world.skillPointsWaiting(points)}` : '';
-    this.toast.show(TEXT.world.rest(townAt) + reminder);
+    this.toast.show(TEXT.world.rest(town) + reminder);
   }
 
   private openSkills(): void {
@@ -176,7 +190,8 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private openSaves(): void {
-    const place = this.towns.town?.name ?? '';
+    const town = this.towns.town;
+    const place = town ? TEXT.names.town(town) : '';
     const data: SavesSceneData = { game: { state: this.state, place } };
     this.scene.start(SCENES.saves, data);
   }
@@ -199,7 +214,7 @@ export class WorldScene extends Phaser.Scene {
       xp: this.state.xp,
       potions: healItemCount(this.state.inventory),
       enemiesLeft: enemiesToBeat(this.state),
-      townName: this.towns.town?.name ?? '',
+      townName: this.towns.town ? TEXT.names.town(this.towns.town) : '',
       bossText: bossHudText(this.state),
     });
     const inTown = this.towns.town !== undefined;

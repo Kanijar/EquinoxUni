@@ -2,7 +2,7 @@ import type Phaser from 'phaser';
 import { BATTLE_CAMERA, BATTLE_STAGE, DAMAGE_NUMBERS } from '../config/battle-config';
 import { BATTLE_VIEW, COLORS } from '../config/game-config';
 import type { BattleBackdropDef } from '../data/types';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import type { Battle, Side } from '../logic/battle';
 import { playSound } from '../systems/sound-fx';
 import { drawBattleBackdrop } from './battle/backdrop';

@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import { COLORS, FONT, SKILLS_VIEW } from '../config/game-config';
 import type { PlayerStats, SkillDef } from '../data/types';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { isSkillMaxed } from '../logic/skill-points';
 import { skillDetail } from './skill-detail';
 import { TextButton } from './text-button';

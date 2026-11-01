@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 import { WORLD_VIEW } from '../config/game-config';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { cornerButton } from './corner-stack';
 import { TextButton } from './text-button';
 

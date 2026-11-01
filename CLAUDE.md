@@ -1,7 +1,7 @@
 # Ohjeet Claudelle
 
 Tämä on **Equinox Universe**, pixelart 2D -seikkailu- ja taistelupeli Android-puhelimen selaimeen.
-Pelaajat ovat 12–15-vuotiaita suomalaisia poikia. **Pelin kieli on suomi.**
+Pelaajat ovat 12–15-vuotiaita suomalaisia poikia. **Pelin kieli on suomi**, ja asetuksista voi vaihtaa englantiin.
 Ominaisuuspyynnöt tulevat usein pelin suunnittelijalta, joka on nuori: vastaa
 selkeästi suomeksi, kerro lopuksi lyhyesti mitä muutit ja miten sitä voi kokeilla.
 
@@ -31,10 +31,10 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
 
 | Pyyntö                                | Tiedosto                                                                                                                                                                            |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Uusi vihollinen                       | `src/data/enemies.ts` (+ sprite `src/data/sprites-characters.ts`)                                                                                                                   |
+| Uusi vihollinen                       | `src/data/enemies.ts` (+ sprite `src/data/sprites-characters.ts`, englanninkielinen nimi `src/i18n/en-content.ts`)                                                                  |
 | Loppuboss (herääminen, liikkeet)      | `src/data/boss.ts`, vihollinen `src/data/enemies.ts` (`moves`, `backdrop`), säännöt `src/logic/boss.ts` ja `src/logic/enemy-turn.ts` + testit                                       |
 | Vihollinen kartalle                   | `src/data/map-enemies.ts` (sijainti ruutuina, x itään ja y etelään)                                                                                                                 |
-| Uusi esine                            | `src/data/items.ts` + sprite `src/data/sprites-items.ts`. Varuste: `kind: 'gear'`, `slot`, `bonus`                                                                                  |
+| Uusi esine                            | `src/data/items.ts` + sprite `src/data/sprites-items.ts`. Varuste: `kind: 'gear'`, `slot`, `bonus`. Englanninkielinen nimi `src/i18n/en-content.ts`                                 |
 | Vihollisen pudotukset (drops)         | `drops` vihollisella `src/data/enemies.ts`, säännöt `src/logic/drops.ts` + testi                                                                                                    |
 | Reppu ja varusteet                    | säännöt `src/logic/equipment.ts`, `src/logic/backpack.ts` + testi, näkymä `src/scenes/backpack-scene.ts`                                                                            |
 | Uusi paikkakunta tai tie              | `src/data/towns.ts` (sijainti ruutuina, kartta `src/data/island.ts`)                                                                                                                |
@@ -49,15 +49,16 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
 | Vihollisten paluu (respawn)           | aika `src/data/rules.ts` (`RESPAWN_RULES`) tai `respawnMs` vihollisella, säännöt `src/logic/respawn.ts` + testi                                                                     |
 | Taistelunäkymän ulkoasu ja napit      | `src/ui/battle-view.ts` (kokoaa osat `src/ui/battle/`), `src/ui/battle-menu.ts`, mitat ja ajat `src/config/battle-config.ts`                                                        |
 | Taistelun taustat ja hiukkasefektit   | `src/data/battle-backdrops.ts` (tausta maaston mukaan), `src/data/battle-effects.ts`, säännöt `src/logic/battle-look.ts` + testi                                                    |
+| Maaston hidastus (metsä)              | kerroin `speedFactor` maastolla `src/data/world.ts`, säännöt `src/logic/terrain-speed.ts` + testi, lehtiefekti `src/ui/leaf-rustle.ts`                                              |
 | Liikkumisen ohjaus                    | `src/systems/controls.ts` (+ `src/ui/`)                                                                                                                                             |
 | Ruudulla näkyvät tiedot kartalla      | `src/ui/hud.ts`                                                                                                                                                                     |
 | Pelin nimi (alkuruutu, otsikko, PWA)  | `src/data/game-info.ts` (ei muualle: muut paikat lukevat nimen sieltä)                                                                                                              |
 | Pelin versio (alkuruudun alakulma)    | Numero tulee automaattisesti PR:stä (PR #25 → `0.25`), julkaisuaika buildista: `src/logic/release-*.ts` + testi. Vaihe (`'alfa'` → `'beta'`) ja alku (`0`): `src/data/game-info.ts` |
 | Pelin kuvake ja asennus (PWA)         | kuvake `src/data/app-icon.ts`, manifesti `src/data/game-info.ts`, ASENNA-nappi `src/ui/install-button.ts` + testi `tests/pwa.test.ts`                                               |
-| Tekstit pelaajalle                    | `src/i18n/fi.ts`                                                                                                                                                                    |
+| Tekstit pelaajalle                    | suomeksi `src/i18n/fi.ts`, englanniksi `src/i18n/en.ts` (samat avaimet), vihollisten ja esineiden englanninkieliset nimet `src/i18n/en-content.ts`, testi `tests/i18n.test.ts`      |
 | Pelaajalaskuri (montako pelaa nyt)    | `src/net/` (rajapinta `presence.ts`), näkymä `src/ui/player-count-label.ts`, palvelin `worker/presence/`, ohje `docs/PELAAJALASKURI.md`                                             |
 | Ääniefektit                           | `src/data/sounds.ts`, soitto `playSound('id')` (`src/systems/sound-fx.ts`)                                                                                                          |
-| Asetukset (valo, äänet)               | `src/logic/settings.ts` + testi, näkymä `src/scenes/settings-scene.ts`, rajat `src/config/persistence.ts`                                                                           |
+| Asetukset (valo, äänet, kieli)        | `src/logic/settings.ts` + testi, näkymä `src/scenes/settings-scene.ts`, rajat `src/config/persistence.ts`                                                                           |
 | Tallennus ja lataus                   | `src/logic/save-*.ts` + testi `tests/save.test.ts`. Uusi kenttä `GameState`en: katso `docs/ARCHITECTURE.md`                                                                         |
 | Värit, koot, scenejen nimet           | `src/config/game-config.ts`                                                                                                                                                         |
 | Uusi näkymä (esim. kauppa)            | uusi tiedosto `src/scenes/`, lisää `SCENES`-listaan ja `src/main.ts`:iin                                                                                                            |
@@ -71,7 +72,9 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
 2. **`src/logic/` ja `src/data/` eivät saa tuoda Phaseria.** Pelisäännöt ovat puhdasta
    TypeScriptiä, jotta ne voi testata.
 3. **Sisältö on dataa.** Uusi vihollinen/esine/paikkakunta = uusi olio data-tiedostoon, ei uutta luokkaa.
-4. **Kaikki pelaajalle näkyvä teksti `src/i18n/fi.ts`:ään**, hyvällä suomen kielellä.
+4. **Kaikki pelaajalle näkyvä teksti `src/i18n/fi.ts`:ään**, hyvällä suomen kielellä, **ja sama englanniksi
+   `src/i18n/en.ts`:ään.** Uusi vihollinen tai esine saa englanninkielisen nimen `src/i18n/en-content.ts`:ään.
+   Koodissa tekstit haetaan `TEXT`illä (`src/i18n/text.ts`) vasta piirrettäessä, ei tiedoston ylätasolla.
 5. **Ei maagisia numeroita**: vakiot `config/`- tai `data/`-kansioon.
 6. **Uudelle logiikalle testi** `tests/`-kansioon. Sisältö tarkistetaan `tests/content.test.ts`:llä.
 7. **Tiedostonimet kebab-case** (`enemy-ai.ts`), luokat PascalCase, yksi asia per tiedosto.

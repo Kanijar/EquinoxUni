@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ENEMIES, getEnemy, MAP_ENEMIES } from '../src/data';
 import { FINAL_BOSS } from '../src/data/boss';
 import type { BossDef } from '../src/data/types';
-import { TEXT } from '../src/i18n/fi';
+import { TEXT } from '../src/i18n/text';
 import {
   bossHudText,
   bossName,

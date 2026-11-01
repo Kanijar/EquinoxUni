@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import { BATTLE_PANEL } from '../../config/battle-config';
 import { COLORS, FONT, GAME_WIDTH } from '../../config/game-config';
-import { TEXT } from '../../i18n/fi';
+import { TEXT } from '../../i18n/text';
 import type { Side } from '../../logic/battle';
 import { XpBar } from '../xp-bar';
 import { HpBar } from './hp-bar';

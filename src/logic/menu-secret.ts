@@ -1,6 +1,6 @@
 import { MENU_SECRET } from '../data/rules';
 import type { MenuSecretRules } from '../data/types';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { createNewGame, playerLevel, type GameState } from './game-state';
 
 // Alkuruudun salaisuudet (data/rules.ts MENU_SECRET). Koskevat vain uutta peliä
