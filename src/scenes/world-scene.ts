@@ -21,7 +21,13 @@ import { Controls } from '../systems/controls';
 import { MapEncounters } from '../systems/map-encounters';
 import { placeTownMarkers, TownTracker } from '../systems/town-markers';
 import { playSound } from '../systems/sound-fx';
-import { buildWorldMap, getWorldGrid, tileToWorld, worldToTile } from '../systems/world-map';
+import {
+  buildWorldMap,
+  getWorldGrid,
+  tileToWorld,
+  walkablePosition,
+  worldToTile,
+} from '../systems/world-map';
 import type { TownDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import { Hud } from '../ui/hud';
@@ -87,7 +93,10 @@ export class WorldScene extends Phaser.Scene {
     const isNewGame = this.state.position === null && data.message === undefined;
     const built = buildWorldMap(this, getWorldGrid());
     placeTownMarkers(this);
-    const start = this.state.position ?? tileToWorld(townTile(lastVisitedTown(this.state)));
+    const saved = this.state.position;
+    const start = saved
+      ? walkablePosition(getWorldGrid(), saved)
+      : tileToWorld(townTile(lastVisitedTown(this.state)));
     const speed = playerStats(this.state).speed;
     this.player = new Player(this, start, speed, playerSprite(this.state));
     this.physics.add.collider(this.player.sprite, built.layer);

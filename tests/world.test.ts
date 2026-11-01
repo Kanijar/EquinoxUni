@@ -10,35 +10,14 @@ import {
   terrainAt,
   townAt,
   townTile,
-  type WorldGrid,
 } from '../src/logic/world-grid';
+import { reachableFrom, tileKey } from './walk-reach';
 
 // Saaren kartan testit: paikkakunnat ovat maalla, kaikkialle pääsee kävellen
 // Kotirannasta ja viholliset ovat omalla alueellaan paikoissa, joihin pääsee.
 
 const grid = buildWorldGrid(WORLD);
-const key = (t: Vec2) => `${t.x},${t.y}`;
-
-/** Kaikki ruudut, joihin pääsee kävellen annetusta ruudusta (vain sivu- ja pystysuunnassa). */
-function reachableFrom(world: WorldGrid, start: Vec2): Set<string> {
-  const seen = new Set([key(start)]);
-  const queue = [start];
-  for (let next = queue.shift(); next; next = queue.shift()) {
-    for (const [dx, dy] of [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1],
-    ] as const) {
-      const tile = { x: next.x + dx, y: next.y + dy };
-      if (!seen.has(key(tile)) && isWalkable(world, tile)) {
-        seen.add(key(tile));
-        queue.push(tile);
-      }
-    }
-  }
-  return seen;
-}
+const key = tileKey;
 
 const start = townTile(getTown(WORLD.startTown));
 const reachable = reachableFrom(grid, start);

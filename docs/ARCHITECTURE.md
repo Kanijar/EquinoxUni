@@ -159,6 +159,15 @@ scenes  →  systems / ui  →  entities  →  logic
   Kerroin luetaan sankarin ruudusta joka ruudunpäivityksessä (`logic/terrain-speed.ts`), joten
   se toimii millä tahansa kartalla. Hidastavassa maastossa jaloista lentää lehtiä
   (`ui/leaf-rustle.ts`). Viholliset ja väijytysten todennäköisyys (per ruutu) eivät muutu.
+- **Kivet metsässä:** metsään tulee harmaita lohkareita (maasto `rock`, `walkable: false`),
+  joiden läpi sankari ja viholliset eivät pääse. Kiviä ei piirretä käsin: `logic/rocks.ts`
+  arpoo ne kartan ruuduista siemenellä (`ROCKS` `data/world.ts`), joten ne ovat joka pelissä
+  samoissa paikoissa ja toimivat millä tahansa kartalla. Kivi tulee vain ruutuun, jonka ympärillä
+  on `clearRadius` (2) ruutua vapaata kävelymaata: ei vettä, toista kiveä, paikkakuntaa eikä
+  vihollisen tai loppubossin paikkaa (`WorldDef.keepClear`). Siksi kiven voi aina kiertää.
+  `tests/rocks.test.ts` varmistaa, että jokaiseen ruutuun, johon pääsi ilman kiviä, pääsee yhä.
+  Jos vanhan tallennuksen paikalle on tullut kivi, sankari siirretään viereiseen ruutuun
+  (`nearestWalkable`, `logic/world-grid.ts`).
 - **Taistelu:** kun kartan vihollinen saa pelaajan kiinni, alkaa vuoropohjainen taistelu.
   Pelaaja valitsee HYÖKKÄÄ, PUOLUSTA, JUOMA tai PAKENE, sitten vihollinen vastaa.
   HYÖKKÄÄ avaa valinnan LYÖNTI tai TULIPALLO. Lyönti tekee hyökkäys − puolustus vahinkoa

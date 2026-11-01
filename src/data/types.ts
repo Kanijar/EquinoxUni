@@ -325,6 +325,7 @@ export type {
   LakeDef,
   MapEnemyDef,
   MapPoint,
+  RockRule,
   TerrainDef,
   TerrainId,
   TerrainRegion,
