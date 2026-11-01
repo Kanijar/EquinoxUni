@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import { COLORS, FONT, GAME_WIDTH, WORLD_VIEW } from '../config/game-config';
 
-// Lyhyt ilmoitus ruudun yläosassa (esim. "Lepäsit Tampereella").
+// Lyhyt ilmoitus ruudun yläosassa (esim. "Lepäsit Kuuselassa").
 
 const TOAST_Y = 44;
 const FADE_MS = 400;

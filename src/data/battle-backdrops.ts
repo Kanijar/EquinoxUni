@@ -1,8 +1,9 @@
 import type { BattleBackdropDef, BattleBackdropId, TerrainId } from './types';
 
 // Taistelun taustat. Tausta valitaan sen maaston mukaan, jossa taistelu alkaa:
-// pellolla kesäinen pelto, metsässä kuusikko, Lapissa lumiset tunturit ja tiellä
-// kylä punaisine mökkeineen. Uusi tausta = uusi olio tähän ja rivi BACKDROP_BY_TERRAIN-listaan.
+// pellolla kesäinen pelto, metsässä kuusikko, tuntureilla lumiset huiput, tiellä
+// kylä punaisine mökkeineen, rannalla meri, suolla usvainen räme ja tulivuorella
+// hehkuvat laavahuiput. Uusi tausta = uusi olio tähän ja rivi BACKDROP_BY_TERRAIN-listaan.
 // Koordinaatit ovat taustan pikseleinä (240 × 135, piirretään kaksinkertaisena).
 
 export const BATTLE_BACKDROPS: Readonly<Record<BattleBackdropId, BattleBackdropDef>> = {
@@ -70,6 +71,48 @@ export const BATTLE_BACKDROPS: Readonly<Record<BattleBackdropId, BattleBackdropD
     weather: { kind: 'fall', colors: [0xffffff, 0xbfe8ff], count: 30 },
     aurora: ['#3dffa0', '#2fd6c8', '#9b6bff'],
   },
+  // Hiekkaranta: meri horisontissa (matala sininen "kukkula") ja vaalea hiekka.
+  beach: {
+    id: 'beach',
+    sky: ['#3a86d8', '#4b93de', '#62a3e4', '#7fb6ea', '#a2cbf0', '#cfe4f7'],
+    sun: { x: 54, y: 20, radius: 10, color: '#fff6c2' },
+    hills: { color: '#2f7fc4', height: 7, peaks: false },
+    trees: null,
+    houses: 0,
+    ground: ['#f0dc9a', '#ead490', '#e4cc86', '#ddc37c', '#d6bb73', '#cfb26a'],
+    speckles: ['#ffffff', '#f7c6b0', '#a89060'],
+    path: null,
+    // Merituuli kuljettaa vaahtoa ja hiekkaa.
+    weather: { kind: 'float', colors: [0xffffff, 0xdff3ff], count: 10 },
+  },
+  // Suo: harmaanvihreä usva, kituliaat kuuset ja virvatulet.
+  swamp: {
+    id: 'swamp',
+    sky: ['#3d4a4a', '#465454', '#516060', '#5d6d69', '#6b7a72', '#7b897d'],
+    sun: { x: 180, y: 26, radius: 7, color: '#d8e0c0' },
+    hills: { color: '#43523d', height: 14, peaks: false },
+    trees: { kind: 'pine', color: '#26331f', shade: '#33432a', count: 9 },
+    houses: 0,
+    ground: ['#566842', '#4f603c', '#485836', '#415031', '#3a482c', '#344128'],
+    speckles: ['#3f5f63', '#8a9a4a', '#6f8e8a'],
+    path: null,
+    // Virvatulet leijuvat suon yllä.
+    weather: { kind: 'float', colors: [0x9fffe0, 0xd8ffb0], count: 10 },
+  },
+  // Tulivuori: punainen taivas, tummat huiput hehkuvine laavapäineen ja kipinät.
+  volcano: {
+    id: 'volcano',
+    sky: ['#2a0e0e', '#3d1410', '#561c12', '#742814', '#933a18', '#b4521e'],
+    sun: { x: 196, y: 22, radius: 7, color: '#ffcf6a' },
+    hills: { color: '#2b2222', height: 44, peaks: true, cap: '#ff7a1e' },
+    trees: null,
+    houses: 0,
+    ground: ['#4d4240', '#463c3a', '#3f3634', '#38302e', '#312a28', '#2a2423'],
+    speckles: ['#e8641e', '#ffb347', '#5b514f'],
+    path: null,
+    // Kipinät ja tuhka leijuvat.
+    weather: { kind: 'float', colors: [0xffa040, 0xff5a1e], count: 14 },
+  },
 };
 
 /** Mikä tausta näytetään missäkin maastossa. Tie kulkee kylien välillä. */
@@ -78,6 +121,10 @@ export const BACKDROP_BY_TERRAIN: Readonly<Record<TerrainId, BattleBackdropId>> 
   forest: 'forest',
   snow: 'snow',
   road: 'village',
+  sand: 'beach',
+  swamp: 'swamp',
+  ash: 'volcano',
+  lava: 'volcano',
   // Kiven päällä ei seistä, mutta kivet ovat metsässä.
   rock: 'forest',
   // Vesillä ei taistella, mutta varmuuden vuoksi niillekin on tausta.

@@ -1,14 +1,14 @@
 import { TERRAINS } from '../data/world';
-import type { GeoPoint, TerrainBand, TerrainId, TownDef, WorldDef } from '../data/types';
-import { distanceKm, geoToTile, gridSize, isInsidePolygon, tileToGeo } from './geo';
+import type { MapPoint, TerrainId, TerrainMix, TownDef, WorldDef } from '../data/types';
 import { gridLine } from './grid-line';
+import { isInsideCircle, isInsidePolygon } from './polygon';
 import { placeRocks } from './rocks';
 import { tileNoise } from './tile-noise';
 import type { Vec2 } from './vector';
 
-// Rakentaa Suomen kartan ruudukoksi data/world.ts:n tiedoista:
-// meri rajojen ulkopuolelle, järvet, maastovyöhykkeet, tiet paikkakuntien välille ja
-// lopuksi kivet metsään (logic/rocks.ts).
+// Rakentaa saaren kartan ruudukoksi data/world.ts:n tiedoista: meri rantaviivan
+// ulkopuolelle, järvet, alueiden maastot, hiekkaranta meren reunalle, tiet paikkakuntien välille
+// ja lopuksi kivet metsään (logic/rocks.ts).
 
 export { tileNoise } from './tile-noise';
 
@@ -20,7 +20,7 @@ export interface WorldGrid {
 }
 
 export function buildWorldGrid(world: WorldDef): WorldGrid {
-  const { width, height } = gridSize(world.projection);
+  const { width, height } = world;
   const cells: TerrainId[][] = [];
   for (let y = 0; y < height; y++) {
     const row: TerrainId[] = [];
@@ -29,11 +29,9 @@ export function buildWorldGrid(world: WorldDef): WorldGrid {
     }
     cells.push(row);
   }
+  paintBeach(world, cells);
   drawRoads(world, cells);
-  const keepClear = [
-    ...world.towns.map((town) => townTile(world, town)),
-    ...world.keepClear.map((point) => geoToTile(point, world.projection)),
-  ];
+  const keepClear = [...world.towns, ...world.keepClear].map(pointTile);
   placeRocks(cells, world.rocks, keepClear);
   return { width, height, cells };
 }
@@ -75,41 +73,86 @@ function ringTiles(center: Vec2, r: number): Vec2[] {
   return tiles;
 }
 
-export function townTile(world: WorldDef, town: TownDef): Vec2 {
-  return geoToTile(town, world.projection);
+/** Ruutu, jossa kartan piste on (desimaalit pyöristetään alaspäin). */
+export function pointTile(point: MapPoint): Vec2 {
+  return { x: Math.floor(point.x), y: Math.floor(point.y) };
+}
+
+export function townTile(town: TownDef): Vec2 {
+  return pointTile(town);
 }
 
 /** Paikkakunta annetussa ruudussa, tai undefined. */
 export function townAt(world: WorldDef, tile: Vec2): TownDef | undefined {
   return world.towns.find((town) => {
-    const t = townTile(world, town);
+    const t = townTile(town);
     return t.x === tile.x && t.y === tile.y;
   });
 }
 
 function baseTerrain(world: WorldDef, tile: Vec2): TerrainId {
-  const geo = tileToGeo(tile, world.projection);
-  if (!isInsidePolygon(geo, world.border)) {
+  const center = { x: tile.x + 0.5, y: tile.y + 0.5 };
+  if (!isInsidePolygon(center, world.coast)) {
     return 'sea';
   }
-  if (isInLake(world, geo)) {
-    return 'lake';
+  const lake = world.lakes.find((l) => l.circles.some((c) => isInsideCircle(center, c)));
+  if (lake) {
+    return lake.terrain ?? 'lake';
   }
-  return bandTerrain(world.bands, geo.lat, tile);
+  const wobbled = wobble(center, world.regionEdgeWobble);
+  const region = world.regions.find((r) => isInsidePolygon(wobbled, r.area));
+  return mixTerrain(region ?? world.inland, tile);
 }
 
-function isInLake(world: WorldDef, geo: GeoPoint): boolean {
-  return world.lakes.some((lake) =>
-    lake.circles.some((c) => distanceKm(geo, c, world.projection) <= c.radiusKm),
+/** Aaltojen tiheys: alueiden rajat kiemurtelevat eivätkä ole suoria viivoja. */
+const WOBBLE_WAVES = { x: [0.37, 0.11], y: [0.29, -0.13] } as const;
+
+/** Siirtää pistettä aaltomaisesti enintään amount ruutua. Sama ruutu siirtyy aina samoin. */
+function wobble(point: MapPoint, amount: number): MapPoint {
+  const [xy, xx] = WOBBLE_WAVES.x;
+  const [yx, yy] = WOBBLE_WAVES.y;
+  return {
+    x: point.x + amount * Math.sin(point.y * xy + point.x * xx),
+    y: point.y + amount * Math.sin(point.x * yx + point.y * yy),
+  };
+}
+
+function mixTerrain(mix: TerrainMix, tile: Vec2): TerrainId {
+  return tileNoise(tile.x, tile.y) < mix.mixShare ? mix.mix : mix.main;
+}
+
+/** Maaruudut, jotka ovat enintään beach.width ruudun päässä merestä, muuttuvat rannaksi. */
+function paintBeach(world: WorldDef, cells: TerrainId[][]): void {
+  const reach = world.beach.width;
+  const shore: Vec2[] = [];
+  cells.forEach((row, y) =>
+    row.forEach((cell, x) => {
+      if (isDryLand(cell) && isNearSea(cells, { x, y }, reach)) {
+        shore.push({ x, y });
+      }
+    }),
   );
+  for (const tile of shore) {
+    const row = cells[tile.y];
+    if (row) {
+      row[tile.x] = world.beach.terrain;
+    }
+  }
 }
 
-function bandTerrain(bands: readonly TerrainBand[], lat: number, tile: Vec2): TerrainId {
-  const band = bands.find((b) => lat < b.untilLat) ?? bands[bands.length - 1];
-  if (!band) {
-    return 'field';
+function isDryLand(cell: TerrainId): boolean {
+  return cell !== 'sea' && cell !== 'lake' && cell !== 'lava';
+}
+
+function isNearSea(cells: readonly (readonly TerrainId[])[], tile: Vec2, reach: number): boolean {
+  for (let dy = -reach; dy <= reach; dy++) {
+    for (let dx = -reach; dx <= reach; dx++) {
+      if ((cells[tile.y + dy]?.[tile.x + dx] ?? 'sea') === 'sea') {
+        return true;
+      }
+    }
   }
-  return tileNoise(tile.x, tile.y) < band.mixShare ? band.mix : band.main;
+  return false;
 }
 
 function drawRoads(world: WorldDef, cells: TerrainId[][]): void {
@@ -119,7 +162,7 @@ function drawRoads(world: WorldDef, cells: TerrainId[][]): void {
     if (!from || !to) {
       continue;
     }
-    for (const p of gridLine(townTile(world, from), townTile(world, to))) {
+    for (const p of gridLine(townTile(from), townTile(to))) {
       const row = cells[p.y];
       if (row && row[p.x] !== 'sea') {
         row[p.x] = 'road';

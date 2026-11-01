@@ -63,7 +63,7 @@ export const ENEMIES: readonly EnemyDef[] = [
     ],
   },
   {
-    // Loppuboss: ei ole kartalla alussa, vaan herää Lappiin, kun tunturipeikkoja on
+    // Loppuboss: ei ole kartalla alussa, vaan herää tuntureille, kun tunturipeikkoja on
     // voitettu tarpeeksi (data/boss.ts). Voitettu Peikkokuningas ei palaa.
     id: 'troll-king',
     name: 'Peikkokuningas',
@@ -83,5 +83,90 @@ export const ENEMIES: readonly EnemyDef[] = [
     // lumimyrsky ohittaa puolustuksen ja sammuttaa tulipallon liekit.
     moves: { chargeChance: 0.25, chargeMultiplier: 3, specialChance: 0.2, specialPower: 10 },
     backdrop: 'summit',
+  },
+  // --- Saaren vahvemmat hirviöt ---
+  // Viholliset eivät vahvistu pelaajan mukana, joten saaren kaukaisemmat alueet ovat
+  // vaikeampia. Tasapaino on simuloitu (kykypisteet jaettu tasaisesti, varusteet päällä):
+  // "taso" = millä tasolla hirviö on reilu vastus. Muutamaa tasoa aiemmin se on vaarallinen.
+  {
+    // Rannoilla. Kova kuori: lyönti tekee vähän vahinkoa, tulipallo ei välitä kuoresta. Taso 5–8.
+    id: 'crab',
+    name: 'Rantakrapu',
+    sprite: 'crab',
+    stats: { maxHp: 36, attack: 11, defense: 6, speed: 40 },
+    aggroRange: 60,
+    xp: 22,
+    drops: [{ item: 'crab-armor', chance: 0.3 }],
+  },
+  {
+    // Suolla. Hidas mutta sitkeä. Taso 12–16.
+    id: 'mud',
+    name: 'Liejuhirviö',
+    sprite: 'mud',
+    stats: { maxHp: 110, attack: 24, defense: 10, speed: 32 },
+    aggroRange: 60,
+    xp: 75,
+    drops: [
+      { item: 'potion', chance: 1 },
+      { item: 'bog-stone', chance: 0.3 },
+    ],
+  },
+  {
+    // Suolla. Nopea ja huomaa pelaajan kaukaa, lyö usein kriittisen osuman. Taso 12–16.
+    id: 'wisp',
+    name: 'Virvatuli',
+    sprite: 'wisp',
+    stats: { maxHp: 70, attack: 28, defense: 6, speed: 70 },
+    aggroRange: 100,
+    xp: 70,
+    critChance: 0.15,
+    drops: [{ item: 'wisp-charm', chance: 0.25 }],
+  },
+  {
+    // Tuntureilla peikkojen seassa. Kivinen ja raskas. Taso 22–26.
+    id: 'giant',
+    name: 'Kalliojätti',
+    sprite: 'giant',
+    stats: { maxHp: 190, attack: 36, defense: 16, speed: 30 },
+    aggroRange: 60,
+    xp: 160,
+    drops: [
+      { item: 'potion', chance: 1 },
+      { item: 'stone-hammer', chance: 0.3 },
+    ],
+    respawnMs: 120_000,
+  },
+  {
+    // Tulivuorella. Taso 30–34.
+    id: 'lizard',
+    name: 'Tulilisko',
+    sprite: 'lizard',
+    stats: { maxHp: 240, attack: 46, defense: 21, speed: 55 },
+    aggroRange: 80,
+    xp: 260,
+    critChance: 0.12,
+    drops: [
+      { item: 'lizard-armor', chance: 0.25 },
+      { item: 'potion', chance: 0.5 },
+    ],
+    respawnMs: 120_000,
+  },
+  {
+    // Tulivuoren kraatterilla. Saaren vahvin hirviö (loppubossin jälkeen): taso 42–50.
+    // Valmistelee voimaiskua (×2,5) kuten loppuboss, PUOLUSTA puolittaa sen.
+    id: 'dragon',
+    name: 'Lohikäärme',
+    sprite: 'dragon',
+    stats: { maxHp: 480, attack: 57, defense: 25, speed: 45 },
+    aggroRange: 90,
+    xp: 700,
+    critChance: 0.1,
+    drops: [
+      { item: 'dragon-sword', chance: 0.35 },
+      { item: 'dragon-charm', chance: 0.35 },
+      { item: 'potion', chance: 1 },
+    ],
+    moves: { chargeChance: 0.25, chargeMultiplier: 2.5, specialChance: 0, specialPower: 0 },
+    respawnMs: 300_000,
   },
 ];

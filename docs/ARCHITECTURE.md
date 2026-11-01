@@ -47,12 +47,12 @@ src/
     en.ts               englanniksi, samat avaimet kuin fi.ts:ssä
     en-content.ts       vihollisten ja esineiden nimet englanniksi
     text.ts             TEXT: tekstit valitulla kielellä
-  data/                 Pelisisältö datana: viholliset, esineet, Suomen kartta, spritet
+  data/                 Pelisisältö datana: viholliset, esineet, saaren kartta, spritet
     types.ts            Sisällön tyypit (muokkaa ensin tätä, kun lisäät uuden kentän)
     game-info.ts        Pelin nimi, kehitysvaihe ja PWA-manifestin sisältö (niiden ainoa määrittelypaikka)
     app-icon.ts         Pelin kuvake (pikselikuva) puhelimen aloitusnäytölle, PNG:t tehdään buildissa
     index.ts            getEnemy(), getItem(), getTown() ... hakufunktiot
-    finland.ts          Suomen rajat, järvet ja maastovyöhykkeet oikeina koordinaatteina
+    island.ts           Saaren rantaviiva, järvet ja alueet (pellot, suo, tunturit, tulivuori) ruutuina
     towns.ts            Paikkakunnat ja tiet
     map-enemies.ts      Viholliset kartalla
     rules.ts            Taistelun ja kokemustasojen säännöt
@@ -88,7 +88,7 @@ scenes  →  systems / ui  →  entities  →  logic
 - **Resoluutio** 480 × 270 (16:9), skaalataan puhelimen näytölle `Scale.FIT`-tilassa.
   Ruutukoko 16 px, hahmot 16 × 16 px.
 - **Scenet:** `BootScene` (luo/lataa grafiikat, ottaa asetukset käyttöön) → `MenuScene`
-  (alkuruutu: PELAA, LATAA, ASETUKSET, LÄHDE) → `WorldScene` (Suomen kartta) ⇄ `BattleScene`
+  (alkuruutu: PELAA, LATAA, ASETUKSET, LÄHDE) → `WorldScene` (saaren kartta) ⇄ `BattleScene`
   (vuoropohjainen taistelu) → `VictoryScene` (voittoruutu: loppuboss voitettu tai jokainen
   karttavihollinen voitettu ainakin kerran) → takaisin kartalle. Peli ei lopu voittoon.
   Paikkakunnassa `WorldScene` ⇄ `SkillsScene` (kykypisteiden jako) ja `WorldScene` ⇄
@@ -125,7 +125,7 @@ scenes  →  systems / ui  →  entities  →  logic
 - **Loppuboss:** Peikkokuningas (`data/boss.ts`, vihollisena `data/enemies.ts`) herää, kun
   pelaaja on voittanut viisi tunturipeikkoa (sama peikko voi olla mukana monta kertaa, koska
   peikot palaavat). Laskuri on `GameState.bossProgress`, ja HUD näyttää "Peikot 3/5". Herännyt
-  boss odottaa Käsivarren tuntureilla isona 24 px spritenä punaisen hehkun keskellä, ja ruudun
+  boss odottaa saaren luoteisilla tuntureilla isona 24 px spritenä punaisen hehkun keskellä, ja ruudun
   reunan nuoli (`ui/boss-pointer.ts`) näyttää suunnan. Boss ei ole `MAP_ENEMIES`-listassa,
   joten se ei vaikuta "Voittamatta"-laskuriin eikä palaa respawnina: voiton jälkeen
   `GameState.bossDefeated` on true. Bossin erikoisliikkeet ovat datana (`EnemyDef.moves`):
@@ -136,10 +136,24 @@ scenes  →  systems / ui  →  entities  →  logic
 - **Läpäisy:** kun jokainen karttavihollinen on voitettu ainakin kerran ("Voittamatta 0"),
   voittoruutu näytetään kerran (`GameState.completed`), ja peli jatkuu kartalla. Ruutu kertoo,
   odottaako loppuboss vielä.
-- **Suomen kartta:** `logic/world-grid.ts` rakentaa ruudukon `data/finland.ts`:n rajoista
-  (oikeat koordinaatit, 1 ruutu = 8 km), järvistä ja maastovyöhykkeistä sekä vetää tiet
-  paikkakuntien välille. `systems/world-map.ts` piirtää ruudukon Phaserin tilemapiksi, jossa meri
-  ja järvet ovat esteitä. Seikkailu alkaa Valkeakoskelta, ja paikkakunnassa elämä palautuu.
+- **Saaren kartta:** pelimaailma on iso keksitty saari (198 × 124 ruutua). Kaikki sijainnit
+  ovat ruutuina (`MapPoint`: x itään, y etelään). `logic/world-grid.ts` rakentaa ruudukon
+  `data/island.ts`:n tiedoista: rantaviivan (monikulmio, ulkopuolella merta), järvet ja
+  laavajärven (ympyröitä), alueet (monikulmioita, joiden rajat kiemurtelevat
+  `regionEdgeWobble`n verran) ja sisämaan maaston. Meren reunalle tulee hiekkaranta, ja
+  lopuksi tiet vedetään paikkakuntien välille. Alueet: lounaassa pellot, keskellä metsät ja
+  järvet, idässä suo, pohjoisessa tunturit ja koillisessa tulivuori. `systems/world-map.ts`
+  piirtää ruudukon Phaserin tilemapiksi, jossa meri, järvet ja laava ovat esteitä.
+  Seikkailu alkaa Kotirannasta, ja paikkakunnassa elämä palautuu. Uusi maasto: tunniste
+  `data/types-world.ts`:ään, rivi `TERRAINS`-listan loppuun (`data/world.ts`), ruudun kuva
+  `data/sprites-tiles.ts`:ään ja taistelun tausta `BACKDROP_BY_TERRAIN`-listaan.
+- **Saaren hirviöt:** kaukaisemmat alueet ovat vaikeampia, koska viholliset eivät vahvistu
+  pelaajan mukana. Rannoilla rantakrapu (taso 5–8), suolla liejuhirviö ja virvatuli (12–16),
+  tuntureilla peikkojen lisäksi kalliojätti (22–26) ja tulivuorella tulilisko (30–34) ja
+  lohikäärme (42–50, voimaisku kuten loppubossilla). Jokainen pudottaa oman varusteensa.
+  Tasot on simuloitu (kykypisteet jaettu tasaisesti, varusteet päällä). Vanhan Suomen
+  kartan tallennus (versio 5) siirtyy saarelle: sankari herää Kotirannassa, ja saaren
+  viholliset ovat voittamatta, mutta taso, reppu ja varusteet säilyvät (`logic/save-format.ts`).
 - **Maaston hidastus:** maastotyypillä voi olla nopeuskerroin (`TerrainDef.speedFactor`,
   `data/world.ts`). Metsässä sankari kulkee 60 % nopeudella, tiellä ja pellolla täysillä.
   Kerroin luetaan sankarin ruudusta joka ruudunpäivityksessä (`logic/terrain-speed.ts`), joten
@@ -263,7 +277,7 @@ Lisäksi periaatteet:
 5. **Logiikka testataan.** Uusi kaava tai sääntö `logic/`-kansioon + testi `tests/`-kansioon.
 6. **Sisältötesti suojaa dataa.** `tests/content.test.ts` tarkistaa, että tunnisteet ovat
    uniikkeja ja spritet olemassa. `tests/world.test.ts` tarkistaa, että paikkakunnat ja
-   viholliset ovat maalla ja että kaikkialle pääsee kävellen Valkeakoskelta.
+   viholliset ovat maalla omalla alueellaan ja että kaikkialle pääsee kävellen Kotirannasta.
 7. **Kun raja tulee vastaan, jaa tiedosto.** Rajoja ei nosteta eikä `eslint-disable`a käytetä.
 
 ## 6. Laatuportit
@@ -278,15 +292,15 @@ tai pelaa GitHub Pagesista mainiin yhdistämisen jälkeen.
 
 **Vaihe 0 – Runko.** Vite + TS + Phaser 4, lintteri, testit, CI, julkaisu. ✓
 
-**Suomen kartta ja vuoropohjainen taistelu.** ✓ Kartta oikeista koordinaateista, 24 paikkakuntaa
-tieverkolla, 17 vihollista (lima, metsähiisi, harmaasusi, tunturipeikko), vuoropohjainen taistelu,
+**Kartta ja vuoropohjainen taistelu.** ✓ Ensin Suomen kartta oikeista koordinaateista, nyt
+iso saari: 14 paikkakuntaa tieverkolla, 37 vihollista kymmentä lajia, vuoropohjainen taistelu,
 kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 
 **Vaihe 1 – Pelituntuma.**
 
 - Hahmojen kävelyanimaatiot ja suunta (4 suuntaa)
 - Vahinkonumerot, ruudun tärähdys ✓, äänitehosteet ✓ (`systems/sound-fx.ts`)
-- Pienkartta ja tarkempi Suomen rantaviiva (lisää pisteitä `data/finland.ts`:ään)
+- Pienkartta saaresta
 
 **Vaihe 2 – Seikkailu.**
 

@@ -14,7 +14,7 @@ const MARKER_DEPTH = 5;
 
 export function placeTownMarkers(scene: Phaser.Scene): void {
   for (const town of WORLD.towns) {
-    const pos = tileToWorld(townTile(WORLD, town));
+    const pos = tileToWorld(townTile(town));
     scene.add.image(pos.x, pos.y, 'town').setDepth(MARKER_DEPTH);
     scene.add
       .text(pos.x, pos.y + LABEL_OFFSET_Y, TEXT.names.town(town), {

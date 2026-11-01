@@ -6,7 +6,7 @@ import { buildWorldGrid, nearestWalkable, type WorldGrid } from '../logic/world-
 import type { Vec2 } from '../logic/vector';
 import { createStripTexture } from './sprite-textures';
 
-// Piirtää Suomen kartan tilemapiksi ja asettaa meren ja järvet esteiksi.
+// Piirtää saaren kartan tilemapiksi ja asettaa meren, järvet ja laavan esteiksi.
 
 const TILESET_KEY = 'world-tiles';
 

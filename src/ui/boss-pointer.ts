@@ -3,7 +3,7 @@ import { GAME_HEIGHT, GAME_WIDTH, WORLD_VIEW } from '../config/game-config';
 import type { Vec2 } from '../logic/vector';
 
 // Punainen nuoli ruudun reunalla osoittaa kohti loppubossia, kun boss ei näy ruudulla.
-// Suomen kartta on iso, joten nuoli auttaa löytämään Lapin tunturille.
+// Saari on iso, joten nuoli auttaa löytämään bossin tunturille.
 
 const POINTER_DEPTH = 905;
 /** Nuolen puolileveys suhteessa sen pituuteen. */

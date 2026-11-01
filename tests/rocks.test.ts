@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { MAP_ENEMIES, TERRAINS, WORLD, getTown } from '../src/data';
 import { FINAL_BOSS } from '../src/data/boss';
 import type { RockRule, TerrainId, WorldDef } from '../src/data/types';
-import { geoToTile } from '../src/logic/geo';
 import { placeRocks } from '../src/logic/rocks';
 import type { Vec2 } from '../src/logic/vector';
 import {
   buildWorldGrid,
   isWalkable,
   nearestWalkable,
+  pointTile,
   terrainAt,
   townTile,
   type WorldGrid,
@@ -24,7 +24,7 @@ const withRocks = (rocks: Partial<RockRule>): WorldDef => ({
 });
 const noRocks = buildWorldGrid(withRocks({ share: 0 }));
 const grid = buildWorldGrid(WORLD);
-const start = townTile(WORLD, getTown(WORLD.startTown));
+const start = townTile(getTown(WORLD.startTown));
 
 function rockTiles(world: WorldGrid): Vec2[] {
   return world.cells.flatMap((row, y) =>
@@ -47,12 +47,12 @@ function tilesAround(center: Vec2, r: number): Vec2[] {
 
 /** Tärkeät paikat: paikkakunnat, viholliset ja loppuboss. */
 const importantPlaces: readonly { readonly name: string; readonly tile: Vec2 }[] = [
-  ...WORLD.towns.map((town) => ({ name: town.name, tile: townTile(WORLD, town) })),
+  ...WORLD.towns.map((town) => ({ name: town.name, tile: townTile(town) })),
   ...MAP_ENEMIES.map((spawn, i) => ({
     name: `${spawn.enemy} ${i}`,
-    tile: geoToTile(spawn, WORLD.projection),
+    tile: pointTile(spawn),
   })),
-  { name: 'loppuboss', tile: geoToTile(FINAL_BOSS, WORLD.projection) },
+  { name: 'loppuboss', tile: pointTile(FINAL_BOSS) },
 ];
 
 /** Jokainen ruutu, johon pääsi ilman kiviä, on yhä saavutettavissa (paitsi itse kivet). */

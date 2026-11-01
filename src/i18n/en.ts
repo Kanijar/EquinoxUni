@@ -124,7 +124,7 @@ export const EN: Texts = {
     players: (count: number): string => `Players now: ${count}`,
   },
   world: {
-    intro: 'Your adventure begins in Valkeakoski!',
+    intro: 'Your adventure begins in Kotiranta!',
     wolfBlessing: (level: number): string => `The wolf blessed you! Level ${level}!`,
     rest: (town): string => `You rested in ${town.name}. HP restored!`,
     revived: (town): string => `You fell... and woke up in ${town.name}. HP restored!`,
@@ -195,7 +195,7 @@ export const EN: Texts = {
     enemyHit: (enemy: string, damage: number): string => `${enemy} hit you: -${damage}.`,
     enemyHitDefended: (enemy: string, damage: number): string =>
       `You blocked! ${enemy} only did ${damage}.`,
-    charge: (enemy: string): string => `${enemy} raises its club! DEFEND now!`,
+    charge: (enemy: string): string => `${enemy} is preparing a power strike! DEFEND now!`,
     heavyHit: (enemy: string, damage: number): string =>
       `POWER STRIKE! ${enemy} smashed you: -${damage}.`,
     heavyHitDefended: (enemy: string, damage: number): string =>
@@ -239,17 +239,17 @@ export const EN: Texts = {
       `Mountain trolls defeated ${count}/${needed}.`,
     awakenedBattle: (boss: string): string => `The ground rumbles... ${boss} has awoken!`,
     awakenedMap: (boss: string): string =>
-      `${boss} has awoken!\nIt waits on the fells near Kilpisjärvi.`,
+      `${boss} has awoken!\nIt waits on the northwestern fells.`,
     defeatedBattle: (boss: string): string => `${boss} has fallen!`,
   },
   victory: {
     bossTitle: 'YOU BEAT THE FINAL BOSS!',
-    bossText: (boss: string): string => `${boss} is defeated. Lapland is free!`,
-    completeTitle: 'Finland is saved!',
+    bossText: (boss: string): string => `${boss} is defeated. The fells are free!`,
+    completeTitle: 'The island is saved!',
     completeText: 'You have beaten every enemy at least once.',
-    bossWaiting: (boss: string): string => `But ${boss} is still waiting in Lapland...`,
+    bossWaiting: (boss: string): string => `But ${boss} is still waiting on the fells...`,
     bossHint: (count: number, needed: number): string =>
-      `Beat mountain trolls (${count}/${needed}) and something will awaken in Lapland...`,
+      `Beat mountain trolls (${count}/${needed}) and something will awaken on the fells...`,
     stats: (level: number, xp: number): string => `Level ${level}   XP ${xp}`,
     next: 'Tap to continue your adventure',
     continues: 'The adventure continues!',
