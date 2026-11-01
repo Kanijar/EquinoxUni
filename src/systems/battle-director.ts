@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import { MAGIC_RULES } from '../data/rules';
 import type { EnemyDef } from '../data/types';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import {
   canChoose,
   takeTurn,
@@ -82,7 +82,7 @@ export class BattleDirector {
     this.busy = true;
     this.menu.refresh(battle, false);
     const events = takeTurn(battle, action, Math.random);
-    const steps = events.map((event) => eventStep(event, view, enemy.name));
+    const steps = events.map((event) => eventStep(event, view, TEXT.names.enemy(enemy)));
     playSteps(this.scene, view, steps, () => this.afterTurn());
   }
 
@@ -104,7 +104,7 @@ export class BattleDirector {
     let steps: BattleStep[] = [];
     if (reward) {
       view.playDefeat('enemy');
-      steps = victorySteps(reward, enemy.name, view);
+      steps = victorySteps(reward, TEXT.names.enemy(enemy), view);
     } else if (outcome === 'lost') {
       view.playDefeat('player');
       steps = [{ text: TEXT.battle.lost }];
@@ -117,8 +117,8 @@ export class BattleDirector {
 function introText(setup: BattleSetup): string {
   const { enemy, mapEnemyIndex } = setup;
   if (isBoss(enemy.id)) {
-    return TEXT.battle.bossAppears(enemy.name);
+    return TEXT.battle.bossAppears(TEXT.names.enemy(enemy));
   }
   const intro = mapEnemyIndex === null ? TEXT.battle.ambush : TEXT.battle.appears;
-  return intro(enemy.name);
+  return intro(TEXT.names.enemy(enemy));
 }

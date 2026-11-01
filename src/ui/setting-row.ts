@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 import { BUTTON, SETTINGS_VIEW } from '../config/game-config';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { TextButton } from './text-button';
 import { addLabel } from './title-text';
 

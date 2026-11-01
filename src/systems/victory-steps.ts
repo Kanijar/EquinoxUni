@@ -1,5 +1,5 @@
 import { getItem } from '../data';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { bossName, type BossNews } from '../logic/boss';
 import type { VictoryReward } from '../logic/game-state';
 import { xpToNextLevel } from '../logic/progression';
@@ -37,7 +37,7 @@ export function victorySteps(
 /** Takaisin saadut (varastetut) esineet ja pudotukset. */
 function lootSteps(reward: VictoryReward, view: BattleView): BattleStep[] {
   const recovered = (reward.recovered ?? []).map((stack) => ({
-    text: TEXT.battle.recovered(getItem(stack.id).name, stack.count),
+    text: TEXT.battle.recovered(TEXT.names.item(getItem(stack.id)), stack.count),
   }));
   return [...recovered, ...dropSteps(reward.drops ?? [], view)];
 }
@@ -47,7 +47,7 @@ function dropSteps(drops: readonly string[], view: BattleView): BattleStep[] {
   const steps: BattleStep[] = drops.map((id) => {
     const item = getItem(id);
     return {
-      text: TEXT.battle.drop(item.name),
+      text: TEXT.battle.drop(TEXT.names.item(item)),
       effect: () => {
         view.showLoot(item.sprite);
         playSound('loot');

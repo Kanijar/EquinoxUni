@@ -21,7 +21,8 @@ import { MapEncounters } from '../systems/map-encounters';
 import { placeTownMarkers, TownTracker } from '../systems/town-markers';
 import { playSound } from '../systems/sound-fx';
 import { buildWorldMap, getWorldGrid, tileToWorld, worldToTile } from '../systems/world-map';
-import { TEXT } from '../i18n/fi';
+import type { TownDef } from '../data/types';
+import { TEXT } from '../i18n/text';
 import { Hud } from '../ui/hud';
 import { addBackpackButton } from '../ui/backpack-button';
 import { coverScreen, revealScreen } from '../ui/screen-wipe';
@@ -125,7 +126,7 @@ export class WorldScene extends Phaser.Scene {
     this.state.position = position;
     const arrived = this.towns.update(position);
     if (arrived) {
-      this.rest(arrived.id, arrived.nameAt);
+      this.rest(arrived);
     }
     this.updateHud();
     this.bossPointer?.update();
@@ -151,11 +152,11 @@ export class WorldScene extends Phaser.Scene {
    * Paikkakuntaan saapuessa elämä palautuu ja paikkakunta muistetaan (siellä herätään
    * kaatumisen jälkeen). Käyttämättömistä kykypisteistä muistutetaan.
    */
-  private rest(townId: string, townAt: string): void {
-    visitTown(this.state, townId);
+  private rest(town: TownDef): void {
+    visitTown(this.state, town.id);
     const points = unspentSkillPoints(this.state);
     const reminder = points > 0 ? `\n${TEXT.world.skillPointsWaiting(points)}` : '';
-    this.toast.show(TEXT.world.rest(townAt) + reminder);
+    this.toast.show(TEXT.world.rest(town) + reminder);
   }
 
   private openSkills(): void {
@@ -177,7 +178,8 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private openSaves(): void {
-    const place = this.towns.town?.name ?? '';
+    const town = this.towns.town;
+    const place = town ? TEXT.names.town(town) : '';
     const data: SavesSceneData = { game: { state: this.state, place } };
     this.scene.start(SCENES.saves, data);
   }
@@ -200,7 +202,7 @@ export class WorldScene extends Phaser.Scene {
       xp: this.state.xp,
       potions: healItemCount(this.state.inventory),
       enemiesLeft: enemiesToBeat(this.state),
-      townName: this.towns.town?.name ?? '',
+      townName: this.towns.town ? TEXT.names.town(this.towns.town) : '',
       bossText: bossHudText(this.state),
     });
     const inTown = this.towns.town !== undefined;

@@ -3,7 +3,7 @@ import { COLORS, FONT, GAME_WIDTH, SCENES, SKILLS_VIEW, WORLD_VIEW } from '../co
 import { PROGRESSION } from '../data/rules';
 import { SKILLS } from '../data/skills';
 import type { SkillDef, SkillId } from '../data/types';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import {
   canSpendSkillPoint,
   playerStats,

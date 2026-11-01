@@ -1,6 +1,6 @@
 import { getSpell } from '../data';
 import type { PlayerStats, SkillDef } from '../data/types';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { burnDamage } from '../logic/magic';
 
 // Kykypistenäkymän rivin lisätieto, joka muuttuu pisteitä laitettaessa.

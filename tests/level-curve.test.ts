@@ -3,7 +3,7 @@ import { getEnemy } from '../src/data';
 import { buildXpTable, xpForLevel } from '../src/data/level-curve';
 import { LEVEL_CURVE, MENU_SECRET, PROGRESSION } from '../src/data/rules';
 import type { EnemyDef, LevelCurve } from '../src/data/types';
-import { TEXT } from '../src/i18n/fi';
+import { TEXT } from '../src/i18n/text';
 import {
   createNewGame,
   grantVictory,

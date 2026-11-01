@@ -9,7 +9,7 @@ import {
   WORLD_VIEW,
 } from '../config/game-config';
 import { FINAL_BOSS } from '../data/boss';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { bossName, isBossAwake } from '../logic/boss';
 import { playerLevel, playerSprite, type GameState } from '../logic/game-state';
 import { playSound } from '../systems/sound-fx';

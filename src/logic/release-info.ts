@@ -1,5 +1,6 @@
 import { GAME_INFO } from '../data/game-info';
-import { TEXT } from '../i18n/fi';
+import type { DateParts } from '../i18n/date-parts';
+import { TEXT } from '../i18n/text';
 
 // Alkuruudun versioteksti: versionumero (0.PR-numero) ja julkaisuaika Suomen aikaa.
 // Arvot tulevat buildista (vite.config.ts → import.meta.env), ks. logic/release-number.ts.
@@ -29,15 +30,20 @@ const timeFormat = new Intl.DateTimeFormat('fi-FI', {
   hourCycle: 'h23',
 });
 
-/** Julkaisuaika Suomen aikaa: päivä "1.11.2026" ja kellonaika "10.05". null, jos aika on rikki. */
-export function releaseTime(iso: string): { date: string; clock: string } | null {
+/**
+ * Julkaisuaika Suomen aikaa osina (vuosi, kuukausi, päivä, tunnit, minuutit). Teksti
+ * tehdään valitulla kielellä (TEXT.menu.released). null, jos aika on rikki.
+ */
+export function releaseTime(iso: string): DateParts | null {
   const time = new Date(iso);
   if (Number.isNaN(time.getTime())) return null;
   const parts = Object.fromEntries(timeFormat.formatToParts(time).map((p) => [p.type, p.value]));
-  const minutes = String(parts['minute']).padStart(2, '0');
   return {
-    date: `${parts['day']}.${parts['month']}.${parts['year']}`,
-    clock: `${Number(parts['hour'])}.${minutes}`,
+    year: Number(parts['year']),
+    month: Number(parts['month']),
+    day: Number(parts['day']),
+    hour: Number(parts['hour']),
+    minute: Number(parts['minute']),
   };
 }
 
@@ -50,5 +56,5 @@ export function releaseLines(info: ReleaseInfo): string[] {
       : TEXT.menu.versionStageOnly;
   if (info.dev) return [version, TEXT.menu.devBuild];
   const time = info.builtAt === undefined ? null : releaseTime(info.builtAt);
-  return time === null ? [version] : [version, TEXT.menu.released(time.date, time.clock)];
+  return time === null ? [version] : [version, TEXT.menu.released(time)];
 }

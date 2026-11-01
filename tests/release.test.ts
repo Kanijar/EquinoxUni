@@ -45,15 +45,33 @@ describe('versionumero', () => {
 
 describe('julkaisuaika Suomen aikaa', () => {
   it('talviaika on UTC + 2 tuntia', () => {
-    expect(releaseTime('2026-11-01T08:05:00.000Z')).toEqual({ date: '1.11.2026', clock: '10.05' });
+    expect(releaseTime('2026-11-01T08:05:00.000Z')).toEqual({
+      year: 2026,
+      month: 11,
+      day: 1,
+      hour: 10,
+      minute: 5,
+    });
   });
 
   it('kesäaika on UTC + 3 tuntia', () => {
-    expect(releaseTime('2026-07-01T08:05:00.000Z')).toEqual({ date: '1.7.2026', clock: '11.05' });
+    expect(releaseTime('2026-07-01T08:05:00.000Z')).toEqual({
+      year: 2026,
+      month: 7,
+      day: 1,
+      hour: 11,
+      minute: 5,
+    });
   });
 
   it('päivä vaihtuu Suomen ajan mukaan, ja keskiyö on 0.00', () => {
-    expect(releaseTime('2026-12-31T22:00:00.000Z')).toEqual({ date: '1.1.2027', clock: '0.00' });
+    expect(releaseTime('2026-12-31T22:00:00.000Z')).toEqual({
+      year: 2027,
+      month: 1,
+      day: 1,
+      hour: 0,
+      minute: 0,
+    });
   });
 
   it('rikkinäinen aika ei kaada peliä', () => {

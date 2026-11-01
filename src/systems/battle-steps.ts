@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import { BATTLE_VIEW } from '../config/game-config';
 import { getItem } from '../data';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import type { BattleEvent } from '../logic/battle';
 import type { BattleView } from '../ui/battle-view';
 
@@ -29,12 +29,12 @@ export function eventStep(event: BattleEvent, view: BattleView, enemyName: strin
       return { text: TEXT.battle.defending, effect: () => view.playDefend() };
     case 'heal':
       return {
-        text: TEXT.battle.heal(getItem(event.itemId).name, event.amount),
+        text: TEXT.battle.heal(TEXT.names.item(getItem(event.itemId)), event.amount),
         effect: () => view.playHeal(event.amount),
       };
     case 'steal':
       return {
-        text: TEXT.battle.stole(enemyName, getItem(event.itemId).name),
+        text: TEXT.battle.stole(enemyName, TEXT.names.item(getItem(event.itemId))),
         effect: () => view.playSteal(getItem(event.itemId).sprite),
       };
     case 'flee':

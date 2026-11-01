@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import { BACKPACK_VIEW, FONT } from '../config/game-config';
 import type { GearSlot, ItemDef } from '../data/types';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { ItemTile } from './item-tile';
 import { addLabel } from './title-text';
 
@@ -32,7 +32,7 @@ export class GearSlotRow {
   update(item: ItemDef | null, selected: boolean): void {
     this.tile.setItem(item?.sprite ?? null);
     this.tile.setSelected(selected);
-    this.nameText.setText(item?.name ?? TEXT.backpack.emptySlot);
+    this.nameText.setText(item ? TEXT.names.item(item) : TEXT.backpack.emptySlot);
     this.nameText.setAlpha(item ? 1 : EMPTY_ALPHA);
   }
 }

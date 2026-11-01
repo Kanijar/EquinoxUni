@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 import { BATTLE_VIEW, COLORS, FONT, GAME_WIDTH } from '../config/game-config';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 
 // Kriittisen osuman efekti: ruutu tärähtää ja "KRIITTINEN OSUMA!" nousee
 // kohteen yläpuolelle ja häviää.
