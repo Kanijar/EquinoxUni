@@ -144,7 +144,7 @@ export const FI = {
     players: (count: number): string => `Pelaajia nyt: ${count}`,
   },
   world: {
-    intro: 'Seikkailu alkaa Valkeakoskelta!',
+    intro: 'Seikkailu alkaa Kotirannasta!',
     /** Alkuruudun suden salaisuus (logic/menu-secret.ts): näkyy vasta kartalla. */
     wolfBlessing: (level: number): string => `Susi siunasi sinut! Taso ${level}!`,
     rest: (town: TownDef): string => `Lepäsit ${town.nameAt}. Elämä palautui!`,
@@ -224,8 +224,8 @@ export const FI = {
     enemyHit: (enemy: string, damage: number): string => `${enemy} löi sinua: -${damage}.`,
     enemyHitDefended: (enemy: string, damage: number): string =>
       `Torjuit iskun! ${enemy} teki vain ${damage}.`,
-    /** Loppubossin voimaisku valmistellaan edellisellä vuorolla. */
-    charge: (enemy: string): string => `${enemy} nostaa nuijansa! PUOLUSTA nyt!`,
+    /** Voimaisku valmistellaan edellisellä vuorolla (loppuboss ja lohikäärme). */
+    charge: (enemy: string): string => `${enemy} valmistelee voimaiskua! PUOLUSTA nyt!`,
     heavyHit: (enemy: string, damage: number): string =>
       `VOIMAISKU! ${enemy} murskasi: -${damage}.`,
     heavyHitDefended: (enemy: string, damage: number): string =>
@@ -287,19 +287,18 @@ export const FI = {
       `Tunturipeikkoja voitettu ${count}/${needed}.`,
     awakenedBattle: (boss: string): string => `Maa jyrisee... ${boss} heräsi!`,
     /** Kartalla, kun boss on juuri herännyt. */
-    awakenedMap: (boss: string): string =>
-      `${boss} heräsi!\nSe odottaa tuntureilla Kilpisjärven lähellä.`,
+    awakenedMap: (boss: string): string => `${boss} heräsi!\nSe odottaa luoteisilla tuntureilla.`,
     defeatedBattle: (boss: string): string => `${boss} kaatui!`,
   },
   /** Voittoruutu: loppuboss voitettu tai jokainen vihollinen voitettu. Peli jatkuu. */
   victory: {
     bossTitle: 'VOITIT LOPPUBOSSIN!',
-    bossText: (boss: string): string => `${boss} on kukistettu. Lappi on vapaa!`,
-    completeTitle: 'Suomi on pelastettu!',
+    bossText: (boss: string): string => `${boss} on kukistettu. Tunturit ovat vapaat!`,
+    completeTitle: 'Saari on pelastettu!',
     completeText: 'Voitit jokaisen vihollisen ainakin kerran.',
-    bossWaiting: (boss: string): string => `Mutta ${boss} odottaa vielä Lapissa...`,
+    bossWaiting: (boss: string): string => `Mutta ${boss} odottaa vielä tuntureilla...`,
     bossHint: (count: number, needed: number): string =>
-      `Voita tunturipeikkoja (${count}/${needed}), niin jokin herää Lapissa...`,
+      `Voita tunturipeikkoja (${count}/${needed}), niin jokin herää tuntureilla...`,
     stats: (level: number, xp: number): string => `Taso ${level}   KP ${xp}`,
     next: 'Kosketa jatkaaksesi seikkailua',
     /** Kartalle palatessa. */

@@ -13,6 +13,12 @@ export const ENEMY_NAMES_EN: Readonly<Record<string, string>> = {
   troll: 'Mountain Troll',
   robber: 'Robber',
   'troll-king': 'Troll King',
+  crab: 'Beach Crab',
+  mud: 'Mud Monster',
+  wisp: "Will-o'-the-Wisp",
+  giant: 'Rock Giant',
+  lizard: 'Fire Lizard',
+  dragon: 'Dragon',
 };
 
 /** Esineiden nimet ja kuvaukset englanniksi tunnisteen (ItemDef.id) mukaan. */
@@ -31,6 +37,19 @@ export const ITEM_TEXTS_EN: Readonly<
     description: "A necklace made of wolf teeth. The wolf's toughness!",
   },
   'king-cloak': { name: "King's Cloak", description: "The Troll King's cloak. Tough and warm!" },
+  'crab-armor': { name: 'Crab Armor', description: 'A hard shell protects you from blows.' },
+  'bog-stone': { name: 'Bog Stone Necklace', description: 'A heavy bog stone. You can take more!' },
+  'wisp-charm': { name: 'Wisp Charm', description: 'A wisp glow. Your fireball burns hotter!' },
+  'stone-hammer': { name: 'Stone Hammer', description: "The Rock Giant's hammer. Crushing!" },
+  'lizard-armor': {
+    name: 'Fire Scale Armor',
+    description: 'Fire lizard scales. Strong and tough!',
+  },
+  'dragon-sword': {
+    name: 'Dragon Sword',
+    description: "Forged from a dragon's fang. Best weapon!",
+  },
+  'dragon-charm': { name: 'Dragon Charm', description: "A dragon's eye. Toughness and fire!" },
 };
 
 /** TEXT.names englanniksi. Jos käännös puuttuu, näytetään suomenkielinen nimi. */

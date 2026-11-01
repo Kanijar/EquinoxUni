@@ -1,4 +1,5 @@
 import type { BattleBackdropId } from './types-battle-look';
+import type { MapPoint, TerrainId } from './types-world';
 
 // Pelisisällön tyypit. Kaikki sisältö (viholliset, esineet, paikkakunnat, spritet)
 // kuvataan näillä tyypeillä data/-kansiossa. Lisää uusi kenttä ensin tänne.
@@ -106,7 +107,7 @@ export interface EnemyMovesDef {
  * Loppuboss (data/boss.ts). Boss herää kartalle, kun pelaaja on voittanut tarpeeksi
  * monta kertaa tietyn vihollisen. Voitettu boss ei palaa.
  */
-export interface BossDef extends GeoPoint {
+export interface BossDef extends MapPoint {
   /** Bossin vihollistunniste (data/enemies.ts). Boss ei ole MAP_ENEMIES-listassa. */
   readonly enemy: string;
   /** Vihollinen, jonka voittaminen herättää bossin (esim. tunturipeikko). */
@@ -165,79 +166,6 @@ export interface KeyItemDef extends ItemBase {
 }
 
 export type ItemDef = HealItemDef | GearItemDef | KeyItemDef;
-
-// --- Suomen kartta ---
-
-/** Maantieteellinen piste: pituusaste (itä) ja leveysaste (pohjoinen) asteina. */
-export interface GeoPoint {
-  readonly lon: number;
-  readonly lat: number;
-}
-
-export interface TownDef extends GeoPoint {
-  readonly id: string;
-  /** Paikkakunnan nimi perusmuodossa, esim. "Tampere". */
-  readonly name: string;
-  /** Nimi sisäpaikallissijassa, esim. "Tampereella" tai "Helsingissä". */
-  readonly nameAt: string;
-}
-
-/** Järvi kuvataan yhtenä tai useampana ympyränä. */
-export interface LakeDef {
-  readonly name: string;
-  readonly circles: readonly (GeoPoint & { readonly radiusKm: number })[];
-}
-
-export type TerrainId = 'sea' | 'lake' | 'field' | 'forest' | 'snow' | 'road';
-
-export interface TerrainDef {
-  readonly id: TerrainId;
-  readonly sprite: string;
-  /** Voiko ruudulla kävellä. Meri ja järvet estävät liikkumisen. */
-  readonly walkable: boolean;
-  /** Liikkumisnopeuden kerroin tällä maastolla (1 = normaali, 0,6 = 60 %). Puuttuu = 1. */
-  readonly speedFactor?: number;
-}
-
-/** Leveysastevyöhyke, joka määrää maaston: etelässä peltoa, pohjoisessa lunta. */
-export interface TerrainBand {
-  /** Vyöhyke on voimassa tätä leveysastetta etelämpänä. */
-  readonly untilLat: number;
-  readonly main: TerrainId;
-  /** Toinen maasto, jota on sekaisin pääasiallisen kanssa. */
-  readonly mix: TerrainId;
-  /** Kuinka suuri osa ruuduista on toista maastoa (0..1). */
-  readonly mixShare: number;
-}
-
-/** Kartan mittakaava ja rajat. Kartta piirretään tasakulmaisella projektiolla. */
-export interface MapProjection {
-  readonly west: number;
-  readonly east: number;
-  readonly north: number;
-  readonly south: number;
-  /** Kuinka monta kilometriä yksi ruutu on. */
-  readonly kmPerTile: number;
-  /** Leveysaste, jonka mukaan pituusasteet muutetaan kilometreiksi. */
-  readonly referenceLat: number;
-}
-
-export interface WorldDef {
-  readonly projection: MapProjection;
-  readonly border: readonly GeoPoint[];
-  readonly lakes: readonly LakeDef[];
-  readonly bands: readonly TerrainBand[];
-  readonly towns: readonly TownDef[];
-  /** Tiet paikkakuntien välillä tunnistepareina. */
-  readonly roads: readonly (readonly [string, string])[];
-  /** Paikkakunta, josta seikkailu alkaa. */
-  readonly startTown: string;
-}
-
-/** Kartalla kulkeva vihollinen. */
-export interface MapEnemyDef extends GeoPoint {
-  readonly enemy: string;
-}
 
 /** Väijytys: tietyssä maastossa kulkiessa vihollinen voi hyökätä yllättäen. */
 export interface AmbushRule {
@@ -390,3 +318,17 @@ export type {
   BattleWeatherDef,
   ParticleBurstDef,
 } from './types-battle-look';
+
+// --- Saaren kartta (data/types-world.ts) ---
+
+export type {
+  LakeDef,
+  MapEnemyDef,
+  MapPoint,
+  TerrainDef,
+  TerrainId,
+  TerrainRegion,
+  TerrainMix,
+  TownDef,
+  WorldDef,
+} from './types-world';

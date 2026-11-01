@@ -1,5 +1,5 @@
-import { SAVE_VERSION } from '../config/persistence';
-import { MAP_ENEMIES } from '../data';
+import { FINLAND_MAP_TROLLS, SAVE_VERSION } from '../config/persistence';
+import { getTown, WORLD } from '../data';
 import { FINAL_BOSS } from '../data/boss';
 import { PLAYER } from '../data/player';
 import type { GameState } from './game-state';
@@ -35,6 +35,7 @@ export const SAVE_MIGRATIONS: Readonly<Record<number, (save: RawSave) => RawSave
   2: addEyeColor,
   3: addEquipment,
   4: addBossProgress,
+  5: moveToIsland,
 };
 
 /**
@@ -85,12 +86,31 @@ function addBossProgress(save: RawSave): RawSave {
   if (!isRecord(state)) {
     return save;
   }
-  const defeated = Array.isArray(state['defeated']) ? state['defeated'] : [];
-  const trolls = MAP_ENEMIES.filter(
-    (spawn, index) => spawn.enemy === FINAL_BOSS.unlockEnemy && defeated.includes(index),
-  ).length;
+  const defeated: unknown[] = Array.isArray(state['defeated']) ? state['defeated'] : [];
+  const trolls = FINLAND_MAP_TROLLS.filter((index) => defeated.includes(index)).length;
   const bossProgress = Math.min(trolls, FINAL_BOSS.unlockCount);
   return { ...save, state: { ...state, bossProgress, bossDefeated: false, completed: false } };
+}
+
+/**
+ * Versio 5 → 6: Suomen kartta vaihtui isoksi saareksi. Vanhat sijainnit, paikkakunnat ja
+ * vihollisten järjestysnumerot eivät sovi saarelle, joten sankari herää saaren
+ * aloituskylässä ja saaren viholliset ovat kaikki voittamatta. Taso (KP), kykypisteet,
+ * reppu, varusteet, silmien väri ja loppubossin tila säilyvät.
+ */
+function moveToIsland(save: RawSave): RawSave {
+  const state = save['state'];
+  if (!isRecord(state)) {
+    return save;
+  }
+  const island = {
+    position: null,
+    lastTown: WORLD.startTown,
+    defeated: [],
+    respawning: [],
+    completed: false,
+  };
+  return { ...save, place: getTown(WORLD.startTown).name, state: { ...state, ...island } };
 }
 
 export function encodeSave(state: GameState, meta: SaveMeta): string {

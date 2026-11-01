@@ -71,9 +71,9 @@ describe('kielet', () => {
   });
 
   it('paikkakunnan nimi taipuu suomeksi, englanniksi se on sama', () => {
-    const tampere = getTown('tampere');
-    expect(textsFor('fi').world.rest(tampere)).toBe('Lepäsit Tampereella. Elämä palautui!');
-    expect(textsFor('en').world.rest(tampere)).toBe('You rested in Tampere. HP restored!');
+    const kuusela = getTown('kuusela');
+    expect(textsFor('fi').world.rest(kuusela)).toBe('Lepäsit Kuuselassa. Elämä palautui!');
+    expect(textsFor('en').world.rest(kuusela)).toBe('You rested in Kuusela. HP restored!');
   });
 
   it('kielinapit ovat aina omalla kielellään', () => {

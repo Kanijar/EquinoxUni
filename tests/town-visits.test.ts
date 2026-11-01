@@ -15,15 +15,15 @@ describe('viimeisin paikkakunta', () => {
   it('uusi peli muistaa aloituspaikkakunnan', () => {
     const state = createNewGame();
     expect(state.lastTown).toBe(START_TOWN);
-    expect(lastVisitedTown(state).id).toBe('valkeakoski');
+    expect(lastVisitedTown(state).id).toBe('kotiranta');
   });
 
   it('paikkakuntaan saapuminen muistetaan ja palauttaa elämän', () => {
     const state = createNewGame();
     state.hp = 3;
-    visitTown(state, 'tampere');
-    expect(state.lastTown).toBe('tampere');
-    expect(lastVisitedTown(state).name).toBe('Tampere');
+    visitTown(state, 'kuusela');
+    expect(state.lastTown).toBe('kuusela');
+    expect(lastVisitedTown(state).name).toBe('Kuusela');
     expect(state.hp).toBe(playerStats(state).maxHp);
   });
 
@@ -37,7 +37,7 @@ describe('viimeisin paikkakunta', () => {
 describe('kaatuminen taistelussa', () => {
   it('sankari herää viimeisimmässä paikkakunnassa täysin elämin', () => {
     const state = createNewGame();
-    visitTown(state, 'tampere');
+    visitTown(state, 'kuusela');
     state.position = { x: 500, y: 700 };
     const battle = createBattle(playerFighter(state), { hp: 9, ...getEnemy('wolf').stats }, {});
     battle.player.hp = 0;
@@ -46,8 +46,8 @@ describe('kaatuminen taistelussa', () => {
     expect(state.hp).toBe(0);
 
     const town = reviveAtLastTown(state);
-    expect(town.id).toBe('tampere');
-    expect(town.nameAt).toBe('Tampereella');
+    expect(town.id).toBe('kuusela');
+    expect(town.nameAt).toBe('Kuuselassa');
     expect(state.position).toBeNull();
     expect(state.hp).toBe(playerStats(state).maxHp);
   });

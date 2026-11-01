@@ -1,4 +1,12 @@
-import { FINLAND_BORDER, LAKES, PROJECTION, TERRAIN_BANDS } from './finland';
+import {
+  BEACH,
+  INLAND,
+  ISLAND_COAST,
+  ISLAND_SIZE,
+  LAKES,
+  REGION_EDGE_WOBBLE,
+  REGIONS,
+} from './island';
 import { ROADS, START_TOWN, TOWNS } from './towns';
 import type { TerrainDef, WorldDef } from './types';
 
@@ -16,13 +24,21 @@ export const TERRAINS: readonly TerrainDef[] = [
   { id: 'forest', sprite: 'tile-forest', walkable: true, speedFactor: 0.6 },
   { id: 'snow', sprite: 'tile-snow', walkable: true },
   { id: 'road', sprite: 'tile-road', walkable: true },
+  { id: 'sand', sprite: 'tile-sand', walkable: true },
+  { id: 'swamp', sprite: 'tile-swamp', walkable: true },
+  { id: 'ash', sprite: 'tile-ash', walkable: true },
+  { id: 'lava', sprite: 'tile-lava', walkable: false },
 ];
 
 export const WORLD: WorldDef = {
-  projection: PROJECTION,
-  border: FINLAND_BORDER,
+  width: ISLAND_SIZE.width,
+  height: ISLAND_SIZE.height,
+  coast: ISLAND_COAST,
+  beach: BEACH,
   lakes: LAKES,
-  bands: TERRAIN_BANDS,
+  regions: REGIONS,
+  regionEdgeWobble: REGION_EDGE_WOBBLE,
+  inland: INLAND,
   towns: TOWNS,
   roads: ROADS,
   startTown: START_TOWN,

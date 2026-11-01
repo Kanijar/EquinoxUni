@@ -3,7 +3,8 @@
 // Muut tiedostot tuovat nämä tyypit tiedoston types.ts kautta.
 
 /** Taistelun tausta. Valitaan maaston mukaan tai vihollisen omana taustana (EnemyDef.backdrop). */
-export type BattleBackdropId = 'field' | 'forest' | 'snow' | 'village' | 'summit';
+export type BattleBackdropId =
+  'field' | 'forest' | 'snow' | 'village' | 'summit' | 'beach' | 'swamp' | 'volcano';
 
 /** Taustan sää: hiutaleet putoavat ylhäältä tai hiukkaset leijuvat ilmassa. */
 export interface BattleWeatherDef {
