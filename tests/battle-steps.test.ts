@@ -71,7 +71,7 @@ describe('voiton viestit', () => {
     expect(texts).toContain(TEXT.battle.skillPoints(3));
   });
 
-  it('kertoo peikkolaskurin, bossin heräämisen ja monta pudotettua esinettä', () => {
+  it('kertoo peikkolaskurin, bossin heräämisen ja bossin pudotukset', () => {
     const { view } = fakeView();
     const base: VictoryReward = {
       xp: 35,
@@ -88,7 +88,10 @@ describe('voiton viestit', () => {
     expect(progress.map((step) => step.text)).toContain(TEXT.boss.progress(3, 5));
     const awakened = victorySteps({ ...base, boss: { kind: 'awakened' } }, 'Peikko', view);
     expect(awakened.map((step) => step.text)).toContain(TEXT.boss.awakenedBattle(bossName()));
-    const loot = victorySteps({ ...base, drop: 'potion', dropCount: 5 }, 'Kuningas', view);
-    expect(loot.map((step) => step.text)).toContain(TEXT.battle.dropMany('Parannusjuoma', 5));
+    const drops = ['king-cloak', 'potion'];
+    const loot = victorySteps({ ...base, drops }, 'Kuningas', view).map((step) => step.text);
+    expect(loot).toContain(TEXT.battle.drop('Kuninkaan viitta'));
+    expect(loot).toContain(TEXT.battle.drop('Parannusjuoma'));
+    expect(loot).toContain(TEXT.battle.gearHint);
   });
 });

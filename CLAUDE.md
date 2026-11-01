@@ -34,7 +34,9 @@ Esimerkki: `setTintFill()` ei tee mitään Phaser 4:ssä, käytä `setTint(c).se
 | Uusi vihollinen                       | `src/data/enemies.ts` (+ sprite `src/data/sprites-characters.ts`)                                                                             |
 | Loppuboss (herääminen, liikkeet)      | `src/data/boss.ts`, vihollinen `src/data/enemies.ts` (`moves`, `backdrop`), säännöt `src/logic/boss.ts` ja `src/logic/enemy-turn.ts` + testit |
 | Vihollinen kartalle                   | `src/data/map-enemies.ts` (sijainti oikeina koordinaatteina)                                                                                  |
-| Uusi esine                            | `src/data/items.ts` (+ sprite). Uusi esinetyyppi: `ItemKind` tiedostossa `data/types.ts` ja käsittely `logic/battle.ts`                       |
+| Uusi esine                            | `src/data/items.ts` + sprite `src/data/sprites-items.ts`. Varuste: `kind: 'gear'`, `slot`, `bonus`                                            |
+| Vihollisen pudotukset (drops)         | `drops` vihollisella `src/data/enemies.ts`, säännöt `src/logic/drops.ts` + testi                                                              |
+| Reppu ja varusteet                    | säännöt `src/logic/equipment.ts`, `src/logic/backpack.ts` + testi, näkymä `src/scenes/backpack-scene.ts`                                      |
 | Uusi paikkakunta tai tie              | `src/data/towns.ts` (koordinaatit esim. Wikipediasta)                                                                                         |
 | Kartan muoto, järvet, maasto          | `src/data/finland.ts` (+ ruutujen kuvat `src/data/sprites-tiles.ts`)                                                                          |
 | Pelaajan arvot (elämä, nopeus, isku)  | `src/data/player.ts`                                                                                                                          |

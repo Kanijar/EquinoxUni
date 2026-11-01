@@ -16,6 +16,9 @@ import {
 import { levelForXp, xpProgress, xpToNextLevel } from '../src/logic/progression';
 import type { Progression } from '../src/data/types';
 
+/** Satunnaisluku, jolla mikään pudotus ei osu (paitsi varma, chance 1). */
+const never = (): number => 0.999;
+
 const progression: Progression = {
   xpForLevel: [0, 10, 30],
   skillPointsPerLevel: 3,
@@ -80,7 +83,7 @@ describe('pelin tila', () => {
       leveledUp: true,
       level: 2,
       skillPoints: PROGRESSION.skillPointsPerLevel,
-      drop: 'potion',
+      drops: ['potion'],
     });
   });
 
@@ -113,7 +116,7 @@ describe('pelin tila', () => {
     state.inventory['potion'] = 1;
     battle.stolen['potion'] = 2;
     battle.outcome = 'won';
-    const reward = applyBattleResult(state, battle, null, robber);
+    const reward = applyBattleResult(state, battle, { enemy: robber, mapEnemyIndex: null }, never);
     expect(reward?.recovered).toEqual([{ id: 'potion', count: 2 }]);
     expect(state.inventory['potion']).toBe(3);
     expect(state.xp).toBe(robber.xp);
@@ -129,7 +132,8 @@ describe('pelin tila', () => {
     );
     battle.player.hp = 11;
     battle.outcome = 'fled';
-    expect(applyBattleResult(state, battle, 0, getEnemy('slime'))).toBeNull();
+    const foe = { enemy: getEnemy('slime'), mapEnemyIndex: 0 };
+    expect(applyBattleResult(state, battle, foe)).toBeNull();
     expect(state.hp).toBe(11);
     expect(state.defeated).toEqual([]);
   });

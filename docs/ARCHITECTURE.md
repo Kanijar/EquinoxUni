@@ -108,7 +108,8 @@ scenes  →  systems / ui  →  entities  →  logic
   `GameState.bossDefeated` on true. Bossin erikoisliikkeet ovat datana (`EnemyDef.moves`):
   voimaisku valmistellaan vuoroa ennen (PUOLUSTA puolittaa sen) ja lumimyrsky ohittaa
   puolustuksen ja sammuttaa tulipallon liekit. Säännöt `logic/boss.ts` ja `logic/enemy-turn.ts`.
-  Voiton jälkeen näytetään voittoruutu, ja peli jatkuu kartalla.
+  Voitosta saa 800 KP, harvinaisen varusteen Kuninkaan viitta ja juoman. Voiton jälkeen
+  näytetään voittoruutu, ja peli jatkuu kartalla.
 - **Läpäisy:** kun jokainen karttavihollinen on voitettu ainakin kerran ("Voittamatta 0"),
   voittoruutu näytetään kerran (`GameState.completed`), ja peli jatkuu kartalla. Ruutu kertoo,
   odottaako loppuboss vielä.
@@ -156,6 +157,18 @@ scenes  →  systems / ui  →  entities  →  logic
   jolloin tekoäly voi tehdä uuden hahmon heti. Myöhemmin oikeat PNG-kuvat (esim. Aseprite tai
   Piskel) laitetaan `public/assets/`-kansioon ja ladataan BootScenessä **samalla avaimella**,
   jolloin muuta koodia ei tarvitse muuttaa.
+- **Reppu ja varusteet:** kartan REPPU-napista (oikea alakulma, aina näkyvissä) avautuu
+  `BackpackScene` kartan päälle; kartta nukkuu (`scene.sleep`) ja herää samaan kohtaan.
+  Varustepaikat: käsi, vartalo ja koru (`GEAR_SLOTS`, `data/items.ts`), yksi varuste per paikka.
+  Varuste on esine, jolla on `kind: 'gear'`, `slot` ja `bonus` (esim. `{ attack: 6 }`).
+  Käytössä olevat varusteet ovat `GameState.equipped`issä, eivät repussa (`inventory`).
+  Lisäykset lasketaan arvoihin vain `logic/equipment.ts`:n `applyGear()`issa, ja
+  `playerStats()` = perusarvot + kykypisteet + varusteet. Kyvyn yläraja (tarkkuus 40 %) koskee
+  vain kykypisteitä (`skillStats()`), varusteet tulevat päälle. Repusta voi myös juoda juoman.
+  Ryöstäjä varastaa vain juomia, ei varusteita.
+- **Pudotukset:** vihollisella on `drops: [{ item, chance }]` (`data/enemies.ts`). Jokainen
+  arvotaan voitossa erikseen (`logic/drops.ts`); varustetta, joka pelaajalla jo on, ei pudoteta
+  uudelleen. Voittoruudulla esineen kuva ponnahtaa ja teksti "Löysit: Peikon nuija!".
 - **Tallennus:** kolme tallennuspaikkaa selaimen `localStorage`ssa, ei palvelinta, ei
   kirjautumista, ei henkilötietoja. Pelin aikana tallennetaan paikkakunnassa TALLENNA-napista,
   alkuruudun LATAA-napista ladataan. Tallennus on JSON: versio (`SAVE_VERSION`,
@@ -229,7 +242,7 @@ kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 **Vaihe 2 – Seikkailu.**
 
 - Paikkakuntien sisänäkymät (kauppa, majatalo) omina sceneinä
-- Inventaario ja aseet (`ItemKind: 'weapon'`), vihollisten erikoisiskut
+- Inventaario ja aseet ✓ (reppu, varusteet ja pudotukset), vihollisten erikoisiskut
 - NPC-hahmot ja dialogit (`data/dialogues.ts`)
 - Tallennus `localStorage`en ✓ (alkuruutu, asetukset ja kolme tallennuspaikkaa)
 

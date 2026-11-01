@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { COLORS, GAME_HEIGHT, GAME_WIDTH } from './config/game-config';
+import { BackpackScene } from './scenes/backpack-scene';
 import { BattleScene } from './scenes/battle-scene';
 import { BootScene } from './scenes/boot-scene';
 import { ExitScene } from './scenes/exit-scene';
@@ -37,6 +38,7 @@ new Phaser.Game({
     SkillsScene,
     SettingsScene,
     SavesScene,
+    BackpackScene,
     ExitScene,
   ],
 });

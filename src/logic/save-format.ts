@@ -33,7 +33,8 @@ type RawSave = Record<string, unknown>;
 export const SAVE_MIGRATIONS: Readonly<Record<number, (save: RawSave) => RawSave>> = {
   1: addRespawnTimers,
   2: addEyeColor,
-  3: addBossProgress,
+  3: addEquipment,
+  4: addBossProgress,
 };
 
 /**
@@ -65,7 +66,16 @@ function addEyeColor(save: RawSave): RawSave {
 }
 
 /**
- * Versio 3 → 4: loppuboss. Peikkolaskuri alkaa niistä tunturipeikoista, jotka on jo voitettu
+ * Versio 3 → 4. Versiossa 4 tuli reppu ja varusteet (GameState.equipped). Vanhassa
+ * tallennuksessa ei ole varusteita käytössä, joten paikat ovat tyhjiä. Repun esineet säilyvät.
+ */
+function addEquipment(save: RawSave): RawSave {
+  const state = save['state'];
+  return isRecord(state) ? { ...save, state: { ...state, equipped: {} } } : save;
+}
+
+/**
+ * Versio 4 → 5: loppuboss. Peikkolaskuri alkaa niistä tunturipeikoista, jotka on jo voitettu
  * (GameState.defeated), joten vanhan tallennuksen peikot eivät mene hukkaan. Boss ei ole
  * vielä voitettu, eikä läpäisyä ole juhlittu (vanha peli loppui läpäisyyn, joten sitä ei
  * voinut tallentaa sen jälkeen).

@@ -78,16 +78,16 @@ describe('loppuboss pelissä', () => {
     expect(isBossOnMap(state)).toBe(true);
   });
 
-  it('bossin voitto: iso palkinto, viisi juomaa, eikä boss palaa', () => {
+  it('bossin voitto: iso palkinto, Kuninkaan viitta ja juoma, eikä boss palaa', () => {
     const state = createNewGame();
     state.bossProgress = FINAL_BOSS.unlockCount;
     const king = getEnemy(FINAL_BOSS.enemy);
     const potions = state.inventory['potion'] ?? 0;
     const reward = grantVictory(state, null, king);
     expect(reward.boss).toEqual({ kind: 'defeated' });
-    expect(reward.drop).toBe('potion');
-    expect(reward.dropCount).toBe(5);
-    expect(state.inventory['potion']).toBe(potions + 5);
+    expect(reward.drops).toEqual(['king-cloak', 'potion']);
+    expect(state.inventory['king-cloak']).toBe(1);
+    expect(state.inventory['potion']).toBe(potions + 1);
     expect(state.xp).toBe(king.xp);
     expect(state.bossDefeated).toBe(true);
     expect(state.respawning).toEqual([]);

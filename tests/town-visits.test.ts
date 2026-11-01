@@ -42,7 +42,7 @@ describe('kaatuminen taistelussa', () => {
     const battle = createBattle(playerFighter(state), { hp: 9, ...getEnemy('wolf').stats }, {});
     battle.player.hp = 0;
     battle.outcome = 'lost';
-    applyBattleResult(state, battle, 2, getEnemy('wolf'));
+    applyBattleResult(state, battle, { enemy: getEnemy('wolf'), mapEnemyIndex: 2 });
     expect(state.hp).toBe(0);
 
     const town = reviveAtLastTown(state);

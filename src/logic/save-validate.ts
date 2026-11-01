@@ -1,8 +1,10 @@
 import { ITEMS, MAP_ENEMIES, TOWNS, WORLD } from '../data';
 import { FINAL_BOSS } from '../data/boss';
+import { GEAR_SLOTS } from '../data/items';
 import { PLAYER } from '../data/player';
 import type { EyeColor } from '../data/types';
 import { SKILLS } from '../data/skills';
+import { findGear, type Equipped } from './equipment';
 import { playerStats, type GameState } from './game-state';
 import { mapEnemyRespawnMs, type RespawnTimer } from './respawn';
 import { noSkillPoints, type SkillPoints } from './skill-points';
@@ -10,7 +12,8 @@ import type { Vec2 } from './vector';
 
 // Tarkistaa tallennuksesta luetun pelin tilan. Selaimen tietoja voi muokata
 // käsin tai ne voivat olla vanhasta pelin versiosta, joten mitään ei oleteta.
-// Tuntemattomat esineet ja viholliset jätetään pois, puuttuvat kyvyt ovat 0.
+// Tuntemattomat esineet ja viholliset jätetään pois, puuttuvat kyvyt ovat 0
+// ja puuttuvat varusteet tyhjiä.
 
 type RawRecord = Record<string, unknown>;
 
@@ -49,6 +52,24 @@ function readInventory(value: unknown): Record<string, number> | null {
     }
   }
   return inventory;
+}
+
+/**
+ * Käytössä olevat varusteet. Puuttuva (vanha tallennus) = ei varusteita. Tuntematon esine
+ * tai varuste väärässä paikassa jätetään pois.
+ */
+function readEquipped(value: unknown): Equipped {
+  const equipped: Equipped = {};
+  if (!isRecord(value)) {
+    return equipped;
+  }
+  for (const slot of GEAR_SLOTS) {
+    const id = value[slot];
+    if (typeof id === 'string' && findGear(id)?.slot === slot) {
+      equipped[slot] = id;
+    }
+  }
+  return equipped;
 }
 
 /** Palauttaa undefined, jos sijainti on virheellinen (null on sallittu: aloituspaikkakunta). */
@@ -150,6 +171,7 @@ export function readGameState(value: unknown): GameState | null {
     xp: value['xp'],
     skills,
     inventory,
+    equipped: readEquipped(value['equipped']),
     position,
     lastTown: readLastTown(value['lastTown']),
     defeated,

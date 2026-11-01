@@ -100,7 +100,7 @@ export class BattleDirector {
 
   private finish(outcome: FinishedOutcome): void {
     const { state, battle, enemy, mapEnemyIndex, view } = this.setup;
-    const reward = applyBattleResult(state, battle, mapEnemyIndex, enemy);
+    const reward = applyBattleResult(state, battle, { enemy, mapEnemyIndex });
     let steps: BattleStep[] = [];
     if (reward) {
       view.playDefeat('enemy');

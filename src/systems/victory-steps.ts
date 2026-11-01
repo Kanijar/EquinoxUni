@@ -27,22 +27,35 @@ export function victorySteps(
   const next = missing === null ? TEXT.battle.maxLevel : TEXT.battle.xpToNext(missing);
   return [
     won,
-    ...lootSteps(reward),
+    ...lootSteps(reward, view),
     ...bossSteps(reward.boss),
     ...levelSteps(reward, view),
     { text: next },
   ];
 }
 
-/** Takaisin saadut (varastetut) ja löydetyt esineet. */
-function lootSteps(reward: VictoryReward): BattleStep[] {
-  const steps = (reward.recovered ?? []).map((stack) => ({
+/** Takaisin saadut (varastetut) esineet ja pudotukset. */
+function lootSteps(reward: VictoryReward, view: BattleView): BattleStep[] {
+  const recovered = (reward.recovered ?? []).map((stack) => ({
     text: TEXT.battle.recovered(getItem(stack.id).name, stack.count),
   }));
-  if (reward.drop) {
-    const name = getItem(reward.drop).name;
-    const count = reward.dropCount ?? 1;
-    steps.push({ text: count > 1 ? TEXT.battle.dropMany(name, count) : TEXT.battle.drop(name) });
+  return [...recovered, ...dropSteps(reward.drops ?? [], view)];
+}
+
+/** "Löysit: Peikon nuija!" jokaisesta pudotuksesta ja vihje reppuun, jos joukossa oli varuste. */
+function dropSteps(drops: readonly string[], view: BattleView): BattleStep[] {
+  const steps: BattleStep[] = drops.map((id) => {
+    const item = getItem(id);
+    return {
+      text: TEXT.battle.drop(item.name),
+      effect: () => {
+        view.showLoot(item.sprite);
+        playSound('loot');
+      },
+    };
+  });
+  if (drops.some((id) => getItem(id).kind === 'gear')) {
+    steps.push({ text: TEXT.battle.gearHint });
   }
   return steps;
 }
