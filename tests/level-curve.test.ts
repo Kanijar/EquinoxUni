@@ -62,8 +62,8 @@ describe('tasokaava', () => {
     });
   });
 
-  it('suden salaisuuden 500 KP riittää tasolle 10, ei huipputasolle', () => {
-    expect(levelForXp(MENU_SECRET.wolfStartXp)).toBe(10);
+  it('suden salaisuus vie huipputasolle', () => {
+    expect(MENU_SECRET.wolfStartLevel).toBe(MAX_LEVEL);
   });
 });
 
@@ -106,7 +106,7 @@ describe('usean tason nousu kerralla', () => {
   });
 
   it('kykypisteet kertyvät oikein, kun tasoja noustaan useassa osassa', () => {
-    const state = createNewGame(MENU_SECRET.wolfStartXp);
+    const state = createNewGame(TABLE[9] ?? 0);
     const reward = grantVictory(state, null, enemyWithXp((TABLE[29] ?? 0) - state.xp));
     expect(reward.level).toBe(30);
     expect(reward.skillPoints).toBe(20 * PROGRESSION.skillPointsPerLevel);

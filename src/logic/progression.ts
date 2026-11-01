@@ -15,6 +15,13 @@ export function levelForXp(xp: number, progression: Progression = PROGRESSION): 
   return Math.max(1, level);
 }
 
+/** Kokemuspisteet, jotka tarvitaan tasolle (taso rajataan välille 1 – suurin taso). */
+export function minXpForLevel(level: number, progression: Progression = PROGRESSION): number {
+  const table = progression.xpForLevel;
+  const index = Math.min(Math.max(Math.floor(level), 1), table.length) - 1;
+  return table[index] ?? 0;
+}
+
 /** Kuinka monta KP:tä puuttuu seuraavasta tasosta, tai null jos taso on jo suurin. */
 export function xpToNextLevel(xp: number, progression: Progression = PROGRESSION): number | null {
   const next = progression.xpForLevel[levelForXp(xp, progression)];

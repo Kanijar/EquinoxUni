@@ -55,13 +55,13 @@ export const PROGRESSION: Progression = {
 
 /**
  * Salaisuus: napauta alkuruudun sutta ja sitten PELAA. Susi muuttuu henkisudeksi, ja uusi
- * peli alkaa 500 KP:llä (taso 10 ja 27 kykypistettä, huipputasoon 50 on vielä matkaa) ja kolmella
+ * peli alkaa huipputasolta 50 (KP tason rajassa, 147 kykypistettä) ja kolmella
  * ylimääräisellä juomalla.
  * Alkuruudulla tästä ei kerrota, vasta kartalla näkyy "Susi siunasi sinut!".
  * Toinen salaisuus: alkuruudun liman napautus muuttaa sankarin silmät mustiksi (slimeEyeColor).
  */
 export const MENU_SECRET: MenuSecretRules = {
-  wolfStartXp: 500,
+  wolfStartLevel: 50,
   bonusItems: [{ id: 'potion', count: 3 }],
   spiritSprite: 'wolf-spirit',
   slimeEyeColor: 'black',
