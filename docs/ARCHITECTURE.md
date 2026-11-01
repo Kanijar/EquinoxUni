@@ -44,7 +44,7 @@ src/
   i18n/fi.ts            KAIKKI pelaajalle näkyvät tekstit
   data/                 Pelisisältö datana: viholliset, esineet, Suomen kartta, spritet
     types.ts            Sisällön tyypit (muokkaa ensin tätä, kun lisäät uuden kentän)
-    game-info.ts        Pelin nimi, versio ja PWA-manifestin sisältö (niiden ainoa määrittelypaikka)
+    game-info.ts        Pelin nimi, kehitysvaihe ja PWA-manifestin sisältö (niiden ainoa määrittelypaikka)
     index.ts            getEnemy(), getItem(), getTown() ... hakufunktiot
     finland.ts          Suomen rajat, järvet ja maastovyöhykkeet oikeina koordinaatteina
     towns.ts            Paikkakunnat ja tiet
@@ -89,6 +89,13 @@ scenes  →  systems / ui  →  entities  →  logic
   `SavesScene` (tallennus). Alkuruudusta `SettingsScene` (valo ja äänet), `SavesScene` (lataus)
   ja `ExitScene` (LÄHDE).
   Pelin tila (`logic/game-state.ts`: elämä, KP, kykypisteet, esineet, sijainti, viimeisin paikkakunta, voitetut viholliset ja niiden palautusajat) annetaan scenejen välillä `scene.start(key, data)` -datana.
+- **Versio ja julkaisuaika:** alkuruudun oikeassa alakulmassa lukee esim. "Versio: 0.25 (alfa)"
+  ja sen alla "Julkaistu 1.11.2026 klo 10.05". Numero on uusimman PR:n numero: `vite.config.ts`
+  lukee buildissa commitien otsikot gitistä (`logic/release-number.ts`), ja buildin aika on
+  julkaisuaika (GitHub julkaisee heti buildin perään). Aika näytetään Suomen aikaa
+  (`logic/release-info.ts`). Arvot kulkevat peliin `import.meta.env.VITE_RELEASE_*`-muuttujina.
+  `npm run dev` näyttää "Kehitysversio". `vite.config.ts` tarkistetaan Noden tyypeillä
+  (`tsconfig.node.json`), peli ilman niitä.
 - **Kaatuminen:** taistelussa kaatunut sankari herää viimeisimmässä paikkakunnassa, jossa hän
   kävi (`GameState.lastTown`, aluksi aloituspaikkakunta), täysin elämin. KP, kykypisteet, esineet
   ja voitetut viholliset säilyvät. Säännöt `logic/town-visits.ts`.

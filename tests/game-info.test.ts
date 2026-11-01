@@ -32,7 +32,12 @@ describe('pelin versio', () => {
     expect(GAME_INFO.version).toBe('alfa');
   });
 
+  it('versionumeron alkuosa on 0, koska peli on vielä kesken', () => {
+    expect(GAME_INFO.versionMajor).toBe(0);
+  });
+
   it('alkuruudun versioteksti tulee pelin versiosta', () => {
-    expect(TEXT.menu.version).toBe(`Versio: ${GAME_INFO.version}`);
+    expect(TEXT.menu.version('0.25')).toBe(`Versio: 0.25 (${GAME_INFO.version})`);
+    expect(TEXT.menu.versionStageOnly).toBe(`Versio: ${GAME_INFO.version}`);
   });
 });

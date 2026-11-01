@@ -1,0 +1,9 @@
+{
+  // vite.config.ts ajetaan Nodessa buildin aikana (lukee gitistä versionumeron),
+  // joten se tarkistetaan Noden tyypeillä. Peli itse (tsconfig.json) ei näe Noden tyyppejä.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"]
+  },
+  "include": ["vite.config.ts"]
+}
