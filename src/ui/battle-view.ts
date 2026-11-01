@@ -1,7 +1,6 @@
 import type Phaser from 'phaser';
 import { BATTLE_CAMERA, BATTLE_STAGE, DAMAGE_NUMBERS } from '../config/battle-config';
 import { BATTLE_VIEW, COLORS } from '../config/game-config';
-import { getSprite } from '../data';
 import type { BattleBackdropDef } from '../data/types';
 import { TEXT } from '../i18n/fi';
 import type { Battle, Side } from '../logic/battle';
@@ -13,6 +12,7 @@ import { showDamageNumber } from './battle/damage-number';
 import { FighterSprite } from './battle/fighter-sprite';
 import { showFireball } from './battle/fireball';
 import { MessageBox } from './battle/message-box';
+import { hitColor, numberSpot, paletteColors } from './battle/view-helpers';
 import { StatusPanel } from './battle/status-panel';
 import { showCritPopup } from './crit-popup';
 import { showLootPopup } from './loot-popup';
@@ -40,6 +40,13 @@ export interface HitInfo {
   readonly damage: number;
   readonly crit: boolean;
   readonly defended: boolean;
+}
+
+/** Lumimyrskyn tiedot näkymää varten (logic/battle.ts:n 'special'-tapahtuma). */
+export interface StormInfo {
+  readonly damage: number;
+  readonly defended: boolean;
+  readonly extinguished: boolean;
 }
 
 interface ShownHp {
@@ -178,6 +185,37 @@ export class BattleView {
     }
   }
 
+  /** Loppuboss valmistelee voimaiskua: punainen hehku, kipinät, karjaisu ja varoitus. */
+  playCharge(): void {
+    const enemy = this.fighters.enemy;
+    playSound('roar');
+    enemy.glow(COLORS.hurt, BATTLE_STAGE.hurt.flashMs * 2);
+    this.particles.burst('charge', enemy.center.x, enemy.center.y);
+    showDamageNumber(this.scene, numberSpot(enemy.center), TEXT.battle.chargePopup, 'crit');
+    shakeHit(this.scene);
+  }
+
+  /** Lumimyrsky: hiutaleet pyyhkäisevät pelaajan yli, elämä laskee ja liekit voivat sammua. */
+  playStorm(storm: StormInfo): void {
+    const player = this.fighters.player;
+    const enemy = this.fighters.enemy;
+    playSound('storm');
+    this.particles.burst('storm', (player.center.x + enemy.center.x) / 2, player.center.y);
+    player.hurt(COLORS.stormFlash);
+    this.changeHp('player', -storm.damage);
+    const kind = storm.defended ? 'blocked' : 'damage';
+    showDamageNumber(
+      this.scene,
+      numberSpot(player.center),
+      TEXT.battle.damagePopup(storm.damage),
+      kind,
+    );
+    if (storm.extinguished) {
+      this.setBurning(false);
+    }
+    shakeHit(this.scene);
+  }
+
   playDefend(): void {
     playSound('shield');
     showShield(this.scene, this.fighters.player.center);
@@ -245,27 +283,4 @@ export class BattleView {
     shown.hp = Math.max(0, Math.min(shown.maxHp, shown.hp + delta));
     this.panels[side].setHp(shown.hp, shown.maxHp);
   }
-}
-
-function hitColor(attacker: Side): number {
-  return attacker === 'player' ? COLORS.hitFlash : COLORS.hurt;
-}
-
-/** Numerot lentävät hahmon keskeltä, jolloin kriittisen osuman teksti mahtuu niiden yläpuolelle. */
-function numberSpot(center: { x: number; y: number }): { x: number; y: number } {
-  return { x: center.x, y: center.y + DAMAGE_NUMBERS.offsetY };
-}
-
-/** Tätä tummemmat värit (esim. mustat silmät) jätetään pölystä pois, ettei se näytä liasta. */
-const MIN_DUST_BRIGHTNESS = 60;
-
-/** Spriten paletin värit numeroina (vihollisen kuolinpöly on vihollisen väristä). */
-function paletteColors(spriteKey: string): number[] {
-  const colors = Object.values(getSprite(spriteKey).palette).map((hex) =>
-    parseInt(hex.slice(1), 16),
-  );
-  const bright = colors.filter(
-    (c) => Math.max(c >> 16, (c >> 8) & 0xff, c & 0xff) >= MIN_DUST_BRIGHTNESS,
-  );
-  return bright.length > 0 ? bright : colors;
 }

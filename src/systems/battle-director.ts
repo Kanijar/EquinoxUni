@@ -9,11 +9,13 @@ import {
   type BattleAction,
   type BattleOutcome,
 } from '../logic/battle';
-import { applyBattleResult, type GameState } from '../logic/game-state';
+import { isBoss } from '../logic/boss';
+import { applyBattleResult, type GameState, type VictoryReward } from '../logic/game-state';
 import { burnTick } from '../logic/magic';
 import { BattleMenu } from '../ui/battle-menu';
 import type { BattleView } from '../ui/battle-view';
-import { eventStep, playSteps, victorySteps, type BattleStep } from './battle-steps';
+import { eventStep, playSteps, type BattleStep } from './battle-steps';
+import { victorySteps } from './victory-steps';
 
 // Ohjaa taistelun kulkua: pelaaja valitsee napista, logiikka laskee vuoron,
 // tapahtumat näytetään järjestyksessä ja lopuksi tulos tallennetaan peliin.
@@ -37,7 +39,8 @@ export class BattleDirector {
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly setup: BattleSetup,
-    private readonly onEnd: (outcome: FinishedOutcome) => void,
+    /** Kutsutaan taistelun lopuksi. reward on voiton palkinto, tai null. */
+    private readonly onEnd: (outcome: FinishedOutcome, reward: VictoryReward | null) => void,
   ) {
     this.menu = new BattleMenu(scene, {
       onChoose: (action) => this.choose(action),
@@ -45,8 +48,7 @@ export class BattleDirector {
     });
     setup.view.syncHp(setup.battle, false);
     setup.view.intro();
-    const intro = setup.mapEnemyIndex === null ? TEXT.battle.ambush : TEXT.battle.appears;
-    setup.view.say(intro(setup.enemy.name));
+    setup.view.say(introText(setup));
     this.menu.refresh(setup.battle, true);
     scene.time.addEvent({
       delay: MAGIC_RULES.burnTickMs,
@@ -107,6 +109,16 @@ export class BattleDirector {
       view.playDefeat('player');
       steps = [{ text: TEXT.battle.lost }];
     }
-    playSteps(this.scene, view, steps, () => this.onEnd(outcome));
+    playSteps(this.scene, view, steps, () => this.onEnd(outcome, reward));
   }
+}
+
+/** Taistelun aloitusviesti: loppuboss, väijytys tai tavallinen kartan vihollinen. */
+function introText(setup: BattleSetup): string {
+  const { enemy, mapEnemyIndex } = setup;
+  if (isBoss(enemy.id)) {
+    return TEXT.battle.bossAppears(enemy.name);
+  }
+  const intro = mapEnemyIndex === null ? TEXT.battle.ambush : TEXT.battle.appears;
+  return intro(enemy.name);
 }

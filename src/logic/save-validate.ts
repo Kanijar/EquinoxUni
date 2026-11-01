@@ -1,4 +1,5 @@
 import { ITEMS, MAP_ENEMIES, TOWNS, WORLD } from '../data';
+import { FINAL_BOSS } from '../data/boss';
 import { GEAR_SLOTS } from '../data/items';
 import { PLAYER } from '../data/player';
 import type { EyeColor } from '../data/types';
@@ -144,6 +145,14 @@ function readRespawning(value: unknown, defeated: readonly number[]): RespawnTim
   return timers;
 }
 
+/** Loppubossin tila. Puuttuva tai virheellinen = alusta (laskuri 0, ei voitettu). */
+function readBoss(value: RawRecord): { bossProgress: number; bossDefeated: boolean } {
+  const bossDefeated = value['bossDefeated'] === true;
+  const raw = value['bossProgress'];
+  const progress = isCount(raw) ? Math.min(raw, FINAL_BOSS.unlockCount) : 0;
+  return { bossProgress: bossDefeated ? FINAL_BOSS.unlockCount : progress, bossDefeated };
+}
+
 /** Lukee pelin tilan. Palauttaa null, jos tila on rikki. */
 export function readGameState(value: unknown): GameState | null {
   if (!isRecord(value) || !isCount(value['hp']) || !isCount(value['xp'])) {
@@ -168,6 +177,8 @@ export function readGameState(value: unknown): GameState | null {
     defeated,
     respawning,
     eyeColor: readEyeColor(value['eyeColor']),
+    ...readBoss(value),
+    completed: value['completed'] === true,
   };
   // Elämä pysyy rajoissa: vähintään 1, enintään maksimielämä.
   state.hp = Math.min(Math.max(1, state.hp), playerStats(state).maxHp);

@@ -3,7 +3,8 @@ import { COLORS, FONT } from '../config/game-config';
 import { TEXT } from '../i18n/fi';
 import { XpBar } from './xp-bar';
 
-// Karttanäkymän yläreunan tiedot: elämäpalkki, KP-palkki ja taso, juomat ja paikkakunta.
+// Karttanäkymän yläreunan tiedot: elämäpalkki, KP-palkki ja taso, juomat, paikkakunta
+// ja loppubossin tilanne (peikkolaskuri).
 
 const BAR_WIDTH = 80;
 const BAR_HEIGHT = 6;
@@ -18,6 +19,8 @@ export interface HudInfo {
   readonly potions: number;
   readonly enemiesLeft: number;
   readonly townName: string;
+  /** Loppubossin tilanne (esim. "Peikot 3/5"), tai tyhjä, kun boss on voitettu. */
+  readonly bossText: string;
 }
 
 export class Hud {
@@ -26,6 +29,7 @@ export class Hud {
   private readonly xpBar: XpBar;
   private readonly itemText: Phaser.GameObjects.Text;
   private readonly townText: Phaser.GameObjects.Text;
+  private readonly bossText: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene) {
     const width = scene.scale.width;
@@ -51,6 +55,8 @@ export class Hud {
     });
     this.itemText = this.addText(scene, width - MARGIN, MARGIN + BAR_HEIGHT + 2 + LINE, 1);
     this.townText = this.addText(scene, width / 2, MARGIN, 0.5).setFontSize(FONT.medium);
+    const bossY = MARGIN + BAR_HEIGHT + 2 + LINE * 2;
+    this.bossText = this.addText(scene, width - MARGIN, bossY, 1).setColor(COLORS.critText);
   }
 
   update(info: HudInfo): void {
@@ -61,6 +67,7 @@ export class Hud {
       `${TEXT.hud.potions(info.potions)}  ${TEXT.hud.enemiesLeft(info.enemiesLeft)}`,
     );
     this.townText.setText(info.townName);
+    this.bossText.setText(info.bossText);
   }
 
   private addText(

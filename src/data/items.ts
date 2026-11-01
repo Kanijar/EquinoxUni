@@ -55,6 +55,16 @@ export const ITEMS: readonly ItemDef[] = [
     slot: 'neck',
     bonus: { defense: 2, maxHp: 5 },
   },
+  {
+    // Loppubossin (Peikkokuningas) pudotus: harvinainen, vain kerran saatava viitta.
+    id: 'king-cloak',
+    name: 'Kuninkaan viitta',
+    description: 'Peikkokuninkaan viitta. Sitkeä ja lämmin!',
+    kind: 'gear',
+    sprite: 'king-cloak',
+    slot: 'body',
+    bonus: { defense: 4, maxHp: 20 },
+  },
 ];
 
 /** Varustepaikat repussa tässä järjestyksessä: käsi (ase), vartalo (vaatteet), kaula (koru). */

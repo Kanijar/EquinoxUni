@@ -56,6 +56,20 @@ export const BATTLE_BACKDROPS: Readonly<Record<BattleBackdropId, BattleBackdropD
     path: '#b58b5a',
     weather: null,
   },
+  // Loppubossin tausta (EnemyDef.backdrop): tunturin huippu yöllä revontulten alla.
+  summit: {
+    id: 'summit',
+    sky: ['#070b1f', '#0b1230', '#111a40', '#18264f', '#22355f', '#2f4670'],
+    sun: { x: 36, y: 20, radius: 6, color: '#f4f1d8' },
+    hills: { color: '#2b3956', height: 48, peaks: true, cap: '#cfdcf2' },
+    trees: null,
+    houses: 0,
+    ground: ['#b9c7e0', '#aebdd8', '#a3b3d0', '#98a9c8', '#8d9fc0', '#8295b8'],
+    speckles: ['#e6eeff', '#6f82a8'],
+    path: null,
+    weather: { kind: 'fall', colors: [0xffffff, 0xbfe8ff], count: 30 },
+    aurora: ['#3dffa0', '#2fd6c8', '#9b6bff'],
+  },
 };
 
 /** Mikä tausta näytetään missäkin maastossa. Tie kulkee kylien välillä. */

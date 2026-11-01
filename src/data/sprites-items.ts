@@ -114,4 +114,27 @@ export const ITEM_SPRITES: readonly SpriteDef[] = [
       '................',
     ],
   },
+  {
+    // Loppubossin pudotus: Peikkokuninkaan purppuraviitta kultareunuksin (data/items.ts).
+    id: 'king-cloak',
+    palette: { k: '#1a0f24', f: '#6a3a86', m: '#43245a', y: '#ffd23f', r: '#e0303a' },
+    rows: [
+      '................',
+      '................',
+      '.....kkkkkk.....',
+      '....kyyyryyk....',
+      '...kffyyyyffk...',
+      '..kfffmyymfffk..',
+      '..kffmffffmffk..',
+      '.kfffmffffmfffk.',
+      '.kffmffffffmffk.',
+      '.kffmffffffmffk.',
+      'kfffmffffffmfffk',
+      'kffmffffffffmffk',
+      'kffmffffffffmffk',
+      'kyyyyyyyyyyyyyyk',
+      '.kkkkkkkkkkkkkk.',
+      '................',
+    ],
+  },
 ];

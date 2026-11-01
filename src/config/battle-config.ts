@@ -12,6 +12,13 @@ export const BATTLE_STAGE = {
   enemy: { x: 362, y: 152 },
   /** Hahmojen koko: 16 px sprite × 5 = 80 px. */
   spriteScale: 5,
+  /** Tavallisen hahmospriten koko pikseleinä (varjon koko on mitoitettu tälle). */
+  baseSpritePx: 16,
+  /**
+   * Suurin hahmon korkeus näyttämöllä. Isompi sprite (esim. 24 px loppuboss) saa pienemmän
+   * kokonaislukukertoimen (24 × 4 = 96 px), jottei se osu nimikylttiin.
+   */
+  maxFighterPx: 100,
   shadow: { width: 64, height: 12, color: 0x000000, alpha: 0.3 },
   /** Taistelun alussa hahmot liukuvat paikalleen ruudun reunoilta (kun siirtymä on puolivälissä). */
   enter: { distancePx: 150, ms: 420, delayMs: 220 },

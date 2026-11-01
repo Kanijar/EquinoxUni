@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { PROGRESSION } from '../src/data/rules';
 import { TEXT } from '../src/i18n/fi';
+import { bossName } from '../src/logic/boss';
 import type { VictoryReward } from '../src/logic/game-state';
-import { victorySteps } from '../src/systems/battle-steps';
+import { victorySteps } from '../src/systems/victory-steps';
 import type { BattleView } from '../src/ui/battle-view';
 
 // Voiton jälkeiset viestit: pelaaja näkee, paljonko KP:tä puuttuu seuraavasta tasosta
@@ -68,5 +69,29 @@ describe('voiton viestit', () => {
     };
     const texts = victorySteps(reward, 'Hiisi', view).map((step) => step.text);
     expect(texts).toContain(TEXT.battle.skillPoints(3));
+  });
+
+  it('kertoo peikkolaskurin, bossin heräämisen ja bossin pudotukset', () => {
+    const { view } = fakeView();
+    const base: VictoryReward = {
+      xp: 35,
+      totalXp: 100,
+      leveledUp: false,
+      level: 5,
+      skillPoints: 0,
+    };
+    const progress = victorySteps(
+      { ...base, boss: { kind: 'progress', count: 3, needed: 5 } },
+      'Peikko',
+      view,
+    );
+    expect(progress.map((step) => step.text)).toContain(TEXT.boss.progress(3, 5));
+    const awakened = victorySteps({ ...base, boss: { kind: 'awakened' } }, 'Peikko', view);
+    expect(awakened.map((step) => step.text)).toContain(TEXT.boss.awakenedBattle(bossName()));
+    const drops = ['king-cloak', 'potion'];
+    const loot = victorySteps({ ...base, drops }, 'Kuningas', view).map((step) => step.text);
+    expect(loot).toContain(TEXT.battle.drop('Kuninkaan viitta'));
+    expect(loot).toContain(TEXT.battle.drop('Parannusjuoma'));
+    expect(loot).toContain(TEXT.battle.gearHint);
   });
 });

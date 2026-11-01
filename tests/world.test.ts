@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MAP_ENEMIES, TOWNS, WORLD, getTown } from '../src/data';
+import { FINAL_BOSS } from '../src/data/boss';
 import { geoToTile } from '../src/logic/geo';
 import type { Vec2 } from '../src/logic/vector';
 import {
@@ -81,6 +82,14 @@ describe('Suomen kartta', () => {
       expect(townAt(WORLD, tile)).toBeUndefined();
     },
   );
+
+  it('loppuboss odottaa Lapissa paikassa, johon pääsee kävellen', () => {
+    const tile = geoToTile(FINAL_BOSS, WORLD.projection);
+    expect(isWalkable(grid, tile)).toBe(true);
+    expect(reachable.has(key(tile))).toBe(true);
+    expect(townAt(WORLD, tile)).toBeUndefined();
+    expect(terrainAt(grid, tile)).toBe('snow');
+  });
 
   it('kukaan vihollinen ei ole aivan aloituspaikan vieressä', () => {
     for (const spawn of MAP_ENEMIES) {

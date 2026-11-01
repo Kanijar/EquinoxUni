@@ -1,4 +1,6 @@
 import { SAVE_VERSION } from '../config/persistence';
+import { MAP_ENEMIES } from '../data';
+import { FINAL_BOSS } from '../data/boss';
 import { PLAYER } from '../data/player';
 import type { GameState } from './game-state';
 import { parseJson } from './key-value-store';
@@ -32,6 +34,7 @@ export const SAVE_MIGRATIONS: Readonly<Record<number, (save: RawSave) => RawSave
   1: addRespawnTimers,
   2: addEyeColor,
   3: addEquipment,
+  4: addBossProgress,
 };
 
 /**
@@ -69,6 +72,25 @@ function addEyeColor(save: RawSave): RawSave {
 function addEquipment(save: RawSave): RawSave {
   const state = save['state'];
   return isRecord(state) ? { ...save, state: { ...state, equipped: {} } } : save;
+}
+
+/**
+ * Versio 4 → 5: loppuboss. Peikkolaskuri alkaa niistä tunturipeikoista, jotka on jo voitettu
+ * (GameState.defeated), joten vanhan tallennuksen peikot eivät mene hukkaan. Boss ei ole
+ * vielä voitettu, eikä läpäisyä ole juhlittu (vanha peli loppui läpäisyyn, joten sitä ei
+ * voinut tallentaa sen jälkeen).
+ */
+function addBossProgress(save: RawSave): RawSave {
+  const state = save['state'];
+  if (!isRecord(state)) {
+    return save;
+  }
+  const defeated = Array.isArray(state['defeated']) ? state['defeated'] : [];
+  const trolls = MAP_ENEMIES.filter(
+    (spawn, index) => spawn.enemy === FINAL_BOSS.unlockEnemy && defeated.includes(index),
+  ).length;
+  const bossProgress = Math.min(trolls, FINAL_BOSS.unlockCount);
+  return { ...save, state: { ...state, bossProgress, bossDefeated: false, completed: false } };
 }
 
 export function encodeSave(state: GameState, meta: SaveMeta): string {

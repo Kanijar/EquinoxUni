@@ -3,6 +3,7 @@ import { PLAYER } from '../data/player';
 import { WORLD } from '../data/world';
 import type { EnemyDef, EyeColor, ItemStack, PlayerStats, SkillId } from '../data/types';
 import { recoverStolen, type Battle, type Rng } from './battle';
+import { recordBossVictory, type BossNews, type BossProgress } from './boss';
 import type { Fighter } from './combat';
 import { rollDrops } from './drops';
 import { applyGear, ownsItem, type Equipped } from './equipment';
@@ -24,7 +25,7 @@ import type { Vec2 } from './vector';
 // Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
 // tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
-export interface GameState {
+export interface GameState extends BossProgress {
   hp: number;
   xp: number;
   /** Kuhunkin kykyyn käytetyt kykypisteet. Käyttämättömät: unspentSkillPoints(). */
@@ -49,6 +50,11 @@ export interface GameState {
   readonly respawning: RespawnTimer[];
   /** Sankarin silmien väri (data/player.ts eyeSprites). Alkuruudun lima muuttaa sen. */
   eyeColor: EyeColor;
+  /**
+   * Onko läpäisy (jokainen karttavihollinen voitettu ainakin kerran) jo juhlittu
+   * voittoruudulla. Peli jatkuu läpäisyn jälkeen, ja voittoruutu näytetään vain kerran.
+   */
+  completed: boolean;
 }
 
 /**
@@ -71,6 +77,9 @@ export function createNewGame(startXp = 0): GameState {
     defeated: [],
     respawning: [],
     eyeColor: PLAYER.eyeColor,
+    bossProgress: 0,
+    bossDefeated: false,
+    completed: false,
   };
 }
 
@@ -82,6 +91,18 @@ export function playerSprite(state: GameState): string {
 /** Karttaviholliset, joita ei ole vielä voitettu kertaakaan. */
 export function enemiesToBeat(state: GameState): number {
   return MAP_ENEMIES.length - state.defeated.length;
+}
+
+/**
+ * Läpäisy: palauttaa true kerran, kun jokainen karttavihollinen on voitettu ainakin kerran
+ * (voittoruutu näytetään). Sen jälkeen false, ja peli jatkuu kartalla.
+ */
+export function celebrateCompletion(state: GameState): boolean {
+  if (state.completed || enemiesToBeat(state) > 0) {
+    return false;
+  }
+  state.completed = true;
+  return true;
 }
 
 /** Merkitsee karttavihollisen voitetuksi: se lähtee kartalta ja palaa palautusajan jälkeen. */
@@ -152,6 +173,8 @@ export interface VictoryReward {
   readonly skillPoints: number;
   /** Esineet, jotka vihollinen pudotti (logic/drops.ts). Puuttuu, jos mitään ei pudonnut. */
   readonly drops?: readonly string[];
+  /** Bossin eteneminen: peikkolaskuri kasvoi, boss heräsi tai boss voitettiin (logic/boss.ts). */
+  readonly boss?: BossNews;
   /** Esineet, jotka vihollinen oli varastanut ja jotka saatiin takaisin. */
   readonly recovered?: readonly ItemStack[];
 }
@@ -189,6 +212,7 @@ export function grantVictory(
     markDefeated(state, mapEnemyIndex, enemy);
   }
   const drops = collectDrops(state, enemy, rng);
+  const boss = recordBossVictory(state, enemy.id);
   const level = playerLevel(state);
   const leveledUp = level > before;
   if (leveledUp) {
@@ -196,7 +220,8 @@ export function grantVictory(
   }
   const skillPoints = skillPointsEarned(level) - skillPointsEarned(before);
   const reward = { xp: enemy.xp, totalXp: state.xp, leveledUp, level, skillPoints };
-  return drops.length > 0 ? { ...reward, drops } : reward;
+  const withDrops = drops.length > 0 ? { ...reward, drops } : reward;
+  return boss ? { ...withDrops, boss } : withDrops;
 }
 
 /**

@@ -17,8 +17,9 @@ export const SAVE_SLOT_COUNT = 3;
  * Versio 2: voitetut viholliset palaavat kartalle (GameState.respawning).
  * Versio 3: sankarin silmien väri (GameState.eyeColor).
  * Versio 4: reppu ja varusteet (GameState.equipped).
+ * Versio 5: loppuboss (GameState.bossProgress, bossDefeated) ja läpäisyn voittoruutu (completed).
  */
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 
 /** Säädettävän asetuksen rajat prosentteina. */
 export interface SettingRange {

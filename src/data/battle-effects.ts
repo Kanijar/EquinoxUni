@@ -90,6 +90,26 @@ export const PARTICLE_BURSTS = {
     gravity: -20,
     angle: { min: -170, max: -100 },
   },
+  /** Loppubossin lumimyrsky: lumihiutaleet pyyhkäisevät pelaajaa kohti (vasemmalle). */
+  storm: {
+    count: 22,
+    colors: [0xffffff, 0xcfe8ff, 0x9fd0ff],
+    speed: { min: 120, max: 240 },
+    lifeMs: 520,
+    size: 2,
+    gravity: 40,
+    angle: { min: 165, max: 195 },
+  },
+  /** Loppuboss valmistelee voimaiskua: punaiset kipinät nousevat. */
+  charge: {
+    count: 12,
+    colors: [0xff5a3c, 0xffd23f],
+    speed: { min: 30, max: 80 },
+    lifeMs: 500,
+    size: 2,
+    gravity: -60,
+    angle: { min: -150, max: -30 },
+  },
 } as const satisfies Record<string, ParticleBurstDef>;
 
 export type ParticleBurstId = keyof typeof PARTICLE_BURSTS;

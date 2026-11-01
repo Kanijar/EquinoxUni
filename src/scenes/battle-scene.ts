@@ -4,13 +4,20 @@ import { getEnemy } from '../data';
 import { PLAYER } from '../data/player';
 import type { TerrainId } from '../data/types';
 import { createBattle, enemyFighter } from '../logic/battle';
-import { backdropForTerrain } from '../logic/battle-look';
-import { playerFighter, playerSprite, type GameState } from '../logic/game-state';
+import { backdropForBattle } from '../logic/battle-look';
+import { bossName } from '../logic/boss';
+import {
+  playerFighter,
+  playerSprite,
+  type GameState,
+  type VictoryReward,
+} from '../logic/game-state';
 import { reviveAtLastTown } from '../logic/town-visits';
 import { BattleDirector, type FinishedOutcome } from '../systems/battle-director';
 import { TEXT } from '../i18n/fi';
 import { BattleView } from '../ui/battle-view';
 import { coverScreen, revealScreen } from '../ui/screen-wipe';
+import type { VictorySceneData } from './victory-scene';
 import type { WorldSceneData } from './world-scene';
 
 // Vuoropohjainen taistelu. Alkaa, kun kartalla vihollinen koskettaa pelaajaa
@@ -39,7 +46,7 @@ export class BattleScene extends Phaser.Scene {
       playerFighter(data.state),
       enemyFighter(enemy),
       data.state.inventory,
-      enemy.stealChance,
+      enemy,
     );
     const view = new BattleView(this, {
       playerName: PLAYER.name,
@@ -47,16 +54,24 @@ export class BattleScene extends Phaser.Scene {
       playerSprite: playerSprite(data.state),
       enemyName: enemy.name,
       enemySprite: enemy.sprite,
-      backdrop: backdropForTerrain(data.terrain),
+      backdrop: backdropForBattle(data.terrain, enemy),
     });
     const setup = { state: data.state, battle, enemy, mapEnemyIndex: data.mapEnemyIndex, view };
-    new BattleDirector(this, setup, (outcome) => this.end(data.state, outcome));
+    new BattleDirector(this, setup, (outcome, reward) => this.end(data.state, outcome, reward));
     revealScreen(this);
   }
 
-  /** Taistelun jälkeen ruutu pikselöityy ja kartta palaa. */
-  private end(state: GameState, outcome: FinishedOutcome): void {
-    const next = outcome === 'lost' ? this.revive(state) : afterBattle(state, outcome);
+  /**
+   * Taistelun jälkeen ruutu pikselöityy ja kartta palaa. Loppubossin voiton jälkeen
+   * näytetään ensin voittoruutu, josta peli jatkuu kartalle.
+   */
+  private end(state: GameState, outcome: FinishedOutcome, reward: VictoryReward | null): void {
+    if (reward?.boss?.kind === 'defeated') {
+      const victory: VictorySceneData = { state, kind: 'boss' };
+      coverScreen(this, () => this.scene.start(SCENES.victory, victory));
+      return;
+    }
+    const next = outcome === 'lost' ? this.revive(state) : afterBattle(state, outcome, reward);
     coverScreen(this, () => this.scene.start(SCENES.world, next));
   }
 
@@ -72,8 +87,22 @@ export class BattleScene extends Phaser.Scene {
   }
 }
 
-function afterBattle(state: GameState, outcome: FinishedOutcome): WorldSceneData {
+function afterBattle(
+  state: GameState,
+  outcome: FinishedOutcome,
+  reward: VictoryReward | null,
+): WorldSceneData {
   const graceMs =
     outcome === 'fled' ? WORLD_VIEW.graceMs.afterFlee : WORLD_VIEW.graceMs.afterBattle;
+  // Viides tunturipeikko herätti bossin: kartalla kerrotaan, missä se odottaa.
+  if (reward?.boss?.kind === 'awakened') {
+    return {
+      state,
+      graceMs,
+      fromBattle: true,
+      message: TEXT.boss.awakenedMap(bossName()),
+      bossAwakened: true,
+    };
+  }
   return { state, graceMs, fromBattle: true };
 }

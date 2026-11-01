@@ -16,6 +16,8 @@ export class FighterSprite {
   private idleTween: Phaser.Tweens.Tween | null = null;
   /** 1 = katsoo oikealle (pelaaja), -1 = vasemmalle (vihollinen). */
   private readonly facing: 1 | -1;
+  /** Spriten suurennos: tavallisesti 5, isolla bossilla pienempi (fighterScale). */
+  private readonly scale: number;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -24,15 +26,16 @@ export class FighterSprite {
   ) {
     this.home = side === 'player' ? BATTLE_STAGE.player : BATTLE_STAGE.enemy;
     this.facing = side === 'player' ? 1 : -1;
+    this.sprite = scene.add.sprite(this.home.x, this.home.y, spriteKey).setOrigin(0.5, 0.92);
+    this.scale = fighterScale(this.sprite.height);
+    this.sprite.setScale(this.scale).setDepth(FIGHTER_DEPTH);
     const { width, height, color, alpha } = BATTLE_STAGE.shadow;
+    // Varjo on mitoitettu tavalliselle hahmolle: isompi hahmo saa leveämmän varjon.
+    const normalPx = BATTLE_STAGE.baseSpritePx * BATTLE_STAGE.spriteScale;
+    const shadowWidth = (width * this.sprite.displayWidth) / normalPx;
     this.shadow = scene.add
-      .ellipse(this.home.x, this.home.y, width, height, color, alpha)
+      .ellipse(this.home.x, this.home.y, shadowWidth, height, color, alpha)
       .setDepth(SHADOW_DEPTH);
-    this.sprite = scene.add
-      .sprite(this.home.x, this.home.y, spriteKey)
-      .setOrigin(0.5, 0.92)
-      .setScale(BATTLE_STAGE.spriteScale)
-      .setDepth(FIGHTER_DEPTH);
   }
 
   /** Hahmon keskikohta (efektit ja numerot). */
@@ -60,7 +63,7 @@ export class FighterSprite {
   startIdle(): void {
     this.idleTween?.stop();
     const { squash, ms } = BATTLE_STAGE.idle;
-    const scale = BATTLE_STAGE.spriteScale;
+    const scale = this.scale;
     this.sprite.setScale(scale);
     this.idleTween = this.scene.tweens.add({
       targets: this.sprite,
@@ -194,4 +197,10 @@ export class FighterSprite {
       onComplete: () => this.sprite.setFlipX(false).setAngle(0).setX(this.home.x),
     });
   }
+}
+
+/** Suurin kokonaislukukerroin, jolla hahmo mahtuu näyttämölle (enintään spriteScale). */
+function fighterScale(heightPx: number): number {
+  const fit = Math.floor(BATTLE_STAGE.maxFighterPx / Math.max(1, heightPx));
+  return Math.max(1, Math.min(BATTLE_STAGE.spriteScale, fit));
 }

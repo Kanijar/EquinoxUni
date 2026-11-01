@@ -83,8 +83,8 @@ scenes  →  systems / ui  →  entities  →  logic
   Ruutukoko 16 px, hahmot 16 × 16 px.
 - **Scenet:** `BootScene` (luo/lataa grafiikat, ottaa asetukset käyttöön) → `MenuScene`
   (alkuruutu: PELAA, LATAA, ASETUKSET, LÄHDE) → `WorldScene` (Suomen kartta) ⇄ `BattleScene`
-  (vuoropohjainen taistelu) → `GameOverScene` (kun jokainen karttavihollinen on voitettu ainakin
-  kerran) → alkuruutu.
+  (vuoropohjainen taistelu) → `VictoryScene` (voittoruutu: loppuboss voitettu tai jokainen
+  karttavihollinen voitettu ainakin kerran) → takaisin kartalle. Peli ei lopu voittoon.
   Paikkakunnassa `WorldScene` ⇄ `SkillsScene` (kykypisteiden jako) ja `WorldScene` ⇄
   `SavesScene` (tallennus). Alkuruudusta `SettingsScene` (valo ja äänet), `SavesScene` (lataus)
   ja `ExitScene` (LÄHDE).
@@ -99,6 +99,20 @@ scenes  →  systems / ui  →  entities  →  logic
   Ajastimet ovat `GameState.respawning`issa (tallentuvat), säännöt `logic/respawn.ts` (kello
   annetaan ulkoa), kartalle palautus `systems/map-encounters.ts`. `GameState.defeated` kertoo,
   ketkä on voitettu ainakin kerran; HUD näyttää vielä voittamattomien määrän.
+- **Loppuboss:** Peikkokuningas (`data/boss.ts`, vihollisena `data/enemies.ts`) herää, kun
+  pelaaja on voittanut viisi tunturipeikkoa (sama peikko voi olla mukana monta kertaa, koska
+  peikot palaavat). Laskuri on `GameState.bossProgress`, ja HUD näyttää "Peikot 3/5". Herännyt
+  boss odottaa Käsivarren tuntureilla isona 24 px spritenä punaisen hehkun keskellä, ja ruudun
+  reunan nuoli (`ui/boss-pointer.ts`) näyttää suunnan. Boss ei ole `MAP_ENEMIES`-listassa,
+  joten se ei vaikuta "Voittamatta"-laskuriin eikä palaa respawnina: voiton jälkeen
+  `GameState.bossDefeated` on true. Bossin erikoisliikkeet ovat datana (`EnemyDef.moves`):
+  voimaisku valmistellaan vuoroa ennen (PUOLUSTA puolittaa sen) ja lumimyrsky ohittaa
+  puolustuksen ja sammuttaa tulipallon liekit. Säännöt `logic/boss.ts` ja `logic/enemy-turn.ts`.
+  Voitosta saa 800 KP, harvinaisen varusteen Kuninkaan viitta ja juoman. Voiton jälkeen
+  näytetään voittoruutu, ja peli jatkuu kartalla.
+- **Läpäisy:** kun jokainen karttavihollinen on voitettu ainakin kerran ("Voittamatta 0"),
+  voittoruutu näytetään kerran (`GameState.completed`), ja peli jatkuu kartalla. Ruutu kertoo,
+  odottaako loppuboss vielä.
 - **Suomen kartta:** `logic/world-grid.ts` rakentaa ruudukon `data/finland.ts`:n rajoista
   (oikeat koordinaatit, 1 ruutu = 8 km), järvistä ja maastovyöhykkeistä sekä vetää tiet
   paikkakuntien välille. `systems/world-map.ts` piirtää ruudukon Phaserin tilemapiksi, jossa meri
@@ -234,7 +248,7 @@ kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 
 **Vaihe 3 – Sisältö ja viimeistely.**
 
-- Pomotaistelut (uusi tekoälytyyppi `logic/`-kansioon)
+- Pomotaistelut ✓ (loppuboss Peikkokuningas, erikoisliikkeet `EnemyDef.moves`)
 - Oikeat pikselikuvat ja musiikki
 - PWA-offline-tila (`vite-plugin-pwa`), musiikki (asetukset ✓)
 
