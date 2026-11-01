@@ -2,7 +2,7 @@ import type Phaser from 'phaser';
 import { TILE_SIZE } from '../config/game-config';
 import { getSprite, TERRAINS, WORLD } from '../data';
 import type { TerrainId } from '../data/types';
-import { buildWorldGrid, type WorldGrid } from '../logic/world-grid';
+import { buildWorldGrid, nearestWalkable, type WorldGrid } from '../logic/world-grid';
 import type { Vec2 } from '../logic/vector';
 import { createStripTexture } from './sprite-textures';
 
@@ -52,6 +52,16 @@ export function buildWorldMap(scene: Phaser.Scene, grid: WorldGrid): BuiltWorld 
 /** Ruutukoordinaatti → pikselikoordinaatti (ruudun keskipiste). */
 export function tileToWorld(tile: Vec2): Vec2 {
   return { x: tile.x * TILE_SIZE + TILE_SIZE / 2, y: tile.y * TILE_SIZE + TILE_SIZE / 2 };
+}
+
+/**
+ * Paikka, jossa sankari voi seistä: sama paikka, tai lähimmän kävelyruudun keskipiste,
+ * jos paikassa on este (esim. vanhan tallennuksen paikalle on tullut kivi).
+ */
+export function walkablePosition(grid: WorldGrid, pos: Vec2): Vec2 {
+  const tile = worldToTile(pos);
+  const free = nearestWalkable(grid, tile);
+  return free && (free.x !== tile.x || free.y !== tile.y) ? tileToWorld(free) : pos;
 }
 
 /** Pikselikoordinaatti → ruutu. */

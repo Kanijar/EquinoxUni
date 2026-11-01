@@ -188,7 +188,7 @@ export interface LakeDef {
   readonly circles: readonly (GeoPoint & { readonly radiusKm: number })[];
 }
 
-export type TerrainId = 'sea' | 'lake' | 'field' | 'forest' | 'snow' | 'road';
+export type TerrainId = 'sea' | 'lake' | 'field' | 'forest' | 'snow' | 'road' | 'rock';
 
 export interface TerrainDef {
   readonly id: TerrainId;
@@ -232,6 +232,28 @@ export interface WorldDef {
   readonly roads: readonly (readonly [string, string])[];
   /** Paikkakunta, josta seikkailu alkaa. */
   readonly startTown: string;
+  /** Kivet, joiden läpi ei pääse (logic/rocks.ts). */
+  readonly rocks: RockRule;
+  /** Paikat, joiden ympärille ei tule kiviä: vihollisten ja loppubossin paikat. */
+  readonly keepClear: readonly GeoPoint[];
+}
+
+/**
+ * Kivet kartalla. Ne arvotaan kartan ruuduista aina samalla tavalla (seed), joten ne
+ * ovat joka pelissä samoissa paikoissa ja toimivat millä tahansa kartalla.
+ */
+export interface RockRule {
+  /** Maasto, johon kiviä tulee (metsä). */
+  readonly onTerrain: TerrainId;
+  /** Kuinka suuri osa maaston ruuduista on kiviehdokkaita (0..1). */
+  readonly share: number;
+  /**
+   * Kuinka monen ruudun säteellä kiven ympärillä pitää olla vapaata kävelymaata
+   * (ei vettä, kiveä, paikkakuntaa tai vihollisen paikkaa). Näin kiven voi aina kiertää.
+   */
+  readonly clearRadius: number;
+  /** Arvonnan siemen: eri luku = kivet eri paikoissa. */
+  readonly seed: number;
 }
 
 /** Kartalla kulkeva vihollinen. */

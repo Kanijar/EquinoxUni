@@ -2,10 +2,15 @@ import { TERRAINS } from '../data/world';
 import type { GeoPoint, TerrainBand, TerrainId, TownDef, WorldDef } from '../data/types';
 import { distanceKm, geoToTile, gridSize, isInsidePolygon, tileToGeo } from './geo';
 import { gridLine } from './grid-line';
+import { placeRocks } from './rocks';
+import { tileNoise } from './tile-noise';
 import type { Vec2 } from './vector';
 
 // Rakentaa Suomen kartan ruudukoksi data/world.ts:n tiedoista:
-// meri rajojen ulkopuolelle, järvet, maastovyöhykkeet ja tiet paikkakuntien välille.
+// meri rajojen ulkopuolelle, järvet, maastovyöhykkeet, tiet paikkakuntien välille ja
+// lopuksi kivet metsään (logic/rocks.ts).
+
+export { tileNoise } from './tile-noise';
 
 export interface WorldGrid {
   readonly width: number;
@@ -25,6 +30,11 @@ export function buildWorldGrid(world: WorldDef): WorldGrid {
     cells.push(row);
   }
   drawRoads(world, cells);
+  const keepClear = [
+    ...world.towns.map((town) => townTile(world, town)),
+    ...world.keepClear.map((point) => geoToTile(point, world.projection)),
+  ];
+  placeRocks(cells, world.rocks, keepClear);
   return { width, height, cells };
 }
 
@@ -37,6 +47,34 @@ export function isWalkable(grid: WorldGrid, tile: Vec2): boolean {
   return TERRAINS.find((terrain) => terrain.id === id)?.walkable ?? false;
 }
 
+/**
+ * Lähin ruutu, jolla voi kävellä (sama ruutu, jos sillä voi). Vanhassa tallennuksessa sankari
+ * voi seistä kohdassa, johon on myöhemmin tullut kivi: hänet siirretään viereen.
+ */
+export function nearestWalkable(grid: WorldGrid, tile: Vec2): Vec2 | undefined {
+  const maxRadius = Math.max(grid.width, grid.height);
+  for (let r = 0; r <= maxRadius; r++) {
+    const found = ringTiles(tile, r).find((t) => isWalkable(grid, t));
+    if (found) {
+      return found;
+    }
+  }
+  return undefined;
+}
+
+/** Ruudut, jotka ovat tasan r ruudun päässä (neliön reuna). */
+function ringTiles(center: Vec2, r: number): Vec2[] {
+  const tiles: Vec2[] = [];
+  for (let dy = -r; dy <= r; dy++) {
+    for (let dx = -r; dx <= r; dx++) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) === r) {
+        tiles.push({ x: center.x + dx, y: center.y + dy });
+      }
+    }
+  }
+  return tiles;
+}
+
 export function townTile(world: WorldDef, town: TownDef): Vec2 {
   return geoToTile(town, world.projection);
 }
@@ -47,12 +85,6 @@ export function townAt(world: WorldDef, tile: Vec2): TownDef | undefined {
     const t = townTile(world, town);
     return t.x === tile.x && t.y === tile.y;
   });
-}
-
-/** Tasainen "satunnaisluku" 0..1 ruudulle. Sama ruutu antaa aina saman luvun. */
-export function tileNoise(x: number, y: number): number {
-  const hash = Math.imul(x, 73856093) ^ Math.imul(y, 19349663) ^ Math.imul(x + y, 83492791);
-  return ((hash >>> 0) % 1000) / 1000;
 }
 
 function baseTerrain(world: WorldDef, tile: Vec2): TerrainId {
