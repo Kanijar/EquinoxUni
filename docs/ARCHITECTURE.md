@@ -135,6 +135,11 @@ scenes  →  systems / ui  →  entities  →  logic
   (oikeat koordinaatit, 1 ruutu = 8 km), järvistä ja maastovyöhykkeistä sekä vetää tiet
   paikkakuntien välille. `systems/world-map.ts` piirtää ruudukon Phaserin tilemapiksi, jossa meri
   ja järvet ovat esteitä. Seikkailu alkaa Valkeakoskelta, ja paikkakunnassa elämä palautuu.
+- **Maaston hidastus:** maastotyypillä voi olla nopeuskerroin (`TerrainDef.speedFactor`,
+  `data/world.ts`). Metsässä sankari kulkee 60 % nopeudella, tiellä ja pellolla täysillä.
+  Kerroin luetaan sankarin ruudusta joka ruudunpäivityksessä (`logic/terrain-speed.ts`), joten
+  se toimii millä tahansa kartalla. Hidastavassa maastossa jaloista lentää lehtiä
+  (`ui/leaf-rustle.ts`). Viholliset ja väijytysten todennäköisyys (per ruutu) eivät muutu.
 - **Taistelu:** kun kartan vihollinen saa pelaajan kiinni, alkaa vuoropohjainen taistelu.
   Pelaaja valitsee HYÖKKÄÄ, PUOLUSTA, JUOMA tai PAKENE, sitten vihollinen vastaa.
   HYÖKKÄÄ avaa valinnan LYÖNTI tai TULIPALLO. Lyönti tekee hyökkäys − puolustus vahinkoa
