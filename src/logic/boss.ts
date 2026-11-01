@@ -1,7 +1,7 @@
 import { getEnemy } from '../data';
 import { FINAL_BOSS } from '../data/boss';
 import type { BossDef } from '../data/types';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 
 // Loppubossin eteneminen. Boss herää, kun pelaaja on voittanut tarpeeksi monta kertaa
 // bossin herättävän vihollisen (data/boss.ts: viisi tunturipeikkoa). Herännyt boss
@@ -23,7 +23,7 @@ export type BossNews =
 
 /** Bossin nimi pelaajalle (data/enemies.ts). */
 export function bossName(boss: BossDef = FINAL_BOSS): string {
-  return getEnemy(boss.enemy).name;
+  return TEXT.names.enemy(getEnemy(boss.enemy));
 }
 
 export function isBoss(enemyId: string, boss: BossDef = FINAL_BOSS): boolean {

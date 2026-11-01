@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 import { BUTTON, GAME_WIDTH, MENU_VIEW } from '../config/game-config';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { installOffer } from '../systems/install-prompt';
 import { TextButton } from './text-button';
 

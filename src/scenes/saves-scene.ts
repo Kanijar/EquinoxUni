@@ -9,7 +9,7 @@ import {
   SCENES,
   WORLD_VIEW,
 } from '../config/game-config';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import type { GameState } from '../logic/game-state';
 import { deleteSlot, listSlots, loadFromSlot, saveToSlot, slotNumbers } from '../logic/save-slots';
 import { browserStore } from '../systems/browser-storage';

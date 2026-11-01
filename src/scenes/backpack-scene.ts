@@ -10,7 +10,7 @@ import {
 import { getItem } from '../data';
 import { GEAR_SLOTS } from '../data/items';
 import type { GearSlot } from '../data/types';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import {
   canDrink,
   drinkFromBag,
@@ -132,7 +132,7 @@ export class BackpackScene extends Phaser.Scene {
     if (!selection || !id) {
       return;
     }
-    const name = getItem(id).name;
+    const name = TEXT.names.item(getItem(id));
     const action = selectionAction(this.state, selection);
     const gear = findGear(id);
     if (action === 'equip' && gear && equipFromBag(this.state, id)) {
@@ -183,8 +183,8 @@ export class BackpackScene extends Phaser.Scene {
       detail = TEXT.backpack.fullHp;
     }
     return {
-      name: item.name,
-      text: this.message ?? item.description,
+      name: TEXT.names.item(item),
+      text: this.message ?? TEXT.names.itemDescription(item),
       detail,
       action: action === null ? null : TEXT.backpack[action],
       actionEnabled: !drinkBlocked,

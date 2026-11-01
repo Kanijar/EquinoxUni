@@ -1,8 +1,22 @@
 import { GAME_INFO } from '../data/game-info';
-import type { GearSlot, GearStat, PlayerStats, SkillStat, StatBonus } from '../data/types';
+import { PLAYER } from '../data/player';
+import type {
+  EnemyDef,
+  GearSlot,
+  GearStat,
+  ItemDef,
+  PlayerStats,
+  SkillStat,
+  StatBonus,
+  TownDef,
+} from '../data/types';
+import { localDateParts, twoDigits, type DateParts } from './date-parts';
+import type { Language } from './language';
 
-// Kaikki pelaajalle näkyvät tekstit. Älä kirjoita tekstejä suoraan koodiin,
-// vaan lisää ne tänne ja käytä muodossa TEXT.menu.play.
+// Kaikki pelaajalle näkyvät tekstit suomeksi. Älä kirjoita tekstejä suoraan koodiin,
+// vaan lisää ne tänne ja käytä muodossa TEXT.menu.play (TEXT tulee i18n/text.ts:stä).
+// Sama teksti englanniksi kuuluu tiedostoon i18n/en.ts: sama avain, englanninkielinen
+// sisältö. TypeScript ja testi tests/i18n.test.ts huomaavat, jos jokin puuttuu.
 
 /** Kykyjen arvojen nimet kykypistenäkymässä ("+1 hyökkäys / piste"). */
 const STAT_NAMES: Readonly<Record<SkillStat, string>> = {
@@ -40,12 +54,17 @@ const decimal = (value: number): string => String(value).replace('.', ',');
 
 /** Tallennushetki muodossa "31.10. klo 14.05". */
 function formatTime(time: number): string {
-  const date = new Date(time);
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${date.getDate()}.${date.getMonth() + 1}. klo ${date.getHours()}.${minutes}`;
+  const { day, month, hour, minute } = localDateParts(time);
+  return `${day}.${month}. klo ${hour}.${twoDigits(minute)}`;
 }
 
-export const TEXT = {
+/** Kielten nimet asetuksissa. Kukin kieli omalla kielellään, jotta sen löytää aina. */
+export const LANGUAGE_NAMES: Readonly<Record<Language, string>> = {
+  fi: 'SUOMI',
+  en: 'ENGLISH',
+};
+
+export const FI = {
   /** Pelin nimi. Vaihda se tiedostossa data/game-info.ts, ei tässä. */
   gameTitle: GAME_INFO.name,
   menu: {
@@ -58,7 +77,8 @@ export const TEXT = {
     /** Versioteksti, kun numeroa ei saatu buildissa (esim. peli ladattu zip-tiedostona). */
     versionStageOnly: `Versio: ${GAME_INFO.version}`,
     /** Julkaisuaika versionumeron alla, esim. "Julkaistu 1.11.2026 klo 10.05". */
-    released: (date: string, clock: string): string => `Julkaistu ${date} klo ${clock}`,
+    released: ({ day, month, year, hour, minute }: DateParts): string =>
+      `Julkaistu ${day}.${month}.${year} klo ${hour}.${twoDigits(minute)}`,
     /** Omalla koneella (npm run dev) ajettava peli ei ole julkaistu versio. */
     devBuild: 'Kehitysversio',
     /** Oikean yläkulman nappi: asentaa pelin puhelimen aloitusnäytölle (PWA). */
@@ -74,6 +94,9 @@ export const TEXT = {
     soundOff: 'POIS',
     less: '-',
     more: '+',
+    /** Kielivalinta: napit SUOMI ja ENGLISH (LANGUAGE_NAMES). */
+    language: 'Kieli',
+    languageNames: LANGUAGE_NAMES,
     back: 'TAKAISIN',
   },
   saves: {
@@ -124,8 +147,8 @@ export const TEXT = {
     intro: 'Seikkailu alkaa Valkeakoskelta!',
     /** Alkuruudun suden salaisuus (logic/menu-secret.ts): näkyy vasta kartalla. */
     wolfBlessing: (level: number): string => `Susi siunasi sinut! Taso ${level}!`,
-    rest: (townAt: string): string => `Lepäsit ${townAt}. Elämä palautui!`,
-    revived: (townAt: string): string => `Kaaduit... heräsit ${townAt}. Elämä palautui!`,
+    rest: (town: TownDef): string => `Lepäsit ${town.nameAt}. Elämä palautui!`,
+    revived: (town: TownDef): string => `Kaaduit... heräsit ${town.nameAt}. Elämä palautui!`,
     skillPointsWaiting: (points: number): string =>
       `Sinulla on ${points} kykypistettä. Paina KYKYPISTEET.`,
   },
@@ -239,6 +262,17 @@ export const TEXT = {
     victoryBanner: 'VOITTO!',
     levelUpPopup: 'TASO NOUSI!',
   },
+  /**
+   * Sisällön nimet. Suomenkieliset nimet ovat data-tiedostoissa (data/enemies.ts,
+   * data/items.ts, data/towns.ts, data/player.ts), englanninkieliset i18n/en-content.ts:ssä.
+   */
+  names: {
+    player: PLAYER.name,
+    enemy: (enemy: EnemyDef): string => enemy.name,
+    item: (item: ItemDef): string => item.name,
+    itemDescription: (item: ItemDef): string => item.description,
+    town: (town: TownDef): string => town.name,
+  },
   /** Loitsujen nimet (data/spells.ts). */
   spells: {
     fireball: 'Tulipallo',
@@ -271,4 +305,7 @@ export const TEXT = {
     /** Kartalle palatessa. */
     continues: 'Seikkailu jatkuu!',
   },
-} as const;
+};
+
+/** Kaikkien kielten tekstien muoto: samat avaimet kuin suomeksi. */
+export type Texts = typeof FI;

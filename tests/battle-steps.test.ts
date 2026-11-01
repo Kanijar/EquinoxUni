@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { PROGRESSION } from '../src/data/rules';
-import { TEXT } from '../src/i18n/fi';
+import { TEXT } from '../src/i18n/text';
 import { bossName } from '../src/logic/boss';
 import type { VictoryReward } from '../src/logic/game-state';
 import { victorySteps } from '../src/systems/victory-steps';

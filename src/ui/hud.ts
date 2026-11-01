@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 import { COLORS, FONT } from '../config/game-config';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { XpBar } from './xp-bar';
 
 // Karttanäkymän yläreunan tiedot: elämäpalkki, KP-palkki ja taso, juomat, paikkakunta

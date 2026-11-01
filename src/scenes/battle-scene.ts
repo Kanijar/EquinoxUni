@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import { SCENES, WORLD_VIEW } from '../config/game-config';
 import { getEnemy } from '../data';
-import { PLAYER } from '../data/player';
 import type { TerrainId } from '../data/types';
 import { createBattle, enemyFighter } from '../logic/battle';
 import { backdropForBattle } from '../logic/battle-look';
@@ -14,7 +13,7 @@ import {
 } from '../logic/game-state';
 import { reviveAtLastTown } from '../logic/town-visits';
 import { BattleDirector, type FinishedOutcome } from '../systems/battle-director';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { BattleView } from '../ui/battle-view';
 import { coverScreen, revealScreen } from '../ui/screen-wipe';
 import type { VictorySceneData } from './victory-scene';
@@ -49,10 +48,10 @@ export class BattleScene extends Phaser.Scene {
       enemy,
     );
     const view = new BattleView(this, {
-      playerName: PLAYER.name,
+      playerName: TEXT.names.player,
       playerXp: data.state.xp,
       playerSprite: playerSprite(data.state),
-      enemyName: enemy.name,
+      enemyName: TEXT.names.enemy(enemy),
       enemySprite: enemy.sprite,
       backdrop: backdropForBattle(data.terrain, enemy),
     });
@@ -81,7 +80,7 @@ export class BattleScene extends Phaser.Scene {
     return {
       state,
       graceMs: WORLD_VIEW.graceMs.afterRevive,
-      message: TEXT.world.revived(town.nameAt),
+      message: TEXT.world.revived(town),
       fromBattle: true,
     };
   }

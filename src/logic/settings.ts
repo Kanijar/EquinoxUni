@@ -1,7 +1,9 @@
 import { SETTING_RANGES, STORAGE_KEYS, type SettingRange } from '../config/persistence';
+import { DEFAULT_LANGUAGE, parseLanguage, type Language } from '../i18n/language';
 import { parseJson, safeRead, safeWrite, type KeyValueStore } from './key-value-store';
 
-// Pelaajan asetukset: valon määrä (kirkkaus) ja äänet. Säilyvät selaimessa.
+// Pelaajan asetukset: valon määrä (kirkkaus), äänet ja kieli. Säilyvät selaimessa.
+// Asetukset ovat erillään tallennuksista, joten kielen vaihto ei koske tallennettuja pelejä.
 
 export interface Settings {
   /** Valon määrä prosentteina (100 = normaali). */
@@ -9,6 +11,8 @@ export interface Settings {
   /** Äänenvoimakkuus prosentteina. */
   readonly volume: number;
   readonly muted: boolean;
+  /** Pelin kieli: suomi tai englanti. */
+  readonly language: Language;
 }
 
 export type AdjustableSetting = keyof typeof SETTING_RANGES;
@@ -18,6 +22,7 @@ export function defaultSettings(): Settings {
     brightness: SETTING_RANGES.brightness.initial,
     volume: SETTING_RANGES.volume.initial,
     muted: false,
+    language: DEFAULT_LANGUAGE,
   };
 }
 
@@ -43,6 +48,7 @@ export function decodeSettings(text: string | null): Settings {
     brightness: readNumber(record['brightness'], SETTING_RANGES.brightness),
     volume: readNumber(record['volume'], SETTING_RANGES.volume),
     muted: record['muted'] === true,
+    language: parseLanguage(record['language']),
   };
 }
 
@@ -58,6 +64,11 @@ export function stepSetting(
 
 export function canStep(settings: Settings, key: AdjustableSetting, direction: 1 | -1): boolean {
   return stepSetting(settings, key, direction)[key] !== settings[key];
+}
+
+/** Vaihtaa pelin kielen. */
+export function chooseLanguage(settings: Settings, language: Language): Settings {
+  return { ...settings, language };
 }
 
 export function toggleMute(settings: Settings): Settings {

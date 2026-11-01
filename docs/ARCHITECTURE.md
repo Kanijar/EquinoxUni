@@ -8,7 +8,8 @@ koodin siistinä, vaikka sitä kirjoittaisi pääosin tekoäly.
 
 - **Peli:** pixelart-tyylinen 2D-seikkailu- ja taistelupeli nimeltä **Equinox Universe**.
   Nimi on määritelty vain tiedostossa `src/data/game-info.ts` (ks. luku 3).
-- **Pelaajat:** 12–15-vuotiaat suomalaiset pojat. Pelin kieli on suomi.
+- **Pelaajat:** 12–15-vuotiaat suomalaiset pojat. Pelin kieli on suomi, ja asetuksista voi
+  vaihtaa englantiin (luku 4, Kielet).
 - **Alusta:** Android-puhelimen verkkoselain (Chrome), vaakasuunta, kosketusohjaus.
   Asennus ei ole pakollista, mutta pelin voi asentaa Chromella aloitusnäytölle (PWA, luku 4).
 - **Kehitystapa:** pelin suunnittelija (Väinö) kertoo Claudelle uusista ominaisuuksista
@@ -41,7 +42,11 @@ public/                 Staattiset tiedostot sellaisenaan (myöhemmin kuvat ja �
 src/
   main.ts               Käynnistää Phaserin ja listaa scenet
   config/               Vakiot: resoluutio, ruutukoko, värit, fontit, scenejen nimet
-  i18n/fi.ts            KAIKKI pelaajalle näkyvät tekstit
+  i18n/                 KAIKKI pelaajalle näkyvät tekstit
+    fi.ts               suomeksi (oletus)
+    en.ts               englanniksi, samat avaimet kuin fi.ts:ssä
+    en-content.ts       vihollisten ja esineiden nimet englanniksi
+    text.ts             TEXT: tekstit valitulla kielellä
   data/                 Pelisisältö datana: viholliset, esineet, Suomen kartta, spritet
     types.ts            Sisällön tyypit (muokkaa ensin tätä, kun lisäät uuden kentän)
     game-info.ts        Pelin nimi, kehitysvaihe ja PWA-manifestin sisältö (niiden ainoa määrittelypaikka)
@@ -202,8 +207,20 @@ scenes  →  systems / ui  →  entities  →  logic
   kenttä niin, että vanha tallennus latautuu (oletusarvo `save-validate.ts`:ssä), tai nosta
   `SAVE_VERSION` ja lisää muunnos `SAVE_MIGRATIONS`-listaan.
 - **Asetukset:** valon määrä (CSS `brightness` pelin canvasiin) ja äänet (Phaserin
-  äänenvoimakkuus ja mykistys). Säännöt `logic/settings.ts`, käyttöönotto
+  äänenvoimakkuus ja mykistys) sekä kieli. Säännöt `logic/settings.ts`, käyttöönotto
   `systems/game-settings.ts`, rajat `config/persistence.ts`.
+- **Kielet:** suomi (oletus) ja englanti. Asetuksissa on napit SUOMI ja ENGLISH, kumpikin
+  omalla kielellään. Valinta on asetuksissa (`Settings.language`), ei tallennuksissa, joten
+  kielen vaihto ei koske tallennettuja pelejä, ja vanhat asetukset ilman kieltä ovat suomeksi.
+  Koodi käyttää aina `TEXT`iä (`i18n/text.ts`), joka hakee tekstin sillä hetkellä valitusta
+  kielestä. Siksi tekstiä ei saa tallentaa tiedoston ylätasolle (`const X = TEXT.y`), vaan se
+  haetaan vasta piirrettäessä. Asetusnäkymä piirretään kielen vaihtuessa alusta.
+  Tekstit ovat `i18n/fi.ts`:ssä ja `i18n/en.ts`:ssä; TypeScript ja `tests/i18n.test.ts`
+  varmistavat, että molemmissa on samat avaimet. Vihollisten, esineiden ja sankarin nimet
+  haetaan `TEXT.names`in kautta: suomeksi data-tiedostosta, englanniksi `i18n/en-content.ts`:stä.
+  Paikkakunnat ovat samannimisiä, mutta suomen sijamuoto ("Tampereella") tulee
+  `TownDef.nameAt`ista. Päivämäärät kulkevat osina (`i18n/date-parts.ts`), ja kumpikin kieli
+  kirjoittaa ne omalla tavallaan. PWA-manifestin kuvaus on vain suomeksi.
 - **Pelaajalaskuri:** alkuruudun ja kartan vasemmassa alakulmassa "Pelaajia nyt: 3".
   Peli avaa yhden WebSocket-yhteyden palvelimeen (`worker/presence`, Cloudflare), joka laskee
   avoimet yhteydet. Ei tunnisteita, evästeitä eikä tallennettua tietoa. Toteutus on
@@ -231,7 +248,7 @@ Lisäksi periaatteet:
 
 1. **Sisältö on dataa.** Uusi vihollinen, esine tai paikkakunta on uusi olio `data/`-kansiossa,
    ei uutta koodia. Koodia kirjoitetaan vain uudelle _käyttäytymiselle_.
-2. **Tekstit `i18n/fi.ts`:ään.** Ei kovakoodattuja suomenkielisiä tekstejä muualle.
+2. **Tekstit `i18n/fi.ts`:ään ja `i18n/en.ts`:ään.** Ei kovakoodattuja tekstejä muualle.
 3. **Luvut `config/`- tai `data/`-kansioon.** Ei "maagisia numeroita" keskelle koodia.
 4. **Yksi asia per tiedosto.** Tiedoston nimi kertoo sisällön (`kebab-case.ts`).
 5. **Logiikka testataan.** Uusi kaava tai sääntö `logic/`-kansioon + testi `tests/`-kansioon.

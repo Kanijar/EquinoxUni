@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { BUTTON, GAME_WIDTH, MENU_VIEW, SCENES } from '../config/game-config';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import { PLAYER } from '../data/player';
 import { MENU_SECRET } from '../data/rules';
 import { NO_MENU_TAPS, startFromMenu, type MenuTaps } from '../logic/menu-secret';

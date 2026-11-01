@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import { BATTLE_VIEW, GAME_HEIGHT, GAME_WIDTH } from '../config/game-config';
 import { PLAYER } from '../data/player';
-import { TEXT } from '../i18n/fi';
+import { TEXT } from '../i18n/text';
 import {
   canChoose,
   firstHealItem,

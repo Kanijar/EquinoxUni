@@ -133,13 +133,16 @@ export const PLAYER_COUNT_VIEW = {
 /** Asetusnäkymän asetukset. */
 export const SETTINGS_VIEW = {
   titleY: 24,
-  firstRowY: 84,
-  rowGap: 52,
+  firstRowY: 66,
+  rowGap: 44,
   labelX: 40,
   lessX: 260,
   moreX: 400,
   stepButtonWidth: 48,
   toggleWidth: 188,
+  /** Kielinapit SUOMI ja ENGLISH vierekkäin: leveys ja väli. */
+  languageButtonWidth: 90,
+  languageButtonGap: 8,
   backButtonWidth: 120,
 } as const;
 
