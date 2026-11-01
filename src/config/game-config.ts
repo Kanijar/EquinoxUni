@@ -178,6 +178,8 @@ export const WORLD_VIEW = {
   bossAwakenShake: { ms: 600, intensity: 0.012 },
   /** Ruudun reunan nuoli, joka osoittaa kohti loppubossia, kun se ei näy ruudulla. */
   bossPointer: { size: 9, margin: 22, color: 0xff3c3c, alpha: 0.9, pulseMs: 500 },
+  /** Metsässä sankarin jaloista lentää värikkäitä lehtiä (ui/leaf-rustle.ts). scale 1,5 = 3 × 3 px. */
+  leafRustle: { colors: [0xb5e655, 0xe8d44d, 0xd98a2b], everyMs: 60, lifeMs: 550, scale: 1.5 },
 } as const;
 
 /** Voittoruutu (loppuboss tai läpäisy). Peli jatkuu kosketuksella. */

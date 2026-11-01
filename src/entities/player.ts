@@ -22,9 +22,13 @@ export class Player {
     return { x: this.sprite.x, y: this.sprite.y };
   }
 
-  /** direction on yksikkövektori tai lyhyempi (joystickin puolivälissä hitaampi). */
-  move(direction: Vec2): void {
-    this.sprite.setVelocity(direction.x * this.speed, direction.y * this.speed);
+  /**
+   * direction on yksikkövektori tai lyhyempi (joystickin puolivälissä hitaampi).
+   * speedFactor tulee maastosta: metsässä alle 1 (logic/terrain-speed.ts).
+   */
+  move(direction: Vec2, speedFactor = 1): void {
+    const speed = this.speed * speedFactor;
+    this.sprite.setVelocity(direction.x * speed, direction.y * speed);
     if (direction.x !== 0) {
       this.sprite.setFlipX(direction.x < 0);
     }

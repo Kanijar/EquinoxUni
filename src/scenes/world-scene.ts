@@ -13,7 +13,9 @@ import {
   unspentSkillPoints,
   type GameState,
 } from '../logic/game-state';
+import { isSlowTerrain, speedFactorAt } from '../logic/terrain-speed';
 import { lastVisitedTown, visitTown } from '../logic/town-visits';
+import { length } from '../logic/vector';
 import { terrainAt, townTile } from '../logic/world-grid';
 import { AmbushWatch } from '../systems/ambush-watch';
 import { Controls } from '../systems/controls';
@@ -23,6 +25,7 @@ import { playSound } from '../systems/sound-fx';
 import { buildWorldMap, getWorldGrid, tileToWorld, worldToTile } from '../systems/world-map';
 import { TEXT } from '../i18n/fi';
 import { Hud } from '../ui/hud';
+import { LeafRustle } from '../ui/leaf-rustle';
 import { addBackpackButton } from '../ui/backpack-button';
 import { coverScreen, revealScreen } from '../ui/screen-wipe';
 import { addPlayerCountLabel } from '../ui/player-count-label';
@@ -58,6 +61,7 @@ export interface WorldSceneData {
 export class WorldScene extends Phaser.Scene {
   private state!: GameState;
   private player!: Player;
+  private leaves!: LeafRustle;
   private controls!: Controls;
   private encounters!: MapEncounters;
   private ambushes!: AmbushWatch;
@@ -87,6 +91,7 @@ export class WorldScene extends Phaser.Scene {
     const speed = playerStats(this.state).speed;
     this.player = new Player(this, start, speed, playerSprite(this.state));
     this.physics.add.collider(this.player.sprite, built.layer);
+    this.leaves = new LeafRustle(this, this.player.sprite);
     this.encounters = new MapEncounters(this, this.state, built.layer);
     this.ambushes = new AmbushWatch(getWorldGrid());
     this.towns = new TownTracker(start);
@@ -120,7 +125,7 @@ export class WorldScene extends Phaser.Scene {
     if (this.leaving) {
       return;
     }
-    this.player.move(this.controls.read().move);
+    this.walk();
     const position = this.player.position;
     this.state.position = position;
     const arrived = this.towns.update(position);
@@ -145,6 +150,14 @@ export class WorldScene extends Phaser.Scene {
     if (ambusher) {
       this.startBattle(ambusher, null);
     }
+  }
+
+  /** Sankari kävelee tikun suuntaan. Metsässä kulku hidastuu, ja jaloista lentää lehtiä. */
+  private walk(): void {
+    const move = this.controls.read().move;
+    const speedFactor = speedFactorAt(getWorldGrid(), worldToTile(this.player.position));
+    this.player.move(move, speedFactor);
+    this.leaves.update(isSlowTerrain(speedFactor) && length(move) > 0);
   }
 
   /**

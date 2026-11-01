@@ -195,6 +195,8 @@ export interface TerrainDef {
   readonly sprite: string;
   /** Voiko ruudulla kävellä. Meri ja järvet estävät liikkumisen. */
   readonly walkable: boolean;
+  /** Liikkumisnopeuden kerroin tällä maastolla (1 = normaali, 0,6 = 60 %). Puuttuu = 1. */
+  readonly speedFactor?: number;
 }
 
 /** Leveysastevyöhyke, joka määrää maaston: etelässä peltoa, pohjoisessa lunta. */
