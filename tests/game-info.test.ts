@@ -15,7 +15,7 @@ describe('pelin nimi', () => {
   });
 
   it('manifestissa on pelin nimi ja lyhyt nimi mahtuu kuvakkeen alle', () => {
-    const manifest = webManifest('#000000');
+    const manifest = webManifest('#000000', []);
     expect(manifest.name).toBe(GAME_INFO.name);
     expect(manifest.short_name).toBe(GAME_INFO.shortName);
     expect(GAME_INFO.shortName.length).toBeLessThanOrEqual(12);

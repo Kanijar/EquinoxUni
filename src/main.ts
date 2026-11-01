@@ -10,8 +10,12 @@ import { SettingsScene } from './scenes/settings-scene';
 import { SkillsScene } from './scenes/skills-scene';
 import { VictoryScene } from './scenes/victory-scene';
 import { WorldScene } from './scenes/world-scene';
+import { requestPersistentStorage, watchInstallPrompt } from './systems/install-prompt';
 
 // Pelin käynnistys. Uusi scene: luo tiedosto scenes/-kansioon ja lisää se listaan.
+
+watchInstallPrompt();
+requestPersistentStorage();
 
 new Phaser.Game({
   type: Phaser.AUTO,
