@@ -218,6 +218,9 @@ scenes  →  systems / ui  →  entities  →  logic
   `playerStats()` = perusarvot + kykypisteet + varusteet. Kyvyn yläraja (tarkkuus 40 %) koskee
   vain kykypisteitä (`skillStats()`), varusteet tulevat päälle. Repusta voi myös juoda juoman.
   Ryöstäjä varastaa vain juomia, ei varusteita.
+  Repun esineet näkyvät sivuittain (5 × 2 = 10 esinettä sivulla, `BACKPACK_VIEW`):
+  nuolinapit ja "Sivu 1/3" esineiden alla (`ui/bag-pager.ts`), säännöt `logic/bag-pages.ts`.
+  Viimeiseltä sivulta eteenpäin pääsee ensimmäiselle. Pelaajan arvot ovat vasemmassa yläkulmassa.
 - **Tehtävät (Jussi Ketola):** tehtävänantaja Jussi Ketola (`data/npcs.ts`) seisoo
   aloituspaikkakunnan talon vieressä (paikkakunta luetaan `START_TOWN`ista, ei koordinaateista).
   Pään päällä pomppii ! (uusi tehtävä) tai ? (valmis tehtävä). Hänen paikkakunnassaan oikean

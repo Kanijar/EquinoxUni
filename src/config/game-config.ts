@@ -205,7 +205,7 @@ export const VICTORY_VIEW = {
   background: 0x0b1230,
 } as const;
 
-/** Reppunäkymän asetukset: varusteet vasemmalla, repun esineet oikealla, tiedot alhaalla. */
+/** Reppunäkymän asetukset: varusteet vasemmalla, repun esineet sivuittain oikealla, tiedot alhaalla. */
 export const BACKPACK_VIEW = {
   titleY: 18,
   headingY: 58,
@@ -220,15 +220,20 @@ export const BACKPACK_VIEW = {
   slotFirstY: 88,
   slotGap: 46,
   slotRowWidth: 202,
-  /** Repun esineet ruudukkona oikealla. */
+  /** Repun esineet ruudukkona oikealla: yhdellä sivulla 5 × 2 = 10 esinettä. */
   bagX: 244,
   bagFirstY: 88,
   bagColumns: 5,
   bagRows: 2,
   bagGap: 48,
-  /** Pelaajan arvot kahdella rivillä repun esineiden alla. */
-  statsFirstY: 172,
-  statsGap: 16,
+  /** Sivunuolet ja sivunumero repun esineiden alla. Nuolinapin ikoni 8 px → 16 px. */
+  pagerY: 180,
+  pagerButtonWidth: 56,
+  pagerIconScale: 2,
+  /** Pelaajan arvot kahdella pienellä rivillä vasemmassa yläkulmassa. */
+  statsX: 8,
+  statsFirstY: 14,
+  statsGap: 13,
   /** Valitun esineen tiedot ja toimintonappi alareunassa. */
   infoX: 12,
   infoNameY: 222,

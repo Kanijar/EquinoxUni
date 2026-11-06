@@ -159,6 +159,7 @@ export const EN: Texts = {
     equipped: 'Equipped',
     bag: 'In the bag',
     bagEmpty: 'The backpack is empty.',
+    page: (page: number, count: number): string => `Page ${page}/${count}`,
     slots: { hand: 'Hand', body: 'Body', neck: 'Neck' },
     emptySlot: 'empty',
     count: (count: number): string => `×${count}`,

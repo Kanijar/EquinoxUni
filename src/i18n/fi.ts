@@ -186,6 +186,8 @@ export const FI = {
     equipped: 'Käytössä',
     bag: 'Repussa',
     bagEmpty: 'Reppu on tyhjä.',
+    /** Repun sivunumero, esim. Sivu 2/3. */
+    page: (page: number, count: number): string => `Sivu ${page}/${count}`,
     slots: { hand: 'Käsi', body: 'Vartalo', neck: 'Koru' } satisfies Record<GearSlot, string>,
     emptySlot: 'tyhjä',
     count: (count: number): string => `×${count}`,
