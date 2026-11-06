@@ -49,6 +49,39 @@ const HERO_COLORS = { h: '#5a3a1a', s: SKIN, b: '#2e6fd8', l: '#22355e', k: '#3b
 
 export const CHARACTER_SPRITES: readonly SpriteDef[] = [
   {
+    // Sankari Bugattin ratissa (kartalla, kun Bugattin avaimet ovat päällä, data/items.ts).
+    // Keula on oikealla: kartalla kuva peilataan, kun sankari ajaa vasemmalle.
+    id: 'bugatti',
+    palette: {
+      k: '#1a1a1a',
+      b: '#3a8ee6',
+      B: '#1c3f8f',
+      w: '#a8d8ff',
+      h: HERO_COLORS.h,
+      s: SKIN,
+      y: '#ffe066',
+      g: '#b0b0b0',
+    },
+    rows: [
+      '................',
+      '................',
+      '................',
+      '................',
+      '................',
+      '......kkkkkk....',
+      '.....kwhhwwwk...',
+      '....kwwsswwwwk..',
+      '..kkbbbbbbbbbbk.',
+      '.kbbbbbbbbbbbbyk',
+      '.kBBBbbbbbbbBBBk',
+      '.kBkkkBBBBBkkkBk',
+      '.kkkgkkkkkkkgkkk',
+      '...kkk.....kkk..',
+      '................',
+      '................',
+    ],
+  },
+  {
     id: 'hero',
     palette: { ...HERO_COLORS, e: '#ffd700' },
     rows: HERO_ROWS,

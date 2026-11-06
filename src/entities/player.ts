@@ -22,6 +22,11 @@ export class Player {
     return { x: this.sprite.x, y: this.sprite.y };
   }
 
+  /** Vaihtaa kuvan, esim. sankari Bugattin ratissa (systems/vehicle-control.ts). */
+  setTexture(texture: string): void {
+    this.sprite.setTexture(texture);
+  }
+
   /**
    * direction on yksikkövektori tai lyhyempi (joystickin puolivälissä hitaampi).
    * speedFactor tulee maastosta: metsässä alle 1 (logic/terrain-speed.ts).

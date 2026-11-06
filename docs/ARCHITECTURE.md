@@ -228,14 +228,22 @@ scenes  →  systems / ui  →  entities  →  logic
   `QuestScene` kartan päälle samalla tavalla kuin reppu. Tehtävät ovat dataa (`data/quests.ts`):
   tavoite voita N vihollista, tuo N esinettä tai käy paikkakunnassa; palkintona KP:tä ja esineitä
   (uudet varusteet `data/items.ts`). `requires` tekee ketjuja ja `minLevel` porrastaa tehtävät
-  tasoille 1–30; viimeinen tehtävä on toistettava (`repeatable`), joten huipputasolle riittää
-  tekemistä. Tehtäväesine putoaa vain tehtävän aikana (`DropDef.quest`). Tila on
+  tasoille 1–40; Liskovahti on toistettava (`repeatable`), joten huipputasolle riittää
+  tekemistä. Viimeinen tehtävä (Lohikäärmeiden tuho, tasolta 40) vaatii kaksi lohikäärmettä, ja
+  palkintona on Bugattin avaimet (ks. Kulkuneuvot). Tehtäväesine putoaa vain tehtävän aikana (`DropDef.quest`). Tila on
   `GameState.quests` (tehtäväkirja: kesken, edistyminen, palautuskerrat), säännöt
   `logic/quest-log.ts` ja `logic/quests.ts`. Vanhassa tallennuksessa tehtäväkirja on tyhjä
   (`logic/save-quests.ts`), joten `SAVE_VERSION`ia ei tarvinnut nostaa. Kartan vasemmassa
   yläkulmassa näkyvät keskeneräiset tehtävät ("Limat kuriin 2/3"), ja voittoruudulla kerrotaan
   tehtävän edistymisestä. Uusi tehtävä: olio `data/quests.ts`:ään ja englanninkieliset tekstit
   `i18n/en-content.ts`:n `QUEST_TEXTS_EN`iin.
+- **Kulkuneuvot (Bugattin avaimet):** esine `kind: 'vehicle'` (`data/items.ts`), jolla on
+  `speedMultiplier` (1,8 = 80 % nopeammin) ja kartan kuva `mapSprite` (sankari autossa,
+  `data/sprites-characters.ts`). Kun avaimet ovat repussa, kartalla näkyy BUGATTI-nappi REPPU-napin
+  vasemmalla puolella (`ui/drive-button.ts`), ja E-näppäin tekee saman: auto päälle tai pois
+  (`systems/vehicle-control.ts`). Säännöt `logic/vehicle.ts`: kerroin kerrotaan maaston kertoimella,
+  joten metsä hidastaa autoakin. Taisteluun auto ei vaikuta. Tila on `GameState.driving`
+  (puuttuva = pois, joten `SAVE_VERSION`ia ei tarvinnut nostaa).
 - **Pudotukset:** vihollisella on `drops: [{ item, chance }]` (`data/enemies.ts`). Jokainen
   arvotaan voitossa erikseen (`logic/drops.ts`); varustetta, joka pelaajalla jo on, ei pudoteta
   uudelleen. Voittoruudulla esineen kuva ponnahtaa ja teksti "Löysit: Peikon nuija!".

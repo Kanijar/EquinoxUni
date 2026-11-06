@@ -131,10 +131,10 @@ export interface DropDef {
 
 /**
  * Esineen tyyppi: parannusjuoma (juodaan taistelussa tai repusta), varuste (laitetaan
- * käyttöön repussa, logic/equipment.ts) tai avain/tehtäväesine (tallessa repussa, esim. tuodaan
- * tehtävänantajalle, data/quests.ts).
+ * käyttöön repussa, logic/equipment.ts), avain/tehtäväesine (tallessa repussa, esim. tuodaan
+ * tehtävänantajalle, data/quests.ts) tai kulkuneuvo (kytketään päälle kartalla, logic/vehicle.ts).
  */
-export type ItemKind = 'heal' | 'gear' | 'key';
+export type ItemKind = 'heal' | 'gear' | 'key' | 'vehicle';
 
 /** Varustepaikka: jokaisessa paikassa voi olla yksi varuste kerrallaan. */
 export type GearSlot = 'hand' | 'body' | 'neck';
@@ -171,7 +171,16 @@ export interface KeyItemDef extends ItemBase {
   readonly kind: 'key';
 }
 
-export type ItemDef = HealItemDef | GearItemDef | KeyItemDef;
+/** Kulkuneuvo (esim. Bugattin avaimet): kartalla päälle ja pois E-näppäimestä tai napista. */
+export interface VehicleItemDef extends ItemBase {
+  readonly kind: 'vehicle';
+  /** Kävelynopeus kerrotaan tällä, kun kulkuneuvo on päällä (1.8 = 80 % nopeammin). */
+  readonly speedMultiplier: number;
+  /** Sankarin kuva kartalla, kun kulkuneuvo on päällä (data/sprites-characters.ts). */
+  readonly mapSprite: string;
+}
+
+export type ItemDef = HealItemDef | GearItemDef | KeyItemDef | VehicleItemDef;
 
 /** Väijytys: tietyssä maastossa kulkiessa vihollinen voi hyökätä yllättäen. */
 export interface AmbushRule {

@@ -163,7 +163,7 @@ describe('Jussi Ketolan tehtävät', () => {
     expect(result?.skillPoints).toBeGreaterThan(0);
   });
 
-  it('viimeisen tehtävän (Liskovahti) voi tehdä yhä uudelleen', () => {
+  it('Liskovahdin voi tehdä yhä uudelleen', () => {
     const state = gameAtLevel(34);
     markDone(state, 'fire-lizards');
     acceptQuest(state, 'lizard-watch');

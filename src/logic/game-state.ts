@@ -65,6 +65,8 @@ export interface GameState extends BossProgress {
   completed: boolean;
   /** Tehtäväkirja: otetut ja palautetut tehtävät (logic/quest-log.ts, data/quests.ts). */
   readonly quests: QuestLog;
+  /** Onko kulkuneuvo (Bugattin avaimet) päällä kartalla (logic/vehicle.ts). */
+  driving: boolean;
 }
 
 /**
@@ -91,6 +93,7 @@ export function createNewGame(startXp = 0): GameState {
     bossDefeated: false,
     completed: false,
     quests: {},
+    driving: false,
   };
 }
 
