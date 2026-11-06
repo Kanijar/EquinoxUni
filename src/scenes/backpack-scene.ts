@@ -20,8 +20,10 @@ import {
   unequipToBag,
   type BackpackSelection,
 } from '../logic/backpack';
+import { clampPage, pageCount, pageItems, pageOfIndex, turnPage } from '../logic/bag-pages';
 import { bagItems, findGear } from '../logic/equipment';
 import { playerStats, type GameState } from '../logic/game-state';
+import { BagPager } from '../ui/bag-pager';
 import { GearSlotRow } from '../ui/gear-slot-row';
 import { ItemInfo, type ItemInfoContent } from '../ui/item-info';
 import { ItemTile } from '../ui/item-tile';
@@ -29,10 +31,11 @@ import { TextButton } from '../ui/text-button';
 import { addLabel, addTitle } from '../ui/title-text';
 
 // Reppu. Avataan kartalta REPPU-napista. Vasemmalla käytössä olevat varusteet (käsi,
-// vartalo, koru), oikealla repun esineet. Esinettä napauttamalla näkee, mitä se tekee,
+// vartalo, koru), oikealla repun esineet sivuittain: nuolinapeista näkee seuraavan sivun,
+// kun esineitä on enemmän kuin yhdelle sivulle mahtuu. Esinettä napauttamalla näkee, mitä se tekee,
 // ja alareunan napista sen voi laittaa käyttöön, ottaa pois tai juoda (juoma).
 // Kartta odottaa taustalla (nukkuu), kunnes reppu suljetaan VALMIS-napista.
-// Säännöt: logic/backpack.ts ja logic/equipment.ts.
+// Säännöt: logic/backpack.ts, logic/equipment.ts ja logic/bag-pages.ts (sivut).
 
 export interface BackpackSceneData {
   readonly state: GameState;
@@ -45,6 +48,9 @@ export class BackpackScene extends Phaser.Scene {
   private message: string | null = null;
   private slotRows: { readonly slot: GearSlot; readonly row: GearSlotRow }[] = [];
   private bagTiles: ItemTile[] = [];
+  /** Repun näkyvä sivu (0 = ensimmäinen). */
+  private page = 0;
+  private pager!: BagPager;
   private statsTexts: Phaser.GameObjects.Text[] = [];
   private bagEmptyText!: Phaser.GameObjects.Text;
   private info!: ItemInfo;
@@ -58,6 +64,7 @@ export class BackpackScene extends Phaser.Scene {
     this.selection = null;
     this.message = null;
     this.bagTiles = [];
+    this.page = 0;
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, COLORS.panel).setOrigin(0);
     addTitle(this, BACKPACK_VIEW.titleY, TEXT.backpack.title);
     this.addDoneButton();
@@ -106,14 +113,38 @@ export class BackpackScene extends Phaser.Scene {
       });
       this.bagTiles.push(tile);
     }
-    const { statsFirstY, statsGap } = BACKPACK_VIEW;
+    const right = left + (bagColumns - 1) * bagGap + tileSize;
+    this.pager = new BagPager(this, { left, right, onTurn: (step) => this.turnPage(step) });
+    const { statsX, statsFirstY, statsGap } = BACKPACK_VIEW;
     this.statsTexts = [0, 1].map((line) =>
-      addLabel(this, { x: left, y: statsFirstY + line * statsGap, text: '' }),
+      addLabel(this, { x: statsX, y: statsFirstY + line * statsGap, text: '', size: FONT.small }),
     );
   }
 
+  /** Montako esinettä mahtuu yhdelle repun sivulle. */
+  private get pageSize(): number {
+    return BACKPACK_VIEW.bagColumns * BACKPACK_VIEW.bagRows;
+  }
+
+  /** Näkyvän sivun esineet. */
+  private pageEntries(): ReturnType<typeof bagItems> {
+    return pageItems(bagItems(this.state.inventory), this.page, this.pageSize);
+  }
+
+  private turnPage(step: number): void {
+    const count = bagItems(this.state.inventory).length;
+    this.page = turnPage(this.page, step, count, this.pageSize);
+    this.refresh();
+  }
+
+  /** Näyttää sivun, jolla esine on (esim. kun varuste otettiin pois ja se palasi reppuun). */
+  private showPageOf(itemId: string): void {
+    const index = bagItems(this.state.inventory).findIndex((entry) => entry.item.id === itemId);
+    this.page = pageOfIndex(index, this.pageSize);
+  }
+
   private selectBagTile(index: number): void {
-    const entry = bagItems(this.state.inventory)[index];
+    const entry = this.pageEntries()[index];
     if (entry) {
       this.select({ kind: 'bag', itemId: entry.item.id });
     }
@@ -141,6 +172,7 @@ export class BackpackScene extends Phaser.Scene {
     } else if (action === 'unequip' && selection.kind === 'slot') {
       unequipToBag(this.state, selection.slot);
       this.selection = { kind: 'bag', itemId: id };
+      this.showPageOf(id);
       this.message = TEXT.backpack.unequippedNow(name);
     } else if (action === 'drink') {
       this.message = TEXT.backpack.drank(drinkFromBag(this.state, id));
@@ -157,8 +189,11 @@ export class BackpackScene extends Phaser.Scene {
       const isSelected = selected?.kind === 'slot' && selected.slot === slot;
       row.update(id === undefined ? null : getItem(id), isSelected);
     }
-    const items = bagItems(this.state.inventory);
-    this.bagEmptyText.setVisible(items.length === 0);
+    const allItems = bagItems(this.state.inventory);
+    this.page = clampPage(this.page, allItems.length, this.pageSize);
+    this.pager.update(this.page, pageCount(allItems.length, this.pageSize));
+    this.bagEmptyText.setVisible(allItems.length === 0);
+    const items = this.pageEntries();
     this.bagTiles.forEach((tile, index) => {
       const entry = items[index];
       tile.setItem(entry?.item.sprite ?? null, entry?.count ?? 0);

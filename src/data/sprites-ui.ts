@@ -1,6 +1,7 @@
 import type { SpriteDef } from './types';
 
-// Käyttöliittymän pienet pikselikuvat: taistelunappien ikonit (8×8) ja taivaan pilvi.
+// Käyttöliittymän pienet pikselikuvat: taistelunappien ja repun sivunuolten ikonit (8×8)
+// sekä taivaan pilvi.
 // Ikonit piirretään kaksinkertaisina (config/battle-config.ts ACTION_BUTTON).
 
 const BLADE = { w: '#e8eef8', l: '#9aa8c0', g: '#ffd23f', k: '#8a5a2a' };
@@ -89,6 +90,34 @@ export const UI_SPRITES: readonly SpriteDef[] = [
       '.......w',
       '..wwwwww',
       '........',
+    ],
+  },
+  {
+    id: 'icon-arrow-left',
+    palette: WHITE,
+    rows: [
+      '....ww..',
+      '...www..',
+      '..wwww..',
+      '.wwwww..',
+      '.wwwww..',
+      '..wwww..',
+      '...www..',
+      '....ww..',
+    ],
+  },
+  {
+    id: 'icon-arrow-right',
+    palette: WHITE,
+    rows: [
+      '..ww....',
+      '..www...',
+      '..wwww..',
+      '..wwwww.',
+      '..wwwww.',
+      '..wwww..',
+      '..www...',
+      '..ww....',
     ],
   },
   {
