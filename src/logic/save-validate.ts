@@ -181,6 +181,7 @@ export function readGameState(value: unknown): GameState | null {
     ...readBoss(value),
     completed: value['completed'] === true,
     quests: readQuests(value['quests']),
+    driving: value['driving'] === true,
   };
   // Elämä pysyy rajoissa: vähintään 1, enintään maksimielämä.
   state.hp = Math.min(Math.max(1, state.hp), playerStats(state).maxHp);

@@ -62,6 +62,7 @@ export const ITEM_TEXTS_EN: Readonly<
     description: 'Old family armor. It can take a hard hit!',
   },
   'wolf-tuft': { name: 'Wolf Fur Tuft', description: 'Soft fur. Take it to Jussi Ketola.' },
+  'bugatti-keys': { name: 'Bugatti Keys', description: 'Drive 80% faster! Press E or BUGATTI.' },
 };
 
 /** Tehtävän tekstit: nimi, tarjous (story) ja kiitos palautettaessa. */
@@ -112,6 +113,11 @@ export const QUEST_TEXTS_EN: Readonly<Record<string, QuestTexts>> = {
     title: 'Lizard Watch',
     story: 'The fire lizards always come back. Defeat five lizards again and I will pay well!',
     thanks: 'Peaceful again. Come back tomorrow if you feel like it!',
+  },
+  'dragon-hunt': {
+    title: 'Dragon Slayer',
+    story: 'Dragons live on the volcano! Destroy two dragons and you get my greatest treasure.',
+    thanks: 'You did it! Take the keys to my Bugatti. Press E or BUGATTI to drive fast!',
   },
   'letter-peltola': {
     title: 'A Letter to Peltola',

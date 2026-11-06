@@ -136,4 +136,27 @@ export const QUEST_ITEM_SPRITES: readonly SpriteDef[] = [
       '................',
     ],
   },
+  {
+    // Bugattin avaimet: kultainen avainrengas ja sininen avaimenperä, jossa punainen merkki.
+    id: 'bugatti-keys',
+    palette: { k: '#1a1a1a', y: '#e0b040', b: '#3a8ee6', B: '#1c3f8f', r: '#e0303a', s: '#c9ced6' },
+    rows: [
+      '................',
+      '.....kkkk.......',
+      '....kyyyyk......',
+      '...ky....yk.....',
+      '...ky....yk.....',
+      '....kyyyyk......',
+      '......kk........',
+      '.....kbbbbk.....',
+      '....kbBBBBbk....',
+      '....kbBrrBbk....',
+      '....kbBrrBbk....',
+      '....kbBBBBbk....',
+      '.....kbbbbk.....',
+      '......kssk......',
+      '......kssk......',
+      '.......kk.......',
+    ],
+  },
 ];

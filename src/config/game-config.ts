@@ -178,6 +178,8 @@ export const WORLD_VIEW = {
   backpackButton: { width: 96 },
   skillButton: { width: 150 },
   saveButton: { width: 150 },
+  /** BUGATTI-nappi alarivissä REPPU-napin vasemmalla puolella (ui/drive-button.ts). */
+  driveButton: { width: 110 },
   /** Loppuboss kartalla: sykkivä punainen hehku jalkojen alla ja kameran tärähdys herätessä. */
   bossAura: { radius: 18, color: 0xff3c3c, alpha: 0.35, pulseScale: 1.4, pulseMs: 700 },
   bossAwakenShake: { ms: 600, intensity: 0.012 },

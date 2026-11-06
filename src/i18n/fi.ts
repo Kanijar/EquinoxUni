@@ -155,6 +155,12 @@ export const FI = {
     skillPointsWaiting: (points: number): string =>
       `Sinulla on ${points} kykypistettä. Paina KYKYPISTEET.`,
   },
+  /** Bugattin avaimet kartalla (logic/vehicle.ts): nappi ja ilmoitukset. */
+  vehicle: {
+    button: 'BUGATTI',
+    on: 'Brrrm! Vauhtia +80 %!',
+    off: 'Bugatti sammui. Kävelet taas.',
+  },
   skills: {
     button: (points: number): string => `KYKYPISTEET ${points}`,
     title: 'Kykypisteet',

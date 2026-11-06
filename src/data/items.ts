@@ -193,6 +193,17 @@ export const ITEMS: readonly ItemDef[] = [
     kind: 'key',
     sprite: 'wolf-tuft',
   },
+  {
+    // Jussin viimeisen tehtävän palkinto (Lohikäärmeiden tuho). Kartalla päälle ja pois
+    // E-näppäimestä tai BUGATTI-napista: sankari ajaa 80 % nopeammin (logic/vehicle.ts).
+    id: 'bugatti-keys',
+    name: 'Bugattin avaimet',
+    description: 'Aja 80 % nopeammin! Paina E tai BUGATTI.',
+    kind: 'vehicle',
+    sprite: 'bugatti-keys',
+    speedMultiplier: 1.8,
+    mapSprite: 'bugatti',
+  },
 ];
 
 /** Varustepaikat repussa tässä järjestyksessä: käsi (ase), vartalo (vaatteet), kaula (koru). */

@@ -9,7 +9,8 @@ import type { QuestDef } from './types';
 // Tehtävät seuraavat saaren alueita ja niiden tasoja (data/map-enemies.ts): pellot, metsät,
 // tunturit, suo ja tulivuori. Tasapaino: palkinnon KP on noin yhden tason verran tehtävän
 // minLevel-tasolla (KP-rajat data/rules.ts: taso 5 → 6 vaatii 49 KP, taso 22 → 23 noin 430 KP).
-// Viimeisen tehtävän voi tehdä yhä uudelleen, joten tasoille 34–50 riittää tekemistä.
+// Liskovahdin voi tehdä yhä uudelleen, joten tasoille 34–50 riittää tekemistä. Viimeinen
+// tehtävä on Lohikäärmeiden tuho: palkintona Bugattin avaimet (nopeampi kulku kartalla).
 
 export const QUESTS: readonly QuestDef[] = [
   // --- Taistelutehtävät ---
@@ -90,7 +91,7 @@ export const QUESTS: readonly QuestDef[] = [
     reward: { xp: 800, items: [{ id: 'potion', count: 5 }] },
   },
   {
-    // Viimeinen tehtävä: sen voi tehdä yhä uudelleen (repeatable). Noin yksi taso tasolla 40.
+    // Tämän voi tehdä yhä uudelleen (repeatable). Noin yksi taso tasolla 40.
     id: 'lizard-watch',
     giver: 'jussi',
     title: 'Liskovahti',
@@ -101,6 +102,20 @@ export const QUESTS: readonly QuestDef[] = [
     repeatable: true,
     goal: { kind: 'defeat', enemy: 'lizard', count: 5 },
     reward: { xp: 1300, items: [{ id: 'potion', count: 3 }] },
+  },
+  {
+    // Viimeinen tehtävä: tulivuoren kaksi lohikäärmettä (data/map-enemies.ts). Liskovahti pitää
+    // tehdä ensin kerran. KP noin yksi taso tasolla 40, ja palkintona Bugattin avaimet.
+    id: 'dragon-hunt',
+    giver: 'jussi',
+    title: 'Lohikäärmeiden tuho',
+    story:
+      'Tulivuorella asuu lohikäärmeitä! Tuhoa kaksi lohikäärmettä, niin saat parhaan aarteeni.',
+    thanks: 'Sinä teit sen! Ota Bugattini avaimet. Paina E tai BUGATTI, niin ajat kovaa!',
+    minLevel: 40,
+    requires: 'lizard-watch',
+    goal: { kind: 'defeat', enemy: 'dragon', count: 2 },
+    reward: { xp: 1300, items: [{ id: 'bugatti-keys', count: 1 }] },
   },
   // --- Asiointitehtävät ---
   {

@@ -48,4 +48,7 @@ export const MAP_ENEMIES: readonly MapEnemyDef[] = [
   { enemy: 'lizard', x: 166, y: 52 },
   { enemy: 'lizard', x: 140, y: 30 },
   { enemy: 'dragon', x: 166, y: 34 },
+  // Toinen lohikäärme kraatterin lounaispuolella (Jussi Ketolan tehtävä Lohikäärmeiden tuho).
+  // Uudet viholliset lisätään listan loppuun, jotta tallennusten järjestysnumerot pysyvät.
+  { enemy: 'dragon', x: 152, y: 46 },
 ];

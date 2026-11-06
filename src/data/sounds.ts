@@ -168,6 +168,17 @@ export const SOUNDS = {
       { freq: 1976, ms: 180 },
     ],
   },
+  /** Bugatti käynnistyy: moottori murisee ja kiihtyy (logic/vehicle.ts). */
+  engine: {
+    wave: 'sawtooth',
+    gain: 0.18,
+    notes: [
+      { freq: 70, ms: 140, slideTo: 90 },
+      { freq: 90, ms: 260, slideTo: 260 },
+    ],
+  },
+  /** Bugatti sammuu: moottori hiljenee. */
+  'engine-off': { wave: 'sawtooth', gain: 0.15, notes: [{ freq: 160, ms: 220, slideTo: 50 }] },
 } as const satisfies Record<string, SoundDef>;
 
 /** Äänen tunniste, esim. playSound('hit'). Kirjoitusvirhe huomataan jo käännöksessä. */

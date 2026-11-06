@@ -23,6 +23,7 @@ import { AmbushWatch } from '../systems/ambush-watch';
 import { Controls } from '../systems/controls';
 import { MapEncounters } from '../systems/map-encounters';
 import { NpcMarkers } from '../systems/npc-markers';
+import { VehicleControl } from '../systems/vehicle-control';
 import { placeTownMarkers, TownTracker } from '../systems/town-markers';
 import { playSound } from '../systems/sound-fx';
 import {
@@ -86,6 +87,7 @@ export class WorldScene extends Phaser.Scene {
   private talkButton!: TalkButton;
   private npcs!: NpcMarkers;
   private questTracker!: QuestTracker;
+  private vehicle!: VehicleControl;
   private toast!: Toast;
   private bossPointer: BossPointer | null = null;
   private encountersFrom = 0;
@@ -127,6 +129,9 @@ export class WorldScene extends Phaser.Scene {
     this.questTracker = new QuestTracker(this);
     addBackpackButton(this, () => this.openBackpack());
     this.toast = new Toast(this);
+    this.vehicle = new VehicleControl(this, this.state, this.player, (text) =>
+      this.toast.show(text),
+    );
     const boss = this.encounters.boss;
     this.bossPointer = boss ? new BossPointer(this, boss.sprite) : null;
     if (data.bossAwakened) {
@@ -175,11 +180,14 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  /** Sankari kävelee tikun suuntaan. Metsässä kulku hidastuu, ja jaloista lentää lehtiä. */
+  /**
+   * Sankari kävelee tikun suuntaan. Metsässä kulku hidastuu, ja jaloista lentää lehtiä.
+   * Bugatti (E tai BUGATTI-nappi) nopeuttaa kulkua, myös metsässä.
+   */
   private walk(): void {
     const move = this.controls.read().move;
     const speedFactor = speedFactorAt(getWorldGrid(), worldToTile(this.player.position));
-    this.player.move(move, speedFactor);
+    this.player.move(move, speedFactor * this.vehicle.speedFactor);
     this.leaves.update(isSlowTerrain(speedFactor) && length(move) > 0);
   }
 
@@ -271,5 +279,6 @@ export class WorldScene extends Phaser.Scene {
     this.talkButton.update(npc, npc ? npcMarker(this.state, npc.id) : null);
     this.npcs.update(this.state);
     this.questTracker.update(this.state);
+    this.vehicle.update();
   }
 }

@@ -131,6 +131,11 @@ export const EN: Texts = {
     revived: (town): string => `You fell... and woke up in ${town.name}. HP restored!`,
     skillPointsWaiting: (count: number): string => `You have ${points(count)}. Tap SKILLS.`,
   },
+  vehicle: {
+    button: 'BUGATTI',
+    on: 'Vroom! Speed +80%!',
+    off: 'Bugatti off. Walking again.',
+  },
   skills: {
     button: (count: number): string => `SKILLS ${count}`,
     title: 'Skill points',
