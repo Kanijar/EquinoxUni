@@ -10,7 +10,6 @@ const BURGER = {
   b: '#d98c2b',
   s: '#fff4d0',
   g: '#5fd35f',
-  c: '#ffd23f',
   m: '#6b3a1e',
   d: '#a8641c',
 };
@@ -143,11 +142,11 @@ export const UI_SPRITES: readonly SpriteDef[] = [
   {
     id: 'burger',
     palette: BURGER,
-    rows: ['..bbbb..', '.bsbbsb.', 'bbbbbbbb', 'gggggggg', 'cccccccc', 'mmmmmmmm', '.dddddd.'],
+    rows: ['.bbbb.', 'bsbbsb', 'gggggg', 'mmmmmm', '.dddd.'],
   },
   {
     id: 'burger-bitten',
     palette: BURGER,
-    rows: ['..bbb...', '.bsbb...', 'bbbbbb..', 'ggggg...', 'cccccc..', 'mmmmmmm.', '.dddddd.'],
+    rows: ['.bbb..', 'bsbb..', 'gggg..', 'mmmmm.', '.dddd.'],
   },
 ];
