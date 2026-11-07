@@ -7,9 +7,16 @@ import { equipItem, isGear, ownsItem } from './equipment';
 import { playerStats, type GameState } from './game-state';
 
 // Alkuruudun salainen burgeri (data/rules.ts BURGER_SECRET). Burgeri antaa sankarille
-// jokaiseen varustepaikkaan parhaan varusteen käyttöön ja Bugattin avaimet.
+// jokaiseen varustepaikkaan parhaan varusteen käyttöön, Bugattin avaimet ja miljoona kultakolikkoa.
 // Kokemus ja taso eivät muutu. Esinettä, joka sankarilla jo on (repussa tai käytössä),
-// ei anneta toista kertaa, joten burgerin voi syödä monta kertaa ilman että reppu täyttyy.
+// ei anneta toista kertaa, ja kolikot nostetaan miljoonaan vain, jos niitä on vähemmän.
+// Siksi burgerin voi syödä monta kertaa ilman että reppu tai kukkaro kasvaa loputtomiin.
+
+/** Mitä burgeri antoi: uudet esineet (tunnisteet) ja lisätyt kolikot. */
+export interface BurgerGift {
+  readonly items: readonly string[];
+  readonly coins: number;
+}
 
 /** Varusteen pisteet: jokaisen arvon lisäys kerrottuna arvon painolla. */
 export function gearScore(gear: GearItemDef, rules: BurgerSecretRules = BURGER_SECRET): number {
@@ -49,9 +56,9 @@ function giveOnce(state: GameState, id: string): boolean {
 /**
  * Syö burgerin: parhaat varusteet käyttöön ja lisäesineet reppuun. Aiemmin käytössä olleet
  * varusteet palaavat reppuun. Elämä kasvaa yhtä paljon kuin maksimielämä kasvoi.
- * Palauttaa uudet esineet (tunnisteet). Tyhjä lista = kaikki oli jo.
+ * Kolikot nostetaan rules.coins-määrään, jos niitä on vähemmän.
  */
-export function eatBurger(state: GameState, rules: BurgerSecretRules = BURGER_SECRET): string[] {
+export function eatBurger(state: GameState, rules: BurgerSecretRules = BURGER_SECRET): BurgerGift {
   const maxHpBefore = playerStats(state).maxHp;
   const gained: string[] = [];
   for (const slot of GEAR_SLOTS) {
@@ -71,10 +78,13 @@ export function eatBurger(state: GameState, rules: BurgerSecretRules = BURGER_SE
   }
   const maxHpAfter = playerStats(state).maxHp;
   state.hp = Math.min(maxHpAfter, state.hp + Math.max(0, maxHpAfter - maxHpBefore));
-  return gained;
+  const coins = Math.max(0, rules.coins - state.coins);
+  state.coins += coins;
+  return { items: gained, coins };
 }
 
 /** Syö burgerin ja palauttaa kartalla näytettävän viestin. */
 export function burgerNews(state: GameState, rules: BurgerSecretRules = BURGER_SECRET): string {
-  return eatBurger(state, rules).length > 0 ? TEXT.world.burgerGift : TEXT.world.burgerAgain;
+  const gift = eatBurger(state, rules);
+  return gift.items.length > 0 || gift.coins > 0 ? TEXT.world.burgerGift : TEXT.world.burgerAgain;
 }

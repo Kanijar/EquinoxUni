@@ -36,7 +36,9 @@ describe('alkuruudun salainen burgeri', () => {
       neck: 'dragon-charm',
     });
     expect(state.inventory['bugatti-keys']).toBe(1);
-    expect(gained).toEqual(['dragon-sword', 'lizard-armor', 'dragon-charm', 'bugatti-keys']);
+    expect(gained.items).toEqual(['dragon-sword', 'lizard-armor', 'dragon-charm', 'bugatti-keys']);
+    expect(gained.coins).toBe(1_000_000 - createNewGame().coins);
+    expect(state.coins).toBe(1_000_000);
     expect(getItem('bugatti-keys').kind).toBe('vehicle');
   });
 
@@ -57,7 +59,7 @@ describe('alkuruudun salainen burgeri', () => {
     const state = createNewGame();
     eatBurger(state);
     const before = structuredClone(state);
-    expect(eatBurger(state)).toEqual([]);
+    expect(eatBurger(state)).toEqual({ items: [], coins: 0 });
     expect(state).toEqual(before);
     expect(burgerNews(state)).toBe('Nam, burgeri!\nSinulla on jo parhaat varusteet.');
   });
@@ -72,7 +74,7 @@ describe('alkuruudun salainen burgeri', () => {
     expect(state.inventory['lizard-armor']).toBe(0);
     expect(state.equipped.body).toBe('lizard-armor');
     expect(state.inventory['bugatti-keys']).toBe(1);
-    expect(gained).toEqual(['dragon-sword', 'dragon-charm']);
+    expect(gained.items).toEqual(['dragon-sword', 'dragon-charm']);
   });
 
   it('ladatun pelin elämä kasvaa yhtä paljon kuin maksimielämä, ei yli', () => {
@@ -86,7 +88,7 @@ describe('alkuruudun salainen burgeri', () => {
 
   it('kartalla näkyy yllätysviesti, ja susi ja burgeri toimivat yhtä aikaa', () => {
     expect(startFromMenu(BURGER).message).toBe(
-      'Nam, salainen burgeri!\nSait parhaat varusteet ja Bugattin avaimet!',
+      'Nam, salainen burgeri!\nSait parhaat varusteet, Bugattin avaimet\nja miljoona kultakolikkoa!',
     );
     const both = startFromMenu({ ...BURGER, wolf: true });
     expect(both.message).toContain('Susi siunasi sinut!');
@@ -99,5 +101,27 @@ describe('alkuruudun salainen burgeri', () => {
     for (const id of BURGER_SECRET.extraItems) {
       expect(() => getItem(id)).not.toThrow();
     }
+  });
+
+  it('burgeri antaa miljoona kultakolikkoa, mutta toistolla kolikot eivät kasva', () => {
+    expect(BURGER_SECRET.coins).toBe(1_000_000);
+    const state = createNewGame();
+    eatBurger(state);
+    expect(state.coins).toBe(1_000_000);
+    state.coins = 400;
+    expect(eatBurger(state).coins).toBe(999_600);
+    expect(state.coins).toBe(1_000_000);
+    expect(eatBurger(state).coins).toBe(0);
+    state.coins = 2_000_000;
+    eatBurger(state);
+    expect(state.coins).toBe(2_000_000);
+  });
+
+  it('ladattu peli saa kolikot, vaikka varusteet olisivat jo', () => {
+    const state = createNewGame();
+    eatBurger(state);
+    state.coins = 0;
+    expect(burgerNews(state)).toContain('miljoona kultakolikkoa');
+    expect(state.coins).toBe(1_000_000);
   });
 });

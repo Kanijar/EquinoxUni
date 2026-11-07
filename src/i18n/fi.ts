@@ -177,7 +177,8 @@ export const FI = {
     /** Alkuruudun suden salaisuus (logic/menu-secret.ts): näkyy vasta kartalla. */
     wolfBlessing: (level: number): string => `Susi siunasi sinut! Taso ${level}!`,
     /** Alkuruudun salainen burgeri (logic/burger-secret.ts): näkyy vasta kartalla. */
-    burgerGift: 'Nam, salainen burgeri!\nSait parhaat varusteet ja Bugattin avaimet!',
+    burgerGift:
+      'Nam, salainen burgeri!\nSait parhaat varusteet, Bugattin avaimet\nja miljoona kultakolikkoa!',
     burgerAgain: 'Nam, burgeri!\nSinulla on jo parhaat varusteet.',
     rest: (town: TownDef): string => `Lepäsit ${town.nameAt}. Elämä palautui!`,
     revived: (town: TownDef): string => `Kaaduit... heräsit ${town.nameAt}. Elämä palautui!`,
