@@ -2,13 +2,14 @@ import { getItem, getNpc, getQuest } from '../data';
 import { TEXT } from '../i18n/text';
 import { bossName, type BossNews } from '../logic/boss';
 import type { QuestNews, VictoryReward } from '../logic/game-state';
+import type { StairsNews } from '../logic/volcano-stairs';
 import { xpToNextLevel } from '../logic/progression';
 import type { BattleView } from '../ui/battle-view';
 import type { BattleStep } from './battle-steps';
 import { playSound } from './sound-fx';
 
 // Voiton jälkeiset viestit: KP ja kolikot, saadut esineet, tehtävien eteneminen,
-// loppubossin eteneminen (peikkolaskuri),
+// loppubossin eteneminen (peikkolaskuri), tulivuoren rappuset Ossi Ketolan luo,
 // tason nousu ja kykypisteet. KP-palkki täyttyy samalla, kun voittoviesti näkyy.
 
 export function victorySteps(
@@ -31,6 +32,7 @@ export function victorySteps(
     ...lootSteps(reward, view),
     ...questSteps(reward.quests ?? []),
     ...bossSteps(reward.boss),
+    ...stairsSteps(reward.stairs),
     ...levelSteps(reward, view),
     { text: next },
   ];
@@ -89,6 +91,18 @@ function bossSteps(news: BossNews | undefined): BattleStep[] {
     default:
       return [];
   }
+}
+
+/** Lohikäärmeen voitto nosti laavasta askelman: ensimmäinen, seuraava tai viimeinen. */
+function stairsSteps(news: StairsNews | undefined): BattleStep[] {
+  if (!news) {
+    return [];
+  }
+  if (news.kind === 'complete') {
+    return [{ text: TEXT.stairs.complete, effect: () => playSound('loot') }];
+  }
+  const step: BattleStep = { text: TEXT.stairs.step(news.count, news.needed) };
+  return news.count === 1 ? [step, { text: TEXT.stairs.cry }] : [step];
 }
 
 function levelSteps(reward: VictoryReward, view: BattleView): BattleStep[] {

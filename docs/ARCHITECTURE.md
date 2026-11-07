@@ -56,7 +56,7 @@ src/
     towns.ts            Paikkakunnat ja tiet
     map-enemies.ts      Viholliset kartalla
     rules.ts            Taistelun ja kokemustasojen säännöt
-    npcs.ts, quests.ts  Tehtävänantajat (Jussi Ketola) ja heidän tehtävänsä
+    npcs.ts, quests.ts  Tehtävänantajat (Jussi ja Ossi Ketola) ja heidän tehtävänsä
   logic/                Puhdas pelilogiikka (vuoropohjainen taistelu, kartta, tasot). EI Phaseria.
   entities/             Kartan hahmot: Phaser-sprite (Player, Enemy)
   systems/              Pelin järjestelmät: ohjaus, kartan piirto, kohtaamiset, taistelun kulku
@@ -93,7 +93,7 @@ scenes  →  systems / ui  →  entities  →  logic
   (vuoropohjainen taistelu) → `VictoryScene` (voittoruutu: loppuboss voitettu tai jokainen
   karttavihollinen voitettu ainakin kerran) → takaisin kartalle. Peli ei lopu voittoon.
   Paikkakunnassa `WorldScene` ⇄ `SkillsScene` (kykypisteiden jako) ja `WorldScene` ⇄
-  `SavesScene` (tallennus), ja Jussi Ketolan paikkakunnassa `WorldScene` ⇄ `QuestScene` (tehtävät).
+  `SavesScene` (tallennus), ja Jussi Ketolan paikkakunnassa (tai Ossi Ketolan vieressä) `WorldScene` ⇄ `QuestScene` (tehtävät).
   Kulkevan kauppiaan vieressä `WorldScene` ⇄ `ShopScene` (kauppa). Alkuruudusta `SettingsScene` (valo ja äänet), `SavesScene` (lataus)
   ja `ExitScene` (LÄHDE).
   Pelin tila (`logic/game-state.ts`: elämä, KP, kykypisteet, esineet, sijainti, viimeisin paikkakunta, voitetut viholliset ja niiden palautusajat) annetaan scenejen välillä `scene.start(key, data)` -datana.
@@ -253,6 +253,19 @@ scenes  →  systems / ui  →  entities  →  logic
   yläkulmassa näkyvät keskeneräiset tehtävät ("Limat kuriin 2/3"), ja voittoruudulla kerrotaan
   tehtävän edistymisestä. Uusi tehtävä: olio `data/quests.ts`:ään ja englanninkieliset tekstit
   `i18n/en-content.ts`:n `QUEST_TEXTS_EN`iin.
+- **Ossi Ketola ja tulivuoren rappuset:** Jussin veli Ossi Ketola (`data/npcs.ts`) seisoo
+  tulivuoren kraatterin keskellä tuhkasaarella laavan ympäröimänä (`LakeDef.islands`,
+  `data/island.ts`). Hahmolla on paikkakunnan sijaan oma ruutu (`NpcDef.tile`), ja hänen kanssaan
+  voi puhua, kun sankari on enintään `NPC_TALK_TILES` ruudun päässä (`logic/quests.ts`
+  `npcNearby`). Jokainen voitettu lohikäärme nostaa laavasta yhden kiviaskelman
+  (`data/volcano-stairs.ts`: viisi askelmaa kraatterin länsireunalta saarelle, maasto `stairs`).
+  Laskuri on `GameState.stairSteps` (puuttuva = 0, joten `SAVE_VERSION`ia ei tarvinnut nostaa),
+  säännöt `logic/volcano-stairs.ts`. Kartta rakennetaan askelmien kanssa aina, kun kartta avataan
+  (`systems/world-map.ts` `showStairs`): askelmia tulee lisää vain taistelussa, ja sen jälkeen
+  kartta avataan uudelleen. Voittoruudulla kerrotaan uudesta askelmasta (1/5), ensimmäisen jälkeen
+  kraatterista kuuluu Ossin huuto. Ossilla on kaksi tehtävää (tasolta 40): terveiset Jussille
+  Kotirantaan ja kolme lohikäärmeen suomua (putoavat vain tehtävän aikana), palkintona
+  Laavahaarniska, saaren paras vartalovaruste.
 - **Kulkuneuvot (Bugattin avaimet):** esine `kind: 'vehicle'` (`data/items.ts`), jolla on
   `speedMultiplier` (1,8 = 80 % nopeammin) ja kartan kuva `mapSprite` (sankari autossa,
   `data/sprites-characters.ts`). Kun avaimet ovat repussa, kartalla näkyy BUGATTI-nappi REPPU-napin
@@ -386,7 +399,7 @@ kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 
 - Kauppa ✓ (kulkeva kauppias Kaapo ja kolikot), kalastus ✓, paikkakuntien sisänäkymät (majatalo) omina sceneinä
 - Inventaario ja aseet ✓ (reppu, varusteet ja pudotukset), vihollisten erikoisiskut
-- NPC-hahmot ja tehtävät ✓ (Jussi Ketola, `data/npcs.ts`, `data/quests.ts`)
+- NPC-hahmot ja tehtävät ✓ (Jussi ja Ossi Ketola, `data/npcs.ts`, `data/quests.ts`)
 - Tallennus `localStorage`en ✓ (alkuruutu, asetukset ja kolme tallennuspaikkaa)
 
 **Vaihe 3 – Sisältö ja viimeistely.**

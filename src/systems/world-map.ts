@@ -4,18 +4,35 @@ import { getSprite, TERRAINS, WORLD } from '../data';
 import type { TerrainId } from '../data/types';
 import { buildWorldGrid, nearestWalkable, type WorldGrid } from '../logic/world-grid';
 import type { Vec2 } from '../logic/vector';
+import { withStairs } from '../logic/volcano-stairs';
 import { createStripTexture } from './sprite-textures';
 
 // Piirtää saaren kartan tilemapiksi ja asettaa meren, järvet ja laavan esteiksi.
+// Tulivuoren rappusten askelmat (logic/volcano-stairs.ts) lisätään karttaan, kun se avataan.
 
 const TILESET_KEY = 'world-tiles';
 
-let cachedGrid: WorldGrid | null = null;
+let baseGrid: WorldGrid | null = null;
+let currentGrid: WorldGrid | null = null;
 
-/** Kartan ruudukko. Lasketaan vain kerran, koska kartta ei muutu pelin aikana. */
+/** Kartta ilman rappusia. Lasketaan vain kerran, koska saaren muoto ei muutu pelin aikana. */
+function getBaseGrid(): WorldGrid {
+  baseGrid ??= buildWorldGrid(WORLD);
+  return baseGrid;
+}
+
+/** Kartan ruudukko sellaisena kuin se on nyt (nousseet askelmat mukana). */
 export function getWorldGrid(): WorldGrid {
-  cachedGrid ??= buildWorldGrid(WORLD);
-  return cachedGrid;
+  return currentGrid ?? getBaseGrid();
+}
+
+/**
+ * Nostaa kartalle laavasta näin monta askelmaa. Kutsutaan, kun kartta avataan: askelmia tulee
+ * lisää vain taistelussa, ja taistelun jälkeen kartta avataan uudelleen.
+ */
+export function showStairs(steps: number): WorldGrid {
+  currentGrid = withStairs(getBaseGrid(), steps);
+  return currentGrid;
 }
 
 /** Luo karttaruutujen kuvan. Kutsutaan BootScenessä. */

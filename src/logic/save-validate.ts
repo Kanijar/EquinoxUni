@@ -14,13 +14,15 @@ import { mapEnemyRespawnMs, type RespawnTimer } from './respawn';
 import { readQuests } from './save-quests';
 import { noSkillPoints, type SkillPoints } from './skill-points';
 import type { Vec2 } from './vector';
+import { readStairSteps } from './volcano-stairs';
 
 // Tarkistaa tallennuksesta luetun pelin tilan. Selaimen tietoja voi muokata
 // käsin tai ne voivat olla vanhasta pelin versiosta, joten mitään ei oleteta.
 // Tuntemattomat esineet ja viholliset jätetään pois, puuttuvat kyvyt ovat 0
 // ja puuttuvat varusteet tyhjiä. Vanhassa tallennuksessa ei ole nimeä eikä ulkonäköä:
 // silloin sankari on oletusnimellä ja -näköinen, joten SAVE_VERSIONia ei tarvinnut nostaa.
-// Samoin puuttuvat kolikot ja ostetut kykypisteet ovat 0 ja kauppias kierroksensa alussa.
+// Samoin puuttuvat kolikot ja ostetut kykypisteet ovat 0 ja kauppias kierroksensa alussa,
+// ja tulivuoren rappusista ei ole noussut yhtään askelmaa.
 
 type RawRecord = Record<string, unknown>;
 
@@ -193,6 +195,7 @@ export function readGameState(value: unknown): GameState | null {
     coins: readCount(value['coins']),
     bonusSkillPoints: readCount(value['bonusSkillPoints']),
     merchantMs: readMerchantMs(value['merchantMs']),
+    stairSteps: readStairSteps(value['stairSteps']),
   };
   // Elämä pysyy rajoissa: vähintään 1, enintään maksimielämä.
   state.hp = Math.min(Math.max(1, state.hp), playerStats(state).maxHp);

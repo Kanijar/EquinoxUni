@@ -1,6 +1,6 @@
 import type { QuestDef } from './types';
 
-// Jussi Ketolan tehtävät. Tehtävästä saa KP:tä ja esineitä (reward). Uusi tehtävä: lisää olio
+// Jussi ja Ossi Ketolan tehtävät. Tehtävästä saa KP:tä ja esineitä (reward). Uusi tehtävä: lisää olio
 // tähän listaan ja englanninkieliset tekstit i18n/en-content.ts:ään (QUEST_TEXTS_EN) samalla
 // tunnisteella.
 //
@@ -11,6 +11,8 @@ import type { QuestDef } from './types';
 // minLevel-tasolla (KP-rajat data/rules.ts: taso 5 → 6 vaatii 49 KP, taso 22 → 23 noin 430 KP).
 // Liskovahdin voi tehdä yhä uudelleen, joten tasoille 34–50 riittää tekemistä. Viimeinen
 // tehtävä on Lohikäärmeiden tuho: palkintona Bugattin avaimet (nopeampi kulku kartalla).
+// Jussin veli Ossi Ketola odottaa tulivuoren kraatterissa (data/npcs.ts). Hänen luokseen pääsee,
+// kun lohikäärmeiden voitot ovat nostaneet rappuset laavasta (data/volcano-stairs.ts).
 
 export const QUESTS: readonly QuestDef[] = [
   // --- Taistelutehtävät ---
@@ -116,6 +118,30 @@ export const QUESTS: readonly QuestDef[] = [
     requires: 'lizard-watch',
     goal: { kind: 'defeat', enemy: 'dragon', count: 2 },
     reward: { xp: 1300, items: [{ id: 'bugatti-keys', count: 1 }] },
+  },
+  // --- Ossi Ketolan tehtävät tulivuoren kraatterissa ---
+  {
+    // Ossi pyytää kertomaan veljelleen Jussille, että hän on kunnossa (käynti Kotirannassa).
+    id: 'ossi-greetings',
+    giver: 'ossi',
+    title: 'Terveiset Jussille',
+    story: 'Pelastit minut lohikäärmeiltä! Käy kertomassa veljelleni Jussille, että olen kunnossa.',
+    thanks: 'Jussi tietää nyt! Ota nämä juomat. Minulla olisi vielä yksi pyyntö...',
+    minLevel: 40,
+    goal: { kind: 'visit', town: 'kotiranta' },
+    reward: { xp: 1500, items: [{ id: 'potion', count: 5 }] },
+  },
+  {
+    // Lohikäärmeen suomut putoavat vain tämän tehtävän aikana. Palkintona saaren paras haarniska.
+    id: 'dragon-scales',
+    giver: 'ossi',
+    title: 'Lohikäärmeen suomut',
+    story: 'Takon sinulle laavahaarniskan, mutta tarvitsen kolme lohikäärmeen suomua. Tuo ne!',
+    thanks: 'Upeita suomuja! Tässä on laavahaarniska. Sitä ei tuli polta!',
+    minLevel: 42,
+    requires: 'ossi-greetings',
+    goal: { kind: 'bring', item: 'dragon-scale', count: 3 },
+    reward: { xp: 2500, items: [{ id: 'lava-armor', count: 1 }] },
   },
   // --- Asiointitehtävät ---
   {

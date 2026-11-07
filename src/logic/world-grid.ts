@@ -1,5 +1,13 @@
 import { TERRAINS } from '../data/world';
-import type { MapPoint, TerrainId, TerrainMix, TownDef, WorldDef } from '../data/types';
+import type {
+  CircleDef,
+  LakeDef,
+  MapPoint,
+  TerrainId,
+  TerrainMix,
+  TownDef,
+  WorldDef,
+} from '../data/types';
 import { gridLine } from './grid-line';
 import { isInsideCircle, isInsidePolygon } from './polygon';
 import { placeRocks } from './rocks';
@@ -95,13 +103,20 @@ function baseTerrain(world: WorldDef, tile: Vec2): TerrainId {
   if (!isInsidePolygon(center, world.coast)) {
     return 'sea';
   }
-  const lake = world.lakes.find((l) => l.circles.some((c) => isInsideCircle(center, c)));
+  const lake = world.lakes.find((l) => isInLake(l, center));
   if (lake) {
     return lake.terrain ?? 'lake';
   }
   const wobbled = wobble(center, world.regionEdgeWobble);
   const region = world.regions.find((r) => isInsidePolygon(wobbled, r.area));
   return mixTerrain(region ?? world.inland, tile);
+}
+
+/** Onko piste järven ympyrässä mutta ei järven saarella. */
+function isInLake(lake: LakeDef, point: MapPoint): boolean {
+  const inside = (circles: readonly CircleDef[]): boolean =>
+    circles.some((circle) => isInsideCircle(point, circle));
+  return inside(lake.circles) && !inside(lake.islands ?? []);
 }
 
 /** Aaltojen tiheys: alueiden rajat kiemurtelevat eivätkä ole suoria viivoja. */

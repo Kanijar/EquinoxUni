@@ -16,6 +16,7 @@ import type {
 import { localDateParts, twoDigits, type DateParts } from './date-parts';
 import { FI_QUESTS } from './fi-quests';
 import { FI_SHOP } from './fi-shop';
+import { FI_STAIRS } from './fi-stairs';
 import { FI_FISHING } from './fi-fishing';
 import type { Language } from './language';
 
@@ -321,10 +322,12 @@ export const FI = {
     /** Tehtävän nimi, tarjous ja kiitos (data/quests.ts). */
     quest: (quest: QuestDef): { title: string; story: string; thanks: string } => quest,
   },
-  /** Jussi Ketolan tehtävät (i18n/fi-quests.ts). */
+  /** Tehtävänantajien (Jussi ja Ossi Ketola) tehtävät (i18n/fi-quests.ts). */
   quests: FI_QUESTS,
   /** Kulkevan kauppiaan kauppa (i18n/fi-shop.ts). */
   shop: FI_SHOP,
+  /** Tulivuoren rappuset Ossi Ketolan luo (i18n/fi-stairs.ts). */
+  stairs: FI_STAIRS,
   /** Kalastus (i18n/fi-fishing.ts). */
   fishing: FI_FISHING,
   /** Loitsujen nimet (data/spells.ts). */

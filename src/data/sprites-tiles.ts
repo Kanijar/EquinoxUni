@@ -228,6 +228,37 @@ export const TILE_SPRITES: readonly SpriteDef[] = [
     ],
   },
   {
+    // Kiviaskelma laavan päällä (data/volcano-stairs.ts): kivilaatta, jonka ympärillä hehkuu laava.
+    id: 'tile-stairs',
+    palette: {
+      a: '#e8501e',
+      b: '#c83a14',
+      y: '#ffb347',
+      d: '#3a3e46',
+      g: '#6a707a',
+      l: '#a9b0b8',
+      w: '#d3d8de',
+    },
+    rows: [
+      'aayaabaaaayaabaa',
+      'aaddddddddddddaa',
+      'adwwllllllllllda',
+      'adwlllllllllllda',
+      'adllllllllllglda',
+      'adllllllllllllda',
+      'adlllgllllllllda',
+      'adllllllllllllda',
+      'adllllllllglllda',
+      'adggggggggggggda',
+      'adggggggggggggda',
+      'adgggggggggggdda',
+      'adddddddddddddda',
+      'aaddddddddddddaa',
+      'abaaaayaaaabaaya',
+      'aaaabaayaaaaabaa',
+    ],
+  },
+  {
     // Harmaa lohkare metsän maassa. Kivi on este (data/world.ts ROCKS).
     id: 'tile-rock',
     palette: {

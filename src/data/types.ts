@@ -428,10 +428,12 @@ export type {
 // --- Saaren kartta (data/types-world.ts) ---
 
 export type {
+  CircleDef,
   LakeDef,
   MapEnemyDef,
   MapPoint,
   RockRule,
+  StairsDef,
   TerrainDef,
   TerrainId,
   TerrainRegion,

@@ -29,14 +29,15 @@ import {
   type SkillPoints,
 } from './skill-points';
 import type { Vec2 } from './vector';
+import { recordStairsVictory, type StairsNews, type StairsProgress } from './volcano-stairs';
 
 // Pelin eteneminen, joka säilyy kartan ja taistelun välillä: sankarin nimi ja ulkonäkö,
 // elämä, kokemus, kykypisteet, esineet ja varusteet, sijainti, voitetut viholliset ja niiden paluu
-// sekä tehtävät, kolikot ja kulkevan kauppiaan paikka.
+// sekä tehtävät, kolikot, kulkevan kauppiaan paikka ja tulivuoren rappuset.
 // Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
 // tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
-export interface GameState extends BossProgress, HeroAppearance, MerchantProgress {
+export interface GameState extends BossProgress, HeroAppearance, MerchantProgress, StairsProgress {
   hp: number;
   xp: number;
   /** Kuhunkin kykyyn käytetyt kykypisteet. Käyttämättömät: unspentSkillPoints(). */
@@ -102,6 +103,7 @@ export function createNewGame(startXp = 0): GameState {
     coins: PLAYER.startCoins,
     bonusSkillPoints: 0,
     merchantMs: 0,
+    stairSteps: 0,
   };
 }
 
@@ -215,6 +217,8 @@ export interface VictoryReward extends XpGain {
   readonly recovered?: readonly ItemStack[];
   /** Tehtävät, jotka edistyivät voitosta tai pudotuksesta (data/quests.ts). */
   readonly quests?: readonly QuestNews[];
+  /** Lohikäärmeen voitto nosti laavasta askelman Ossi Ketolan luo (logic/volcano-stairs.ts). */
+  readonly stairs?: StairsNews;
 }
 
 /** Tehtävän edistyminen voitossa, esim. Limat kuriin 2/3. */
@@ -263,13 +267,15 @@ export function grantVictory(
   }
   const drops = collectDrops(state, enemy, rng);
   const boss = recordBossVictory(state, enemy.id);
+  const stairs = recordStairsVictory(state, enemy.id);
   const quests = questUpdates(state, enemy.id, drops);
   const coins = victoryCoins(enemy.xp, rng);
   state.coins += coins;
   const reward: VictoryReward = { ...gainXp(state, enemy.xp), coins };
   const withDrops = drops.length > 0 ? { ...reward, drops } : reward;
   const withQuests = quests.length > 0 ? { ...withDrops, quests } : withDrops;
-  return boss ? { ...withQuests, boss } : withQuests;
+  const withStairs = stairs ? { ...withQuests, stairs } : withQuests;
+  return boss ? { ...withStairs, boss } : withStairs;
 }
 
 /** Tehtävät, jotka edistyivät: voitetun vihollisen tehtävät ja pudonneita esineitä odottavat. */

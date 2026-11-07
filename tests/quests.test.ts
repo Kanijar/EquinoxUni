@@ -19,7 +19,7 @@ import { recordQuestVisit } from '../src/logic/quest-log';
 import {
   acceptQuest,
   nextQuestLevel,
-  npcInTown,
+  npcNearby,
   npcMarker,
   questRows,
   statusOf,
@@ -65,8 +65,9 @@ describe('Jussi Ketolan tehtävät', () => {
 
   it('Jussi asuu aloituspaikkakunnassa', () => {
     const state = createNewGame();
-    expect(npcInTown(state.lastTown)?.id).toBe('jussi');
-    expect(npcInTown('peltola')).toBeNull();
+    const far = { x: 0, y: 0 };
+    expect(npcNearby(state.lastTown, far)?.id).toBe('jussi');
+    expect(npcNearby('peltola', far)).toBeNull();
   });
 
   it('voitot lasketaan vasta, kun tehtävä on otettu', () => {
@@ -231,7 +232,9 @@ describe('tehtävien sisältö', () => {
       if (goal.kind === 'visit') expect(() => getTown(goal.town)).not.toThrow();
     }
     for (const npc of NPCS) {
-      expect(() => getTown(npc.town)).not.toThrow();
+      // Hahmolla on joko paikkakunta tai oma paikka kartalla, ei molempia.
+      expect(npc.town === undefined, npc.id).not.toBe(npc.tile === undefined);
+      if (npc.town !== undefined) expect(() => getTown(npc.town ?? '')).not.toThrow();
       expect(() => getSprite(npc.sprite)).not.toThrow();
     }
   });

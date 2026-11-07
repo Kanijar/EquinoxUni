@@ -125,6 +125,7 @@ export const BACKDROP_BY_TERRAIN: Readonly<Record<TerrainId, BattleBackdropId>> 
   swamp: 'swamp',
   ash: 'volcano',
   lava: 'volcano',
+  stairs: 'volcano',
   // Kiven päällä ei seistä, mutta kivet ovat metsässä.
   rock: 'forest',
   // Vesillä ei taistella, mutta varmuuden vuoksi niillekin on tausta.

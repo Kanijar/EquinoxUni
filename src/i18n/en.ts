@@ -4,6 +4,7 @@ import { localDateParts, twoDigits, type DateParts } from './date-parts';
 import { EN_CONTENT } from './en-content';
 import { EN_QUESTS } from './en-quests';
 import { EN_SHOP } from './en-shop';
+import { EN_STAIRS } from './en-stairs';
 import { EN_FISHING } from './en-fishing';
 import { LANGUAGE_NAMES, type Texts } from './fi';
 
@@ -265,6 +266,7 @@ export const EN: Texts = {
   names: EN_CONTENT,
   quests: EN_QUESTS,
   shop: EN_SHOP,
+  stairs: EN_STAIRS,
   fishing: EN_FISHING,
   spells: {
     fireball: 'Fireball',

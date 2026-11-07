@@ -6,10 +6,12 @@ import type { NpcDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import type { GameState } from '../logic/game-state';
 import { npcMarker } from '../logic/quests';
-import { townTile } from '../logic/world-grid';
+import type { Vec2 } from '../logic/vector';
+import { pointTile, townTile } from '../logic/world-grid';
 import { tileToWorld } from './world-map';
 
-// Tehtävänantajat (esim. Jussi Ketola) kartalla paikkakuntansa talon vieressä. Pään päällä
+// Tehtävänantajat kartalla: paikkakunnan talon vieressä (Jussi Ketola) tai omassa paikassaan
+// (Ossi Ketola tulivuoren kraatterissa). Pään päällä
 // pomppii keltainen ! (uusi tehtävä) tai ? (valmis tehtävä palautettavaksi).
 // Hahmoa napauttamalla avautuu tehtävänäkymä (kun pelaaja on samassa paikkakunnassa).
 
@@ -35,9 +37,7 @@ export class NpcMarkers {
 
   private place(scene: Phaser.Scene, npc: NpcDef, onTap: (npc: NpcDef) => void): NpcMarker {
     const { offsetX, offsetY, depth, markerOffsetY, markerBobPx, markerBobMs } = NPC_MAP_VIEW;
-    const town = tileToWorld(townTile(getTown(npc.town)));
-    const x = town.x + offsetX;
-    const y = town.y + offsetY;
+    const { x, y } = npcPosition(npc, offsetX, offsetY);
     const sprite = scene.add.image(x, y, npc.sprite).setDepth(depth).setInteractive();
     sprite.on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => onTap(npc));
     const mark = scene.add
@@ -59,4 +59,13 @@ export class NpcMarkers {
     });
     return { npc, mark };
   }
+}
+
+/** Hahmon paikka pikseleinä: oma ruutu, tai paikkakunnan talon vieressä. */
+function npcPosition(npc: NpcDef, offsetX: number, offsetY: number): Vec2 {
+  if (npc.tile) {
+    return tileToWorld(pointTile(npc.tile));
+  }
+  const town = tileToWorld(townTile(getTown(npc.town ?? '')));
+  return { x: town.x + offsetX, y: town.y + offsetY };
 }
