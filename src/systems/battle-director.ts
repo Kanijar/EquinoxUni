@@ -9,6 +9,7 @@ import {
   type BattleAction,
   type BattleOutcome,
 } from '../logic/battle';
+import { isFishedEnemy } from '../logic/fishing';
 import { isBoss } from '../logic/boss';
 import { applyBattleResult, type GameState, type VictoryReward } from '../logic/game-state';
 import { burnTick } from '../logic/magic';
@@ -113,11 +114,14 @@ export class BattleDirector {
   }
 }
 
-/** Taistelun aloitusviesti: loppuboss, väijytys tai tavallinen kartan vihollinen. */
+/** Taistelun aloitusviesti: loppuboss, onkeen tarttunut (hai), väijytys tai kartan vihollinen. */
 function introText(setup: BattleSetup): string {
   const { enemy, mapEnemyIndex } = setup;
   if (isBoss(enemy.id)) {
     return TEXT.battle.bossAppears(TEXT.names.enemy(enemy));
+  }
+  if (isFishedEnemy(enemy.id)) {
+    return TEXT.fishing.battleIntro(TEXT.names.enemy(enemy));
   }
   const intro = mapEnemyIndex === null ? TEXT.battle.ambush : TEXT.battle.appears;
   return intro(TEXT.names.enemy(enemy));

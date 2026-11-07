@@ -160,9 +160,9 @@ describe('kaupan sisältö', () => {
     }
   });
 
-  it('kauppias myy aseita, varusteita, juomia ja voimia', () => {
+  it('kauppias myy aseita, varusteita, juomia, voimia ja kalastustarvikkeita', () => {
     const kinds = new Set(shopStock().map((item) => item.kind));
-    expect([...kinds].sort()).toEqual(['gear', 'heal', 'power']);
+    expect([...kinds].sort()).toEqual(['bait', 'gear', 'heal', 'power', 'tool']);
     const slots = new Set(shopStock().flatMap((item) => (item.kind === 'gear' ? [item.slot] : [])));
     expect([...slots].sort()).toEqual(['body', 'hand', 'neck']);
   });

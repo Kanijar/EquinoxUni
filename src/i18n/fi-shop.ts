@@ -29,6 +29,9 @@ export const FI_SHOP = {
   owned: 'Sinulla on jo tämä.',
   notBought: (merchant: string): string => `${merchant} ei osta tätä.`,
   powerBonus: (points: number): string => `+${points} kykypiste heti`,
+  /** Monen kappaleen erä (esim. madot). */
+  pack: (count: number): string => `${count} kpl yhdellä ostolla`,
+  boughtMany: (item: string, count: number): string => `Ostit: ${item} ×${count}!`,
   bought: (item: string): string => `Ostit: ${item}!`,
   boughtPower: 'Sait kykypisteen! Käytä se paikkakunnassa.',
   sold: (item: string, coins: number): string => `Myit: ${item}. Sait ${coins} kolikkoa!`,

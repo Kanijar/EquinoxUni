@@ -4,7 +4,7 @@ import { equipItem, unequipSlot } from './equipment';
 import { playerStats, type GameState } from './game-state';
 
 // Reppu: pelaaja avaa repun kartalla, laittaa varusteita käyttöön, ottaa niitä pois
-// ja juo parannusjuomia. Varusteiden säännöt ovat logic/equipment.ts:ssä; tämä tiedosto
+// juo parannusjuomia ja syö ruokaa (kalat). Varusteiden säännöt ovat logic/equipment.ts:ssä; tämä tiedosto
 // pitää lisäksi elämän rajoissa, kun maksimielämä muuttuu (esim. hammaskoru).
 
 /** Elämä ei saa olla yli maksimin, kun elämää antava varuste otetaan pois. */
@@ -29,22 +29,33 @@ export function unequipToBag(state: GameState, slot: GearSlot): boolean {
   return done;
 }
 
-/** Voiko esineen juoda nyt: se on parannusjuoma, sitä on repussa ja elämä ei ole täynnä. */
-export function canDrink(state: GameState, itemId: string): boolean {
+/** Paljonko esine parantaa, kun sen juo tai syö, tai null, jos se ei paranna. */
+function healValue(itemId: string): number | null {
   const item = getItem(itemId);
-  const inBag = (state.inventory[itemId] ?? 0) > 0;
-  return item.kind === 'heal' && inBag && state.hp < playerStats(state).maxHp;
+  return item.kind === 'heal' || item.kind === 'food' ? item.value : null;
 }
 
-/** Juo parannusjuoman repusta. Palauttaa, paljonko elämää palautui (0, jos ei voinut juoda). */
+/**
+ * Voiko esineen juoda tai syödä nyt: se on parannusjuoma tai ruoka, sitä on repussa ja
+ * elämä ei ole täynnä.
+ */
+export function canDrink(state: GameState, itemId: string): boolean {
+  const inBag = (state.inventory[itemId] ?? 0) > 0;
+  return healValue(itemId) !== null && inBag && state.hp < playerStats(state).maxHp;
+}
+
+/**
+ * Juo parannusjuoman tai syö ruoan (kala) repusta. Palauttaa, paljonko elämää palautui
+ * (0, jos ei voinut).
+ */
 export function drinkFromBag(state: GameState, itemId: string): number {
-  const item = getItem(itemId);
-  if (item.kind !== 'heal' || !canDrink(state, itemId)) {
+  const value = healValue(itemId);
+  if (value === null || !canDrink(state, itemId)) {
     return 0;
   }
   state.inventory[itemId] = (state.inventory[itemId] ?? 0) - 1;
   const before = state.hp;
-  state.hp = Math.min(playerStats(state).maxHp, state.hp + item.value);
+  state.hp = Math.min(playerStats(state).maxHp, state.hp + value);
   return state.hp - before;
 }
 
@@ -53,8 +64,8 @@ export type BackpackSelection =
   | { readonly kind: 'bag'; readonly itemId: string }
   | { readonly kind: 'slot'; readonly slot: GearSlot };
 
-/** Mitä valitulle esineelle voi tehdä: laittaa käyttöön, ottaa pois tai juoda. */
-export type BackpackAction = 'equip' | 'unequip' | 'drink';
+/** Mitä valitulle esineelle voi tehdä: laittaa käyttöön, ottaa pois, juoda tai syödä. */
+export type BackpackAction = 'equip' | 'unequip' | 'drink' | 'eat';
 
 /** Valitun esineen tunniste, tai null, jos valittu paikka on tyhjä tai esine loppui repusta. */
 export function selectedItemId(state: GameState, selection: BackpackSelection): string | null {
@@ -79,6 +90,9 @@ export function selectionAction(
   const kind = getItem(id).kind;
   if (kind === 'gear') {
     return 'equip';
+  }
+  if (kind === 'food') {
+    return 'eat';
   }
   return kind === 'heal' ? 'drink' : null;
 }

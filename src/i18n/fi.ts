@@ -16,6 +16,7 @@ import type {
 import { localDateParts, twoDigits, type DateParts } from './date-parts';
 import { FI_QUESTS } from './fi-quests';
 import { FI_SHOP } from './fi-shop';
+import { FI_FISHING } from './fi-fishing';
 import type { Language } from './language';
 
 // Kaikki pelaajalle näkyvät tekstit suomeksi. Älä kirjoita tekstejä suoraan koodiin,
@@ -237,10 +238,12 @@ export const FI = {
     equip: 'LAITA KÄYTTÖÖN',
     unequip: 'OTA POIS',
     drink: 'JUO',
+    eat: 'SYÖ',
     done: 'VALMIS',
     equippedNow: (item: string): string => `${item} on nyt käytössä!`,
     unequippedNow: (item: string): string => `${item} on taas repussa.`,
     drank: (amount: number): string => `Joit juoman. Elämä +${amount}!`,
+    ate: (item: string, amount: number): string => `Söit: ${item}. Elämä +${amount}!`,
     fullHp: 'Elämäsi on jo täynnä.',
   },
   battle: {
@@ -322,6 +325,8 @@ export const FI = {
   quests: FI_QUESTS,
   /** Kulkevan kauppiaan kauppa (i18n/fi-shop.ts). */
   shop: FI_SHOP,
+  /** Kalastus (i18n/fi-fishing.ts). */
+  fishing: FI_FISHING,
   /** Loitsujen nimet (data/spells.ts). */
   spells: {
     fireball: 'Tulipallo',

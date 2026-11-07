@@ -19,6 +19,7 @@ export const ENEMY_NAMES_EN: Readonly<Record<string, string>> = {
   giant: 'Rock Giant',
   lizard: 'Fire Lizard',
   dragon: 'Dragon',
+  shark: 'Shark',
 };
 
 /** Esineiden nimet ja kuvaukset englanniksi tunnisteen (ItemDef.id) mukaan. */
@@ -72,6 +73,16 @@ export const ITEM_TEXTS_EN: Readonly<
   'rune-axe': { name: 'Rune Axe', description: 'Glowing runes. Hits hard and true!' },
   'steel-armor': { name: 'Steel Armor', description: 'Shiny armor. It takes a lot!' },
   'moon-charm': { name: 'Moonstone Charm', description: 'Moon silver protects and guides you.' },
+  // Kalastus (data/fishing-items.ts)
+  'fishing-rod': { name: 'Fishing Rod', description: 'Fish by the water. You need worms!' },
+  worm: { name: 'Worm', description: 'Bait for the rod. Used up when a fish bites.' },
+  perch: { name: 'Perch', description: 'A small fish. Eat: HP +12.' },
+  pike: { name: 'Pike', description: 'A big fish. Eat: HP +25.' },
+  salmon: { name: 'Salmon', description: 'A rare treat. Eat: HP +50.' },
+  'fish-scale-armor': {
+    name: 'Fish Scale Armor',
+    description: 'Shiny scales. Slippery and tough!',
+  },
 };
 
 /** Tehtävän tekstit: nimi, tarjous (story) ja kiitos palautettaessa. */

@@ -1,3 +1,4 @@
+import { FISHING_ITEMS } from './fishing-items';
 import { MERCHANT_ITEMS } from './merchant-items';
 import type { GearSlot, ItemDef } from './types';
 
@@ -7,7 +8,8 @@ import type { GearSlot, ItemDef } from './types';
 // Viholliset pudottavat varusteita (EnemyDef.drops, data/enemies.ts).
 // price: hinta kolikkoina kulkevalla kauppiaalla, joka ostaa esineitä puoleen hintaan
 // (data/merchant.ts). Esinettä ilman hintaa (tehtäväesine, Bugattin avaimet) ei voi myydä.
-// Kauppiaan omat tavarat: data/merchant-items.ts. Sprite: data/sprites-items.ts.
+// Kauppiaan omat tavarat: data/merchant-items.ts, kalastus: data/fishing-items.ts.
+// Sprite: data/sprites-items.ts.
 
 export const ITEMS: readonly ItemDef[] = [
   {
@@ -227,6 +229,8 @@ export const ITEMS: readonly ItemDef[] = [
   },
   // --- Kulkevan kauppiaan tavarat (data/merchant-items.ts) ---
   ...MERCHANT_ITEMS,
+  // --- Kalastus: onki, madot, kalat ja Kalan suomupanssari (data/fishing-items.ts) ---
+  ...FISHING_ITEMS,
 ];
 
 /** Varustepaikat repussa tässä järjestyksessä: käsi (ase), vartalo (vaatteet), kaula (koru). */
