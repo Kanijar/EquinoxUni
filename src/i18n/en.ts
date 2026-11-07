@@ -5,6 +5,7 @@ import { EN_CONTENT } from './en-content';
 import { EN_QUESTS } from './en-quests';
 import { EN_SHOP } from './en-shop';
 import { EN_STAIRS } from './en-stairs';
+import { EN_FISHING } from './en-fishing';
 import { LANGUAGE_NAMES, type Texts } from './fi';
 
 // Kaikki pelaajalle näkyvät tekstit englanniksi. Avaimet ovat samat kuin i18n/fi.ts:ssä:
@@ -202,10 +203,12 @@ export const EN: Texts = {
     equip: 'EQUIP',
     unequip: 'REMOVE',
     drink: 'DRINK',
+    eat: 'EAT',
     done: 'DONE',
     equippedNow: (item: string): string => `${item} is now equipped!`,
     unequippedNow: (item: string): string => `${item} is back in the bag.`,
     drank: (amount: number): string => `You drank a potion. HP +${amount}!`,
+    ate: (item: string, amount: number): string => `You ate: ${item}. HP +${amount}!`,
     fullHp: 'Your HP is already full.',
   },
   battle: {
@@ -264,6 +267,7 @@ export const EN: Texts = {
   quests: EN_QUESTS,
   shop: EN_SHOP,
   stairs: EN_STAIRS,
+  fishing: EN_FISHING,
   spells: {
     fireball: 'Fireball',
   },

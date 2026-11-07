@@ -33,7 +33,7 @@ import { addLabel, addTitle } from '../ui/title-text';
 // Reppu. Avataan kartalta REPPU-napista. Vasemmalla käytössä olevat varusteet (käsi,
 // vartalo, koru), oikealla repun esineet sivuittain: nuolinapeista näkee seuraavan sivun,
 // kun esineitä on enemmän kuin yhdelle sivulle mahtuu. Esinettä napauttamalla näkee, mitä se tekee,
-// ja alareunan napista sen voi laittaa käyttöön, ottaa pois tai juoda (juoma).
+// ja alareunan napista sen voi laittaa käyttöön, ottaa pois, juoda (juoma) tai syödä (kala).
 // Kartta odottaa taustalla (nukkuu), kunnes reppu suljetaan VALMIS-napista.
 // Säännöt: logic/backpack.ts, logic/equipment.ts ja logic/bag-pages.ts (sivut).
 
@@ -174,8 +174,10 @@ export class BackpackScene extends Phaser.Scene {
       this.selection = { kind: 'bag', itemId: id };
       this.showPageOf(id);
       this.message = TEXT.backpack.unequippedNow(name);
-    } else if (action === 'drink') {
-      this.message = TEXT.backpack.drank(drinkFromBag(this.state, id));
+    } else if (action === 'drink' || action === 'eat') {
+      const healed = drinkFromBag(this.state, id);
+      this.message =
+        action === 'eat' ? TEXT.backpack.ate(name, healed) : TEXT.backpack.drank(healed);
     }
     this.refresh();
   }
@@ -212,7 +214,7 @@ export class BackpackScene extends Phaser.Scene {
     }
     const item = getItem(id);
     const action = selectionAction(this.state, selection);
-    const drinkBlocked = action === 'drink' && !canDrink(this.state, id);
+    const drinkBlocked = (action === 'drink' || action === 'eat') && !canDrink(this.state, id);
     let detail = item.kind === 'gear' ? TEXT.backpack.bonus(item.bonus) : '';
     if (drinkBlocked) {
       detail = TEXT.backpack.fullHp;

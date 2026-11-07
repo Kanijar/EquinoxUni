@@ -17,6 +17,7 @@ import { localDateParts, twoDigits, type DateParts } from './date-parts';
 import { FI_QUESTS } from './fi-quests';
 import { FI_SHOP } from './fi-shop';
 import { FI_STAIRS } from './fi-stairs';
+import { FI_FISHING } from './fi-fishing';
 import type { Language } from './language';
 
 // Kaikki pelaajalle näkyvät tekstit suomeksi. Älä kirjoita tekstejä suoraan koodiin,
@@ -238,10 +239,12 @@ export const FI = {
     equip: 'LAITA KÄYTTÖÖN',
     unequip: 'OTA POIS',
     drink: 'JUO',
+    eat: 'SYÖ',
     done: 'VALMIS',
     equippedNow: (item: string): string => `${item} on nyt käytössä!`,
     unequippedNow: (item: string): string => `${item} on taas repussa.`,
     drank: (amount: number): string => `Joit juoman. Elämä +${amount}!`,
+    ate: (item: string, amount: number): string => `Söit: ${item}. Elämä +${amount}!`,
     fullHp: 'Elämäsi on jo täynnä.',
   },
   battle: {
@@ -325,6 +328,8 @@ export const FI = {
   shop: FI_SHOP,
   /** Tulivuoren rappuset Ossi Ketolan luo (i18n/fi-stairs.ts). */
   stairs: FI_STAIRS,
+  /** Kalastus (i18n/fi-fishing.ts). */
+  fishing: FI_FISHING,
   /** Loitsujen nimet (data/spells.ts). */
   spells: {
     fireball: 'Tulipallo',

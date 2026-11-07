@@ -41,6 +41,11 @@ export class MerchantWalker {
     this.place(scene.time.now, false);
   }
 
+  /** Näkyykö KAUPPA-nappi: sankari on kauppiaan vieressä. */
+  get shopShown(): boolean {
+    return this.near;
+  }
+
   /**
    * Kauppias kävelee eteenpäin, paitsi kun sankari on hänen vieressään.
    * driveShown = BUGATTI-nappi näkyy, jolloin KAUPPA-nappi siirtyy sen vasemmalle puolelle.

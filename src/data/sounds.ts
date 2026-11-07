@@ -197,6 +197,24 @@ export const SOUNDS = {
       { freq: 200, ms: 70, slideTo: 90 },
     ],
   },
+  /** Kalastus: koho molskahtaa veteen. */
+  splash: {
+    wave: 'sine',
+    gain: 0.25,
+    notes: [
+      { freq: 500, ms: 60, slideTo: 200 },
+      { freq: 260, ms: 90, slideTo: 120 },
+    ],
+  },
+  /** Kalastus: kala nappaa, nyt pitää nykäistä! */
+  bite: {
+    wave: 'square',
+    gain: 0.25,
+    notes: [
+      { freq: 880, ms: 60 },
+      { freq: 1180, ms: 80 },
+    ],
+  },
 } as const satisfies Record<string, SoundDef>;
 
 /** Äänen tunniste, esim. playSound('hit'). Kirjoitusvirhe huomataan jo käännöksessä. */
