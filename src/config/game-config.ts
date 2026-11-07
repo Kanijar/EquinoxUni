@@ -59,6 +59,7 @@ export const SCENES = {
   saves: 'saves',
   backpack: 'backpack',
   quests: 'quests',
+  shop: 'shop',
   exit: 'exit',
 } as const;
 

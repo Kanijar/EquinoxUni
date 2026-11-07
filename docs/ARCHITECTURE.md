@@ -93,7 +93,8 @@ scenes  →  systems / ui  →  entities  →  logic
   (vuoropohjainen taistelu) → `VictoryScene` (voittoruutu: loppuboss voitettu tai jokainen
   karttavihollinen voitettu ainakin kerran) → takaisin kartalle. Peli ei lopu voittoon.
   Paikkakunnassa `WorldScene` ⇄ `SkillsScene` (kykypisteiden jako) ja `WorldScene` ⇄
-  `SavesScene` (tallennus), ja Jussi Ketolan paikkakunnassa `WorldScene` ⇄ `QuestScene` (tehtävät). Alkuruudusta `SettingsScene` (valo ja äänet), `SavesScene` (lataus)
+  `SavesScene` (tallennus), ja Jussi Ketolan paikkakunnassa `WorldScene` ⇄ `QuestScene` (tehtävät).
+  Kulkevan kauppiaan vieressä `WorldScene` ⇄ `ShopScene` (kauppa). Alkuruudusta `SettingsScene` (valo ja äänet), `SavesScene` (lataus)
   ja `ExitScene` (LÄHDE).
   Pelin tila (`logic/game-state.ts`: elämä, KP, kykypisteet, esineet, sijainti, viimeisin paikkakunta, voitetut viholliset ja niiden palautusajat) annetaan scenejen välillä `scene.start(key, data)` -datana.
 - **Hahmonluonti:** alkuruudun PELAA-nappi avaa ensin `HeroScene`n (`scenes/hero-scene.ts`),
@@ -259,6 +260,28 @@ scenes  →  systems / ui  →  entities  →  logic
   (`systems/vehicle-control.ts`). Säännöt `logic/vehicle.ts`: kerroin kerrotaan maaston kertoimella,
   joten metsä hidastaa autoakin. Taisteluun auto ei vaikuta. Tila on `GameState.driving`
   (puuttuva = pois, joten `SAVE_VERSION`ia ei tarvinnut nostaa).
+- **Kulkeva kauppias ja kolikot:** kauppias Kaapo (`data/merchant.ts`) kävelee teitä pitkin
+  paikkakunnasta toiseen (Kotiranta → Peltola → Myllykylä → Havula → Kuusela ja takaisin) ja
+  pysähtyy jokaiseen 15 sekunniksi. Reitti lasketaan samasta ruutuviivasta kuin kartan tiet,
+  joten hän pysyy tiellä (`logic/merchant-route.ts`, testi tarkistaa jokaisen ruudun). Paikka
+  lasketaan kauppiaan kellosta (`GameState.merchantMs`), joka käy vain kartalla ja pysähtyy, kun
+  sankari on hänen vieressään (`MERCHANT.talkRangePx`). Kartalla kauppias ja hänen päänsä päällä
+  pomppiva kolikko piirretään `systems/merchant-walker.ts`:ssä. Vieressä alareunaan tulee
+  KAUPPA-nappi (`ui/shop-button.ts`, REPPU- tai BUGATTI-napin vasemmalle), ja kauppiasta voi myös
+  napauttaa. `ShopScene` (`scenes/shop-scene.ts`) avautuu kartan päälle kuten reppu: OSTA- ja
+  MYY-napit, tavarat sivuittain samoilla mitoilla kuin repussa ja hinta ruudun kulmassa.
+  Hinta on esineen `price` (`data/items.ts`), ja kauppias ostaa tavarat puoleen hintaan
+  (`SHOP_RULES`). Esinettä ilman hintaa (tehtäväesine, Bugattin avaimet) ei voi myydä, eikä
+  käytössä olevaa varustetta. Varustetta, joka pelaajalla jo on, ei osteta toista kertaa, ja
+  varusteen myynti kysyy varmistuksen (VARMA?). Kauppiaan omat tavarat ovat
+  `data/merchant-items.ts`:ssä: Iso parannusjuoma (40 elämää), kuusi varustetta ja
+  Voimakristalli, uusi esinetyyppi `kind: 'power'`, joka antaa heti kykypisteen
+  (`GameState.bonusSkillPoints`) ja jonka hinta nousee joka ostolla (`priceStep`).
+  Kolikoita (`GameState.coins`, alussa `PLAYER.startCoins`) saa voitoista: puolet vihollisen
+  KP:stä ±25 % (`COIN_RULES`, `logic/coins.ts`), ja voittoviesti kertoo ne. HUD näyttää kolikot.
+  Taistelun JUOMA-nappi juo pienimmän juoman, joka riittää (`logic/heal-choice.ts`).
+  Vanhassa tallennuksessa kolikoita ja ostettuja pisteitä on 0 ja kauppias on kierroksensa
+  alussa, joten `SAVE_VERSION`ia ei tarvinnut nostaa. Säännöt `logic/shop.ts`.
 - **Pudotukset:** vihollisella on `drops: [{ item, chance }]` (`data/enemies.ts`). Jokainen
   arvotaan voitossa erikseen (`logic/drops.ts`); varustetta, joka pelaajalla jo on, ei pudoteta
   uudelleen. Voittoruudulla esineen kuva ponnahtaa ja teksti "Löysit: Peikon nuija!".
@@ -346,7 +369,7 @@ kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 
 **Vaihe 2 – Seikkailu.**
 
-- Paikkakuntien sisänäkymät (kauppa, majatalo) omina sceneinä
+- Kauppa ✓ (kulkeva kauppias Kaapo ja kolikot), paikkakuntien sisänäkymät (majatalo) omina sceneinä
 - Inventaario ja aseet ✓ (reppu, varusteet ja pudotukset), vihollisten erikoisiskut
 - NPC-hahmot ja tehtävät ✓ (Jussi Ketola, `data/npcs.ts`, `data/quests.ts`)
 - Tallennus `localStorage`en ✓ (alkuruutu, asetukset ja kolme tallennuspaikkaa)

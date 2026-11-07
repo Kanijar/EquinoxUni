@@ -9,6 +9,7 @@ import { MenuScene } from './scenes/menu-scene';
 import { QuestScene } from './scenes/quest-scene';
 import { SavesScene } from './scenes/saves-scene';
 import { SettingsScene } from './scenes/settings-scene';
+import { ShopScene } from './scenes/shop-scene';
 import { SkillsScene } from './scenes/skills-scene';
 import { VictoryScene } from './scenes/victory-scene';
 import { WorldScene } from './scenes/world-scene';
@@ -47,6 +48,7 @@ new Phaser.Game({
     SavesScene,
     BackpackScene,
     QuestScene,
+    ShopScene,
     ExitScene,
   ],
 });

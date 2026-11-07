@@ -24,6 +24,7 @@ describe('voiton viestit', () => {
       leveledUp: false,
       level: 1,
       skillPoints: 0,
+      coins: 3,
     };
     const texts = victorySteps(reward, 'Lima', view).map((step) => step.text);
     const missing = (PROGRESSION.xpForLevel[1] ?? 0) - 5;
@@ -39,6 +40,7 @@ describe('voiton viestit', () => {
       leveledUp: false,
       level: PROGRESSION.xpForLevel.length,
       skillPoints: 0,
+      coins: 3,
     };
     const texts = victorySteps(reward, 'Lima', view).map((step) => step.text);
     expect(texts.at(-1)).toBe(TEXT.battle.maxLevel);
@@ -52,6 +54,7 @@ describe('voiton viestit', () => {
       leveledUp: true,
       level: 2,
       skillPoints: 3,
+      coins: 3,
     };
     const [won] = victorySteps(reward, 'Hiisi', view);
     won?.effect?.();
@@ -66,6 +69,7 @@ describe('voiton viestit', () => {
       leveledUp: true,
       level: 2,
       skillPoints: 3,
+      coins: 3,
     };
     const texts = victorySteps(reward, 'Hiisi', view).map((step) => step.text);
     expect(texts).toContain(TEXT.battle.skillPoints(3));
@@ -79,6 +83,7 @@ describe('voiton viestit', () => {
       leveledUp: false,
       level: 5,
       skillPoints: 0,
+      coins: 3,
     };
     const progress = victorySteps(
       { ...base, boss: { kind: 'progress', count: 3, needed: 5 } },

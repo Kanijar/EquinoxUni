@@ -63,6 +63,15 @@ export const ITEM_TEXTS_EN: Readonly<
   },
   'wolf-tuft': { name: 'Wolf Fur Tuft', description: 'Soft fur. Take it to Jussi Ketola.' },
   'bugatti-keys': { name: 'Bugatti Keys', description: 'Drive 80% faster! Press E or BUGATTI.' },
+  // Kulkevan kauppiaan tavarat (data/merchant-items.ts)
+  'big-potion': { name: 'Big Healing Potion', description: 'Restores 40 HP.' },
+  'power-crystal': { name: 'Power Crystal', description: 'Gives you one skill point now!' },
+  'iron-sword': { name: 'Iron Sword', description: 'A sturdy sword for a traveller.' },
+  'chain-mail': { name: 'Chain Mail', description: 'A shirt woven from iron rings.' },
+  'ruby-amulet': { name: 'Ruby Amulet', description: 'A glowing stone. Stronger fireballs!' },
+  'rune-axe': { name: 'Rune Axe', description: 'Glowing runes. Hits hard and true!' },
+  'steel-armor': { name: 'Steel Armor', description: 'Shiny armor. It takes a lot!' },
+  'moon-charm': { name: 'Moonstone Charm', description: 'Moon silver protects and guides you.' },
 };
 
 /** Tehtävän tekstit: nimi, tarjous (story) ja kiitos palautettaessa. */

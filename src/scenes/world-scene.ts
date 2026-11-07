@@ -22,6 +22,7 @@ import { AmbushWatch } from '../systems/ambush-watch';
 import { heroTexture } from '../systems/hero-texture';
 import { Controls } from '../systems/controls';
 import { MapEncounters } from '../systems/map-encounters';
+import { MerchantWalker } from '../systems/merchant-walker';
 import { NpcMarkers } from '../systems/npc-markers';
 import { VehicleControl } from '../systems/vehicle-control';
 import { placeTownMarkers, TownTracker } from '../systems/town-markers';
@@ -33,6 +34,7 @@ import {
   walkablePosition,
   worldToTile,
 } from '../systems/world-map';
+import { MERCHANT } from '../data/merchant';
 import type { NpcDef, TownDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import { Hud } from '../ui/hud';
@@ -50,6 +52,7 @@ import type { BackpackSceneData } from './backpack-scene';
 import type { BattleSceneData } from './battle-scene';
 import type { QuestSceneData } from './quest-scene';
 import type { SavesSceneData } from './saves-scene';
+import type { ShopSceneData } from './shop-scene';
 import type { SkillsSceneData } from './skills-scene';
 import type { VictorySceneData } from './victory-scene';
 
@@ -59,6 +62,7 @@ import type { VictorySceneData } from './victory-scene';
 // reppu, jossa varusteita laitetaan käyttöön. Paikkakunnassa voi jakaa kykypisteet
 // KYKYPISTEET-napista ja tallentaa pelin TALLENNA-napista. Jussi Ketola seisoo kotipaikkakuntansa
 // vieressä: hänen kanssaan puhutaan puhenapista tai napauttamalla häntä (tehtävät).
+// Kulkeva kauppias Kaapo kävelee teitä pitkin: hänen vieressään aukeaa kauppa KAUPPA-napista.
 // Tämä scene vain kokoaa osat.
 
 export interface WorldSceneData {
@@ -88,6 +92,7 @@ export class WorldScene extends Phaser.Scene {
   private npcs!: NpcMarkers;
   private questTracker!: QuestTracker;
   private vehicle!: VehicleControl;
+  private merchant!: MerchantWalker;
   private toast!: Toast;
   private bossPointer: BossPointer | null = null;
   private encountersFrom = 0;
@@ -132,6 +137,10 @@ export class WorldScene extends Phaser.Scene {
     this.vehicle = new VehicleControl(this, this.state, this.player, (text) =>
       this.toast.show(text),
     );
+    this.merchant = new MerchantWalker(this, this.state, {
+      onOpen: () => this.openShop(),
+      onTooFar: () => this.toast.show(TEXT.shop.tooFar(MERCHANT.name)),
+    });
     const boss = this.encounters.boss;
     this.bossPointer = boss ? new BossPointer(this, boss.sprite) : null;
     if (data.bossAwakened) {
@@ -160,6 +169,7 @@ export class WorldScene extends Phaser.Scene {
     if (arrived) {
       this.rest(arrived);
     }
+    this.merchant.update(position, delta, this.vehicle.buttonShown);
     this.updateHud();
     this.bossPointer?.update();
     if (celebrateCompletion(this.state)) {
@@ -235,8 +245,16 @@ export class WorldScene extends Phaser.Scene {
     this.sleepUnder(SCENES.backpack, data);
   }
 
+  /** Kauppa avautuu kartan päälle (kuten reppu), kun sankari on kauppiaan vieressä. */
+  private openShop(): void {
+    if (!this.leaving) {
+      const data: ShopSceneData = { state: this.state };
+      this.sleepUnder(SCENES.shop, data);
+    }
+  }
+
   /** Kartta nukkuu toisen näkymän alla ja herää samaan kohtaan. */
-  private sleepUnder(key: string, data: BackpackSceneData | QuestSceneData): void {
+  private sleepUnder(key: string, data: BackpackSceneData | QuestSceneData | ShopSceneData): void {
     this.events.once(Phaser.Scenes.Events.WAKE, () => {
       this.encountersFrom = this.time.now + WORLD_VIEW.graceMs.afterBattle;
     });
@@ -268,6 +286,7 @@ export class WorldScene extends Phaser.Scene {
       maxHp: playerStats(this.state).maxHp,
       xp: this.state.xp,
       potions: healItemCount(this.state.inventory),
+      coins: this.state.coins,
       enemiesLeft: enemiesToBeat(this.state),
       townName: this.towns.town ? TEXT.names.town(this.towns.town) : '',
       bossText: bossHudText(this.state),

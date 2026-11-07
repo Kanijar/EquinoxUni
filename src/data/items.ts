@@ -1,10 +1,13 @@
+import { MERCHANT_ITEMS } from './merchant-items';
 import type { GearSlot, ItemDef } from './types';
 
 // Esineet. Parannusjuoma juodaan taistelussa tai repusta. Varusteet (kind: 'gear')
 // laitetaan käyttöön repussa: yksi varuste kerrallaan kuhunkin paikkaan (käsi, vartalo, kaula).
 // bonus lisätään pelaajan arvoihin, kun varuste on käytössä (logic/equipment.ts).
 // Viholliset pudottavat varusteita (EnemyDef.drops, data/enemies.ts).
-// Sprite: data/sprites-items.ts.
+// price: hinta kolikkoina kulkevalla kauppiaalla, joka ostaa esineitä puoleen hintaan
+// (data/merchant.ts). Esinettä ilman hintaa (tehtäväesine, Bugattin avaimet) ei voi myydä.
+// Kauppiaan omat tavarat: data/merchant-items.ts. Sprite: data/sprites-items.ts.
 
 export const ITEMS: readonly ItemDef[] = [
   {
@@ -13,6 +16,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Palauttaa 10 elämäpistettä.',
     kind: 'heal',
     sprite: 'potion',
+    price: 15,
     value: 10,
   },
   {
@@ -22,6 +26,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Raskas nuija. Kova isku!',
     kind: 'gear',
     sprite: 'club',
+    price: 60,
     slot: 'hand',
     bonus: { attack: 6 },
   },
@@ -32,6 +37,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Terävä ja kevyt. Osut tarkemmin.',
     kind: 'gear',
     sprite: 'knife',
+    price: 50,
     slot: 'hand',
     bonus: { critPercent: 8, attack: 1 },
   },
@@ -42,6 +48,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Ketterät vaatteet. Osut tarkemmin.',
     kind: 'gear',
     sprite: 'robber-clothes',
+    price: 50,
     slot: 'body',
     bonus: { critPercent: 6 },
   },
@@ -52,6 +59,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Suden hampaista tehty koru. Suden sitkeys!',
     kind: 'gear',
     sprite: 'tooth-necklace',
+    price: 50,
     slot: 'neck',
     bonus: { defense: 2, maxHp: 5 },
   },
@@ -62,6 +70,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Peikkokuninkaan viitta. Sitkeä ja lämmin!',
     kind: 'gear',
     sprite: 'king-cloak',
+    price: 1200,
     slot: 'body',
     bonus: { defense: 4, maxHp: 20 },
   },
@@ -73,6 +82,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Kova kuori suojaa iskuilta.',
     kind: 'gear',
     sprite: 'crab-armor',
+    price: 90,
     slot: 'body',
     bonus: { defense: 3, maxHp: 10 },
   },
@@ -83,6 +93,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Raskas suon kivi. Kestät enemmän!',
     kind: 'gear',
     sprite: 'bog-stone',
+    price: 220,
     slot: 'neck',
     bonus: { defense: 4, maxHp: 15 },
   },
@@ -93,6 +104,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Virvatulen hehku. Tulipallo polttaa kovemmin!',
     kind: 'gear',
     sprite: 'wisp-charm',
+    price: 220,
     slot: 'neck',
     bonus: { magic: 2, critPercent: 6 },
   },
@@ -103,6 +115,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Kalliojätin vasara. Murskaava isku!',
     kind: 'gear',
     sprite: 'stone-hammer',
+    price: 500,
     slot: 'hand',
     bonus: { attack: 12 },
   },
@@ -113,6 +126,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Tuliliskon suomut. Vahva ja sitkeä!',
     kind: 'gear',
     sprite: 'lizard-armor',
+    price: 900,
     slot: 'body',
     bonus: { defense: 7, maxHp: 30 },
   },
@@ -123,6 +137,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Lohikäärmeen hampaasta taottu. Paras ase!',
     kind: 'gear',
     sprite: 'dragon-sword',
+    price: 2000,
     slot: 'hand',
     bonus: { attack: 20, critPercent: 6 },
   },
@@ -133,6 +148,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Lohikäärmeen silmä. Sitkeyttä ja tulta!',
     kind: 'gear',
     sprite: 'dragon-charm',
+    price: 2000,
     slot: 'neck',
     bonus: { maxHp: 40, defense: 3, magic: 3 },
   },
@@ -144,6 +160,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Vähän ruosteinen, mutta terävä.',
     kind: 'gear',
     sprite: 'jussi-sword',
+    price: 30,
     slot: 'hand',
     bonus: { attack: 3 },
   },
@@ -153,6 +170,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Paksu liivi, joka pehmentää iskuja.',
     kind: 'gear',
     sprite: 'leather-vest',
+    price: 40,
     slot: 'body',
     bonus: { defense: 2, maxHp: 6 },
   },
@@ -162,6 +180,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Jussin onnenkalu. Osut tarkemmin!',
     kind: 'gear',
     sprite: 'lucky-charm',
+    price: 60,
     slot: 'neck',
     bonus: { critPercent: 5, magic: 1 },
   },
@@ -172,6 +191,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Sauvan päässä hehkuu liekki.',
     kind: 'gear',
     sprite: 'fire-staff',
+    price: 150,
     slot: 'hand',
     bonus: { magic: 3, attack: 1 },
   },
@@ -182,6 +202,7 @@ export const ITEMS: readonly ItemDef[] = [
     description: 'Vanha suvun haarniska. Kestää kovan iskun!',
     kind: 'gear',
     sprite: 'ketola-armor',
+    price: 400,
     slot: 'body',
     bonus: { defense: 3, maxHp: 15 },
   },
@@ -204,6 +225,8 @@ export const ITEMS: readonly ItemDef[] = [
     speedMultiplier: 1.8,
     mapSprite: 'bugatti',
   },
+  // --- Kulkevan kauppiaan tavarat (data/merchant-items.ts) ---
+  ...MERCHANT_ITEMS,
 ];
 
 /** Varustepaikat repussa tässä järjestyksessä: käsi (ase), vartalo (vaatteet), kaula (koru). */

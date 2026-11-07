@@ -4,10 +4,12 @@ import { GEAR_SLOTS } from '../data/items';
 import { PLAYER } from '../data/player';
 import type { EyeColor } from '../data/types';
 import { SKILLS } from '../data/skills';
+import { readCount } from './coins';
 import { findGear, type Equipped } from './equipment';
 import { readLook } from './hero-look';
 import { cleanHeroName } from './hero-name';
 import { playerStats, type GameState } from './game-state';
+import { readMerchantMs } from './merchant-route';
 import { mapEnemyRespawnMs, type RespawnTimer } from './respawn';
 import { readQuests } from './save-quests';
 import { noSkillPoints, type SkillPoints } from './skill-points';
@@ -18,6 +20,7 @@ import type { Vec2 } from './vector';
 // Tuntemattomat esineet ja viholliset jätetään pois, puuttuvat kyvyt ovat 0
 // ja puuttuvat varusteet tyhjiä. Vanhassa tallennuksessa ei ole nimeä eikä ulkonäköä:
 // silloin sankari on oletusnimellä ja -näköinen, joten SAVE_VERSIONia ei tarvinnut nostaa.
+// Samoin puuttuvat kolikot ja ostetut kykypisteet ovat 0 ja kauppias kierroksensa alussa.
 
 type RawRecord = Record<string, unknown>;
 
@@ -187,6 +190,9 @@ export function readGameState(value: unknown): GameState | null {
     completed: value['completed'] === true,
     quests: readQuests(value['quests']),
     driving: value['driving'] === true,
+    coins: readCount(value['coins']),
+    bonusSkillPoints: readCount(value['bonusSkillPoints']),
+    merchantMs: readMerchantMs(value['merchantMs']),
   };
   // Elämä pysyy rajoissa: vähintään 1, enintään maksimielämä.
   state.hp = Math.min(Math.max(1, state.hp), playerStats(state).maxHp);

@@ -58,6 +58,11 @@ export class ItemTile {
     this.countText.setText(sprite !== null && count > 1 ? TEXT.backpack.count(count) : '');
   }
 
+  /** Pieni teksti oikeaan alakulmaan määrän paikalle (esim. hinta kaupassa). */
+  setNote(text: string, color: string = COLORS.text): void {
+    this.countText.setText(text).setColor(color);
+  }
+
   setSelected(selected: boolean): void {
     this.box.setStrokeStyle(
       selected ? SELECTED_BORDER : BORDER,

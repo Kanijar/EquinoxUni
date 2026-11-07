@@ -1,6 +1,7 @@
 import { BOSS_SPRITES } from './sprites-bosses';
 import { CHARACTER_SPRITES } from './sprites-characters';
 import { ITEM_SPRITES } from './sprites-items';
+import { MERCHANT_SPRITES } from './sprites-merchant';
 import { MONSTER_SPRITES } from './sprites-monsters';
 import { QUEST_ITEM_SPRITES } from './sprites-quest-items';
 import { TILE_SPRITES } from './sprites-tiles';
@@ -9,7 +10,8 @@ import type { SpriteDef } from './types';
 
 // Kaikki pikselispritet yhdessä listassa. Hahmot: sprites-characters.ts,
 // bossit (24x24): sprites-bosses.ts, saaren hirviöt: sprites-monsters.ts, esineet: sprites-items.ts
-// ja sprites-quest-items.ts, karttaruudut: sprites-tiles.ts,
+// ja sprites-quest-items.ts, kulkeva kauppias ja hänen tavaransa: sprites-merchant.ts,
+// karttaruudut: sprites-tiles.ts,
 // käyttöliittymän ikonit: sprites-ui.ts.
 export const SPRITES: readonly SpriteDef[] = [
   ...CHARACTER_SPRITES,
@@ -17,6 +19,7 @@ export const SPRITES: readonly SpriteDef[] = [
   ...MONSTER_SPRITES,
   ...ITEM_SPRITES,
   ...QUEST_ITEM_SPRITES,
+  ...MERCHANT_SPRITES,
   ...TILE_SPRITES,
   ...UI_SPRITES,
 ];
