@@ -24,7 +24,7 @@ import type { HeroSceneData } from './hero-scene';
 // lisäjuomilla (logic/menu-secret.ts). Alkuruudulla siitä ei kerrota: susi vain ulvahtaa
 // ja muuttuu hehkuvaksi henkisudeksi. Kartalla näkyy yllätysviesti.
 // Toinen salaisuus: liman napautus muuttaa sankarin silmät mustiksi heti ja uudessa pelissä.
-// Kolmas salaisuus: vasemmassa reunassa on todella pieni burgeri. Sen napautus antaa parhaat
+// Kolmas salaisuus: vasemmassa reunassa on todella pieni, kerran minuutissa välähtävä burgeri. Sen napautus antaa parhaat
 // varusteet ja Bugattin avaimet uuteen peliin tai LATAA-napista ladattuun peliin (logic/burger-secret.ts).
 
 interface MenuEntry {
