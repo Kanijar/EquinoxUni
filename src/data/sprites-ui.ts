@@ -1,11 +1,19 @@
 import type { SpriteDef } from './types';
 
-// Käyttöliittymän pienet pikselikuvat: taistelunappien ja repun sivunuolten ikonit (8×8)
-// sekä taivaan pilvi.
+// Käyttöliittymän pienet pikselikuvat: taistelunappien ja repun sivunuolten ikonit (8×8),
+// taivaan pilvi ja alkuruudun salainen burgeri (ehjä ja purtu).
 // Ikonit piirretään kaksinkertaisina (config/battle-config.ts ACTION_BUTTON).
 
 const BLADE = { w: '#e8eef8', l: '#9aa8c0', g: '#ffd23f', k: '#8a5a2a' };
 const WHITE = { w: '#e8eef8' };
+const BURGER = {
+  b: '#d98c2b',
+  s: '#fff4d0',
+  g: '#5fd35f',
+  c: '#ffd23f',
+  m: '#6b3a1e',
+  d: '#a8641c',
+};
 
 export const UI_SPRITES: readonly SpriteDef[] = [
   {
@@ -131,5 +139,15 @@ export const UI_SPRITES: readonly SpriteDef[] = [
       'wwwwwwwwwwwwwwwwwwwwww',
       '.ssssssssssssssssssss.',
     ],
+  },
+  {
+    id: 'burger',
+    palette: BURGER,
+    rows: ['..bbbb..', '.bsbbsb.', 'bbbbbbbb', 'gggggggg', 'cccccccc', 'mmmmmmmm', '.dddddd.'],
+  },
+  {
+    id: 'burger-bitten',
+    palette: BURGER,
+    rows: ['..bbb...', '.bsbb...', 'bbbbbb..', 'ggggg...', 'cccccc..', 'mmmmmmm.', '.dddddd.'],
   },
 ];
