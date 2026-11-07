@@ -71,10 +71,12 @@ export const MENU_SECRET: MenuSecretRules = {
 /**
  * Salaisuus: alkuruudun vasemmassa reunassa on pieni burgeri. Kun sitä napauttaa ja sitten
  * aloittaa uuden pelin tai lataa tallennuksen, sankari saa parhaat varusteet käyttöön
- * (jokaiseen paikkaan pisteiltään paras, gearWeights) ja Bugattin avaimet. Tasot eivät nouse.
- * Omistettua esinettä ei anneta toista kertaa (logic/burger-secret.ts).
+ * (jokaiseen paikkaan pisteiltään paras, gearWeights), Bugattin avaimet ja miljoona kultakolikkoa.
+ * Tasot eivät nouse. Omistettua esinettä ei anneta toista kertaa, ja kolikot nostetaan
+ * miljoonaan vain, jos niitä on vähemmän (logic/burger-secret.ts).
  */
 export const BURGER_SECRET: BurgerSecretRules = {
   gearWeights: { attack: 1, defense: 2, maxHp: 0.5, critPercent: 1, magic: 2 },
   extraItems: ['bugatti-keys'],
+  coins: 1_000_000,
 };

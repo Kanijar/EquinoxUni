@@ -148,7 +148,8 @@ export const EN: Texts = {
   world: {
     intro: 'Your adventure begins in Kotiranta!',
     wolfBlessing: (level: number): string => `The wolf blessed you! Level ${level}!`,
-    burgerGift: 'Yum, a secret burger!\nYou got the best gear and the Bugatti keys!',
+    burgerGift:
+      'Yum, a secret burger!\nYou got the best gear, the Bugatti keys\nand a million gold coins!',
     burgerAgain: 'Yum, a burger!\nYou already have the best gear.',
     rest: (town): string => `You rested in ${town.name}. HP restored!`,
     revived: (town): string => `You fell... and woke up in ${town.name}. HP restored!`,

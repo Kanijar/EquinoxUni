@@ -274,6 +274,8 @@ export interface BurgerSecretRules {
   readonly gearWeights: Readonly<Record<GearStat, number>>;
   /** Muut esineet, jotka burgeri antaa (yksi kutakin, ei toista kertaa). */
   readonly extraItems: readonly string[];
+  /** Kultakolikot: jos kolikoita on vähemmän, määrä nostetaan tähän (ei kasva toistolla). */
+  readonly coins: number;
 }
 
 export interface MagicRules {
