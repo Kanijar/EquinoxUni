@@ -50,6 +50,7 @@ export const FONT = {
 export const SCENES = {
   boot: 'boot',
   menu: 'menu',
+  hero: 'hero',
   world: 'world',
   battle: 'battle',
   victory: 'victory',

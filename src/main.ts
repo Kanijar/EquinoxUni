@@ -4,6 +4,7 @@ import { BackpackScene } from './scenes/backpack-scene';
 import { BattleScene } from './scenes/battle-scene';
 import { BootScene } from './scenes/boot-scene';
 import { ExitScene } from './scenes/exit-scene';
+import { HeroScene } from './scenes/hero-scene';
 import { MenuScene } from './scenes/menu-scene';
 import { QuestScene } from './scenes/quest-scene';
 import { SavesScene } from './scenes/saves-scene';
@@ -37,6 +38,7 @@ new Phaser.Game({
   scene: [
     BootScene,
     MenuScene,
+    HeroScene,
     WorldScene,
     BattleScene,
     VictoryScene,

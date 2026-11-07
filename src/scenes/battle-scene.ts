@@ -5,14 +5,11 @@ import type { TerrainId } from '../data/types';
 import { createBattle, enemyFighter } from '../logic/battle';
 import { backdropForBattle } from '../logic/battle-look';
 import { bossName } from '../logic/boss';
-import {
-  playerFighter,
-  playerSprite,
-  type GameState,
-  type VictoryReward,
-} from '../logic/game-state';
+import { playerFighter, type GameState, type VictoryReward } from '../logic/game-state';
+import { heroName } from '../logic/hero-name';
 import { reviveAtLastTown } from '../logic/town-visits';
 import { BattleDirector, type FinishedOutcome } from '../systems/battle-director';
+import { heroTexture } from '../systems/hero-texture';
 import { TEXT } from '../i18n/text';
 import { BattleView } from '../ui/battle-view';
 import { coverScreen, revealScreen } from '../ui/screen-wipe';
@@ -48,9 +45,9 @@ export class BattleScene extends Phaser.Scene {
       enemy,
     );
     const view = new BattleView(this, {
-      playerName: TEXT.names.player,
+      playerName: heroName(data.state.name, TEXT.names.player),
       playerXp: data.state.xp,
-      playerSprite: playerSprite(data.state),
+      playerSprite: heroTexture(this.textures, data.state),
       enemyName: TEXT.names.enemy(enemy),
       enemySprite: enemy.sprite,
       backdrop: backdropForBattle(data.terrain, enemy),

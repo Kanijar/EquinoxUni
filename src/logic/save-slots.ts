@@ -11,6 +11,8 @@ export type SlotInfo =
   | {
       readonly slot: number;
       readonly kind: 'saved';
+      /** Sankarin oma nimi, tyhjä = oletusnimi. */
+      readonly heroName: string;
       readonly level: number;
       readonly xp: number;
       readonly place: string;
@@ -36,7 +38,8 @@ export function readSlot(store: KeyValueStore, slot: number): SlotInfo {
     return { slot, kind: 'broken' };
   }
   const { state, place, savedAt } = save;
-  return { slot, kind: 'saved', level: playerLevel(state), xp: state.xp, place, savedAt };
+  const level = playerLevel(state);
+  return { slot, kind: 'saved', heroName: state.name, level, xp: state.xp, place, savedAt };
 }
 
 export function listSlots(store: KeyValueStore): SlotInfo[] {

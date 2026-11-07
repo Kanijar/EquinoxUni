@@ -5,6 +5,7 @@ import type {
   GearSlot,
   GearStat,
   ItemDef,
+  LookPart,
   NpcDef,
   PlayerStats,
   QuestDef,
@@ -87,6 +88,26 @@ export const FI = {
     /** Oikean yläkulman nappi: asentaa pelin puhelimen aloitusnäytölle (PWA). */
     install: 'ASENNA',
   },
+  /** Hahmonluonti uuden pelin alussa (scenes/hero-scene.ts). */
+  hero: {
+    title: 'LUO SANKARI',
+    start: 'ALOITA',
+    back: 'TAKAISIN',
+    random: 'ARVO',
+    name: 'Nimi',
+    /** Valintarivin nuolinapit: edellinen ja seuraava vaihtoehto. */
+    previous: '<',
+    next: '>',
+    parts: {
+      skin: 'Iho',
+      hairStyle: 'Hiukset',
+      hairColor: 'Hiusväri',
+      shirt: 'Paita',
+      pants: 'Housut',
+    } satisfies Record<LookPart, string>,
+    /** Hiustyylin numero, esim. "2/5". */
+    choice: (choice: number, total: number): string => `${choice}/${total}`,
+  },
   settings: {
     title: 'Asetukset',
     brightness: 'Valo',
@@ -108,6 +129,9 @@ export const FI = {
     empty: 'Tyhjä',
     broken: 'Tallennus on vioittunut.',
     level: (level: number): string => `Taso ${level}`,
+    /** Tallennettu peli: paikan numero, sankarin nimi ja taso. */
+    savedTitle: (slot: number, hero: string, level: number): string =>
+      `${slot}. ${hero}  Taso ${level}`,
     details: (place: string, savedAt: number): string => `${place}, ${formatTime(savedAt)}`,
     save: 'TALLENNA',
     load: 'LATAA',

@@ -5,6 +5,8 @@ import { PLAYER } from '../data/player';
 import type { EyeColor } from '../data/types';
 import { SKILLS } from '../data/skills';
 import { findGear, type Equipped } from './equipment';
+import { readLook } from './hero-look';
+import { cleanHeroName } from './hero-name';
 import { playerStats, type GameState } from './game-state';
 import { mapEnemyRespawnMs, type RespawnTimer } from './respawn';
 import { readQuests } from './save-quests';
@@ -14,7 +16,8 @@ import type { Vec2 } from './vector';
 // Tarkistaa tallennuksesta luetun pelin tilan. Selaimen tietoja voi muokata
 // käsin tai ne voivat olla vanhasta pelin versiosta, joten mitään ei oleteta.
 // Tuntemattomat esineet ja viholliset jätetään pois, puuttuvat kyvyt ovat 0
-// ja puuttuvat varusteet tyhjiä.
+// ja puuttuvat varusteet tyhjiä. Vanhassa tallennuksessa ei ole nimeä eikä ulkonäköä:
+// silloin sankari on oletusnimellä ja -näköinen, joten SAVE_VERSIONia ei tarvinnut nostaa.
 
 type RawRecord = Record<string, unknown>;
 
@@ -95,7 +98,7 @@ function readLastTown(value: unknown): string {
 
 /** Tuntematon tai puuttuva silmien väri = pelin oletusväri. */
 function readEyeColor(value: unknown): EyeColor {
-  return typeof value === 'string' && Object.keys(PLAYER.eyeSprites).includes(value)
+  return typeof value === 'string' && Object.keys(PLAYER.eyeColors).includes(value)
     ? (value as EyeColor)
     : PLAYER.eyeColor;
 }
@@ -177,6 +180,8 @@ export function readGameState(value: unknown): GameState | null {
     lastTown: readLastTown(value['lastTown']),
     defeated,
     respawning,
+    name: typeof value['name'] === 'string' ? cleanHeroName(value['name']) : '',
+    look: readLook(value['look']),
     eyeColor: readEyeColor(value['eyeColor']),
     ...readBoss(value),
     completed: value['completed'] === true,

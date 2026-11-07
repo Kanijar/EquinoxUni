@@ -6,10 +6,10 @@ import type { MenuSecretRules } from '../src/data/types';
 import {
   createNewGame,
   playerLevel,
-  playerSprite,
   playerStats,
   unspentSkillPoints,
 } from '../src/logic/game-state';
+import { heroSprite } from '../src/logic/hero-look';
 import { createMenuGame, NO_MENU_TAPS, startFromMenu } from '../src/logic/menu-secret';
 import { minXpForLevel, xpProgress } from '../src/logic/progression';
 
@@ -98,7 +98,7 @@ describe('alkuruudun suden salaisuus', () => {
     const state = createMenuGame(SLIME);
     expect(state.eyeColor).toBe(MENU_SECRET.slimeEyeColor);
     expect(state.eyeColor).toBe('black');
-    expect(playerSprite(state)).toBe(PLAYER.eyeSprites.black);
+    expect(heroSprite(state.look, state.eyeColor).palette['e']).toBe(PLAYER.eyeColors.black);
     expect(state.xp).toBe(0);
   });
 
@@ -115,9 +115,9 @@ describe('alkuruudun suden salaisuus', () => {
     expect(start.message).toContain('Susi siunasi sinut!');
   });
 
-  it('sankarilla on sprite jokaiselle silmien värille', () => {
-    for (const sprite of Object.values(PLAYER.eyeSprites)) {
-      expect(() => getSprite(sprite)).not.toThrow();
+  it('sankarilla on väri jokaiselle silmien värille', () => {
+    for (const color of Object.values(PLAYER.eyeColors)) {
+      expect(color).toMatch(/^#[0-9a-f]{6}$/);
     }
   });
 });

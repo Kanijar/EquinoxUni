@@ -89,13 +89,28 @@ scenes  →  systems / ui  →  entities  →  logic
 - **Resoluutio** 480 × 270 (16:9), skaalataan puhelimen näytölle `Scale.FIT`-tilassa.
   Ruutukoko 16 px, hahmot 16 × 16 px.
 - **Scenet:** `BootScene` (luo/lataa grafiikat, ottaa asetukset käyttöön) → `MenuScene`
-  (alkuruutu: PELAA, LATAA, ASETUKSET, LÄHDE) → `WorldScene` (saaren kartta) ⇄ `BattleScene`
+  (alkuruutu: PELAA, LATAA, ASETUKSET, LÄHDE) → `HeroScene` (hahmonluonti, vain uusi peli) → `WorldScene` (saaren kartta) ⇄ `BattleScene`
   (vuoropohjainen taistelu) → `VictoryScene` (voittoruutu: loppuboss voitettu tai jokainen
   karttavihollinen voitettu ainakin kerran) → takaisin kartalle. Peli ei lopu voittoon.
   Paikkakunnassa `WorldScene` ⇄ `SkillsScene` (kykypisteiden jako) ja `WorldScene` ⇄
   `SavesScene` (tallennus), ja Jussi Ketolan paikkakunnassa `WorldScene` ⇄ `QuestScene` (tehtävät). Alkuruudusta `SettingsScene` (valo ja äänet), `SavesScene` (lataus)
   ja `ExitScene` (LÄHDE).
   Pelin tila (`logic/game-state.ts`: elämä, KP, kykypisteet, esineet, sijainti, viimeisin paikkakunta, voitetut viholliset ja niiden palautusajat) annetaan scenejen välillä `scene.start(key, data)` -datana.
+- **Hahmonluonti:** alkuruudun PELAA-nappi avaa ensin `HeroScene`n (`scenes/hero-scene.ts`),
+  jossa pelaaja kirjoittaa sankarille nimen ja valitsee ihon, hiustyylin, hiusten värin, paidan
+  ja housujen värin nuolinapeilla (ARVO arpoo ulkonäön, ALOITA vie kartalle). Vaihtoehdot ovat
+  dataa (`data/hero-looks.ts`): värit listoina ja hiustyylit riveinä, jotka korvaavat sankarin
+  spriten ylimmät rivit. Valinta tallennetaan järjestysnumeroina (`GameState.look`), ja sprite
+  kootaan niistä (`logic/hero-look.ts` `heroSprite`, tekstuuri `systems/hero-texture.ts`).
+  Sama sankari näkyy kartalla, taistelussa ja voittoruudulla, ja Bugattin kuskilla on sankarin
+  hiukset ja iho. Nimi kirjoitetaan HTML-tekstikenttään pelin päällä (`ui/name-input.ts`), jotta
+  puhelin avaa oman näppäimistönsä; kenttä on ruudun yläosassa, ettei näppäimistö peitä sitä.
+  Nimi siistitään (`logic/hero-name.ts`: kirjaimet, numerot, välilyönnit ja yhdysmerkit,
+  enintään `PLAYER.nameMaxLength` = 12 merkkiä). Tyhjä nimi (`GameState.name` = '') näytetään
+  oletusnimenä valitulla kielellä (Sankari / Hero). Nimi näkyy taistelun nimikyltissä ja
+  tallennuksissa. Vanhassa tallennuksessa ei ole nimeä eikä ulkonäköä, joten se latautuu
+  oletuksilla (`save-validate.ts`), eikä `SAVE_VERSION`ia tarvinnut nostaa. Alkuruudun sankari
+  on aina oletusnäköinen.
 - **Versio ja julkaisuaika:** alkuruudun oikeassa alakulmassa lukee esim. "Versio: 0.25 (alfa)"
   ja sen alla "Julkaistu 1.11.2026 klo 10.05". Numero on uusimman PR:n numero: `vite.config.ts`
   lukee buildissa commitien otsikot gitistä (`logic/release-number.ts`), ja buildin aika on

@@ -2,6 +2,7 @@ import type { SpriteDef } from './types';
 
 // Hahmojen pikselispritet (16x16). Esineet: sprites-items.ts. Korvataan myöhemmin oikeilla PNG-kuvilla
 // (public/assets/), mutta tunniste (id) pysyy samana, joten muu koodi ei muutu.
+// Sankari kootaan pelaajan valitsemasta ulkonäöstä: data/hero-looks.ts ja logic/hero-look.ts.
 
 const SKIN = '#f2c38f';
 
@@ -25,28 +26,6 @@ const WOLF_ROWS = [
   '................',
 ];
 
-/** Sankarin muoto. Silmien väri (e) vaihtelee: data/player.ts eyeSprites. */
-const HERO_ROWS = [
-  '................',
-  '.....hhhhhh.....',
-  '....hhhhhhhh....',
-  '....hssssssh....',
-  '....sesssses....',
-  '....ssssssss....',
-  '.....ssssss.....',
-  '....bbbbbbbb....',
-  '...bbbbbbbbbb...',
-  '...sbbbbbbbbs...',
-  '...sbbbbbbbbs...',
-  '....llllllll....',
-  '....lll..lll....',
-  '....lll..lll....',
-  '....kkk..kkk....',
-  '................',
-];
-
-const HERO_COLORS = { h: '#5a3a1a', s: SKIN, b: '#2e6fd8', l: '#22355e', k: '#3b2a1a' };
-
 export const CHARACTER_SPRITES: readonly SpriteDef[] = [
   {
     // Sankari Bugattin ratissa (kartalla, kun Bugattin avaimet ovat päällä, data/items.ts).
@@ -57,7 +36,8 @@ export const CHARACTER_SPRITES: readonly SpriteDef[] = [
       b: '#3a8ee6',
       B: '#1c3f8f',
       w: '#a8d8ff',
-      h: HERO_COLORS.h,
+      // Kuski: hiukset ja iho vaihtuvat sankarin ulkonäön mukaan (logic/hero-look.ts driverSprite).
+      h: '#5a3a1a',
       s: SKIN,
       y: '#ffe066',
       g: '#b0b0b0',
@@ -80,16 +60,6 @@ export const CHARACTER_SPRITES: readonly SpriteDef[] = [
       '................',
       '................',
     ],
-  },
-  {
-    id: 'hero',
-    palette: { ...HERO_COLORS, e: '#ffd700' },
-    rows: HERO_ROWS,
-  },
-  {
-    id: 'hero-black-eyes',
-    palette: { ...HERO_COLORS, e: '#1a1a2e' },
-    rows: HERO_ROWS,
   },
   {
     id: 'slime',

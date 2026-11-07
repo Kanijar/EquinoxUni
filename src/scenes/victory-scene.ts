@@ -11,7 +11,8 @@ import {
 import { FINAL_BOSS } from '../data/boss';
 import { TEXT } from '../i18n/text';
 import { bossName, isBossAwake } from '../logic/boss';
-import { playerLevel, playerSprite, type GameState } from '../logic/game-state';
+import { playerLevel, type GameState } from '../logic/game-state';
+import { heroTexture } from '../systems/hero-texture';
 import { playSound } from '../systems/sound-fx';
 import { revealScreen } from '../ui/screen-wipe';
 import type { WorldSceneData } from './world-scene';
@@ -75,7 +76,7 @@ export class VictoryScene extends Phaser.Scene {
   private addHero(state: GameState): void {
     const { heroY, heroScale, hopPx, hopMs } = VICTORY_VIEW;
     const hero = this.add
-      .sprite(GAME_WIDTH / 2, heroY, playerSprite(state))
+      .sprite(GAME_WIDTH / 2, heroY, heroTexture(this.textures, state))
       .setOrigin(0.5, 1)
       .setScale(heroScale);
     this.tweens.add({

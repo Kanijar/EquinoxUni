@@ -1,12 +1,13 @@
 import { MAP_ENEMIES } from '../data/map-enemies';
 import { PLAYER } from '../data/player';
 import { WORLD } from '../data/world';
-import type { EnemyDef, EyeColor, ItemStack, PlayerStats, SkillId } from '../data/types';
+import type { EnemyDef, ItemStack, PlayerStats, SkillId } from '../data/types';
 import { recoverStolen, type Battle, type Rng } from './battle';
 import { recordBossVictory, type BossNews, type BossProgress } from './boss';
 import type { Fighter } from './combat';
 import { rollDrops } from './drops';
 import { applyGear, ownsItem, type Equipped } from './equipment';
+import { newAppearance, type HeroAppearance } from './hero-look';
 import { levelForXp } from './progression';
 import {
   canQuestDrop,
@@ -27,13 +28,13 @@ import {
 } from './skill-points';
 import type { Vec2 } from './vector';
 
-// Pelin eteneminen, joka säilyy kartan ja taistelun välillä:
+// Pelin eteneminen, joka säilyy kartan ja taistelun välillä: sankarin nimi ja ulkonäkö,
 // elämä, kokemus, kykypisteet, esineet ja varusteet, sijainti, voitetut viholliset ja niiden paluu
 // sekä tehtävät.
 // Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
 // tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
-export interface GameState extends BossProgress {
+export interface GameState extends BossProgress, HeroAppearance {
   hp: number;
   xp: number;
   /** Kuhunkin kykyyn käytetyt kykypisteet. Käyttämättömät: unspentSkillPoints(). */
@@ -56,8 +57,6 @@ export interface GameState extends BossProgress {
   readonly defeated: number[];
   /** Kartalta poissa olevat voitetut viholliset ja aika niiden paluuseen (logic/respawn.ts). */
   readonly respawning: RespawnTimer[];
-  /** Sankarin silmien väri (data/player.ts eyeSprites). Alkuruudun lima muuttaa sen. */
-  eyeColor: EyeColor;
   /**
    * Onko läpäisy (jokainen karttavihollinen voitettu ainakin kerran) jo juhlittu
    * voittoruudulla. Peli jatkuu läpäisyn jälkeen, ja voittoruutu näytetään vain kerran.
@@ -88,18 +87,13 @@ export function createNewGame(startXp = 0): GameState {
     lastTown: WORLD.startTown,
     defeated: [],
     respawning: [],
-    eyeColor: PLAYER.eyeColor,
+    ...newAppearance(),
     bossProgress: 0,
     bossDefeated: false,
     completed: false,
     quests: {},
     driving: false,
   };
-}
-
-/** Sankarin sprite silmien värin mukaan (kartta ja taistelu). */
-export function playerSprite(state: GameState): string {
-  return PLAYER.eyeSprites[state.eyeColor];
 }
 
 /** Karttaviholliset, joita ei ole vielä voitettu kertaakaan. */
