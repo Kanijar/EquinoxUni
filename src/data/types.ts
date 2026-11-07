@@ -32,21 +32,48 @@ export interface ItemStack {
   readonly count: number;
 }
 
-/** Sankarin silmien väri. Uusi väri: lisää tähän ja PLAYER.eyeSprites-listaan (data/player.ts). */
+/** Sankarin silmien väri. Uusi väri: lisää tähän ja PLAYER.eyeColors-listaan (data/player.ts). */
 export type EyeColor = 'yellow' | 'black';
 
 export interface PlayerDef {
+  /** Sankarin nimi, jos pelaaja ei kirjoita omaa nimeä hahmonluonnissa. */
   readonly name: string;
+  /** Pelaajan oman nimen enimmäispituus merkkeinä (hahmonluonti). */
+  readonly nameMaxLength: number;
   /** Silmien väri pelin alussa. */
   readonly eyeColor: EyeColor;
-  /** Sankarin sprite kullekin silmien värille (data/sprites-characters.ts). */
-  readonly eyeSprites: Readonly<Record<EyeColor, string>>;
+  /** Kunkin silmien värin väri spritessä (#rrggbb). */
+  readonly eyeColors: Readonly<Record<EyeColor, string>>;
   /** Arvot pelin alussa. Kasvavat vain kykypisteillä (data/skills.ts). */
   readonly stats: PlayerStats;
   /** Loitsu, joka on HYÖKKÄÄ-valikon TULIPALLO-napissa (data/spells.ts). */
   readonly spell: SpellId;
   /** Esineet, jotka pelaajalla on pelin alussa. */
   readonly startItems: readonly ItemStack[];
+}
+
+/** Sankarin värit, jotka pelaaja valitsee hahmonluonnissa (data/hero-looks.ts). */
+export type LookColorPart = 'skin' | 'hairColor' | 'shirt' | 'pants';
+/** Kaikki valittavat ulkonäön osat: värit ja hiustyyli. */
+export type LookPart = LookColorPart | 'hairStyle';
+/** Valittu ulkonäkö: kunkin osan vaihtoehdon järjestysnumero HERO_LOOKS-listoissa (0 = ensimmäinen). */
+export type HeroLook = Readonly<Record<LookPart, number>>;
+
+/** Hiustyyli: sankarin spriten ylimmät rivit korvataan näillä (merkit kuten HERO_LOOKS.baseRows). */
+export interface HairStyleDef {
+  readonly id: string;
+  readonly rows: readonly string[];
+}
+
+export interface HeroLookOptions {
+  /** Sankarin muoto. h hiukset, c lippis, s iho, e silmät, b paita, l housut, k kengät. */
+  readonly baseRows: readonly string[];
+  readonly hairStyles: readonly HairStyleDef[];
+  /** Valittavat värit (#rrggbb) osittain. Ensimmäinen on oletus. */
+  readonly colors: Readonly<Record<LookColorPart, readonly string[]>>;
+  readonly bootColor: string;
+  /** Osien järjestys hahmonluonnissa ylhäältä alas. */
+  readonly parts: readonly LookPart[];
 }
 
 export interface EnemyDef {

@@ -1,6 +1,7 @@
 import type Phaser from 'phaser';
 import { BUTTON, COLORS, FONT, GAME_WIDTH, SAVES_VIEW } from '../config/game-config';
 import { TEXT } from '../i18n/text';
+import { heroName } from '../logic/hero-name';
 import type { SlotInfo } from '../logic/save-slots';
 import { ConfirmButton } from './confirm-button';
 import { addLabel } from './title-text';
@@ -28,6 +29,7 @@ export class SaveSlotRow {
   private readonly load: ConfirmButton;
   private readonly remove: ConfirmButton;
   private info: SlotInfo;
+  private readonly titleMaxWidth: number;
 
   constructor(scene: Phaser.Scene, options: SaveSlotRowOptions) {
     const { slot, y, inGame } = options;
@@ -45,6 +47,7 @@ export class SaveSlotRow {
     const removeX = GAME_WIDTH - BUTTON.margin * 2 - remove / 2;
     const loadX = removeX - remove / 2 - BUTTON.margin - load / 2;
     const saveX = loadX - load / 2 - BUTTON.margin - save / 2;
+    this.titleMaxWidth = saveX - save / 2 - BUTTON.margin - SAVES_VIEW.textX;
     const button = (x: number, width: number, label: string) => ({
       x,
       y,
@@ -74,15 +77,18 @@ export class SaveSlotRow {
 
   update(info: SlotInfo): void {
     this.info = info;
-    this.title.setText(this.titleText(info));
+    // Pitkä nimi pienemmällä fontilla, ettei teksti mene nappien alle.
+    this.title.setFontSize(FONT.medium).setText(this.titleText(info));
+    if (this.title.width > this.titleMaxWidth) this.title.setFontSize(FONT.small);
     this.details.setText(this.detailText(info));
     this.load.setEnabled(info.kind === 'saved');
     this.remove.setEnabled(info.kind !== 'empty');
   }
 
   private titleText(info: SlotInfo): string {
-    const name = TEXT.saves.slot(info.slot);
-    return info.kind === 'saved' ? `${name}  ${TEXT.saves.level(info.level)}` : name;
+    if (info.kind !== 'saved') return TEXT.saves.slot(info.slot);
+    const hero = heroName(info.heroName, TEXT.names.player);
+    return TEXT.saves.savedTitle(info.slot, hero, info.level);
   }
 
   private detailText(info: SlotInfo): string {

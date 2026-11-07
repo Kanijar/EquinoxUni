@@ -8,7 +8,6 @@ import {
   celebrateCompletion,
   createNewGame,
   enemiesToBeat,
-  playerSprite,
   playerStats,
   unspentSkillPoints,
   type GameState,
@@ -20,6 +19,7 @@ import { lastVisitedTown, visitTown } from '../logic/town-visits';
 import { length } from '../logic/vector';
 import { terrainAt, townTile } from '../logic/world-grid';
 import { AmbushWatch } from '../systems/ambush-watch';
+import { heroTexture } from '../systems/hero-texture';
 import { Controls } from '../systems/controls';
 import { MapEncounters } from '../systems/map-encounters';
 import { NpcMarkers } from '../systems/npc-markers';
@@ -112,7 +112,7 @@ export class WorldScene extends Phaser.Scene {
       ? walkablePosition(getWorldGrid(), saved)
       : tileToWorld(townTile(lastVisitedTown(this.state)));
     const speed = playerStats(this.state).speed;
-    this.player = new Player(this, start, speed, playerSprite(this.state));
+    this.player = new Player(this, start, speed, heroTexture(this.textures, this.state));
     this.physics.add.collider(this.player.sprite, built.layer);
     this.leaves = new LeafRustle(this, this.player.sprite);
     this.encounters = new MapEncounters(this, this.state, built.layer);

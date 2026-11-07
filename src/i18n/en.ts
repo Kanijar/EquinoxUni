@@ -71,6 +71,23 @@ export const EN: Texts = {
     devBuild: 'Development build',
     install: 'INSTALL',
   },
+  hero: {
+    title: 'CREATE HERO',
+    start: 'START',
+    back: 'BACK',
+    random: 'RANDOM',
+    name: 'Name',
+    previous: '<',
+    next: '>',
+    parts: {
+      skin: 'Skin',
+      hairStyle: 'Hair',
+      hairColor: 'Hair color',
+      shirt: 'Shirt',
+      pants: 'Pants',
+    },
+    choice: (choice: number, total: number): string => `${choice}/${total}`,
+  },
   settings: {
     title: 'Settings',
     brightness: 'Brightness',
@@ -91,6 +108,8 @@ export const EN: Texts = {
     empty: 'Empty',
     broken: 'This save is damaged.',
     level: (level: number): string => `Level ${level}`,
+    savedTitle: (slot: number, hero: string, level: number): string =>
+      `${slot}. ${hero}  Level ${level}`,
     details: (place: string, savedAt: number): string => `${place}, ${formatTime(savedAt)}`,
     save: 'SAVE',
     load: 'LOAD',

@@ -23,6 +23,8 @@ function playedGame(): GameState {
   state.hp = 20;
   state.lastTown = 'kuusela';
   state.eyeColor = 'black';
+  state.name = 'Väinö';
+  state.look = { skin: 2, hairStyle: 4, hairColor: 5, shirt: 1, pants: 3 };
   state.bossProgress = 2;
   return state;
 }
@@ -227,6 +229,7 @@ describe('tallennuspaikat', () => {
     expect(listSlots(store)[1]).toEqual({
       slot: 2,
       kind: 'saved',
+      heroName: 'Väinö',
       level: 3,
       xp: 40,
       place: 'Kuusela',

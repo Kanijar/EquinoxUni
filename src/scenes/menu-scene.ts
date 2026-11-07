@@ -1,22 +1,21 @@
 import Phaser from 'phaser';
 import { BUTTON, GAME_WIDTH, MENU_VIEW, SCENES } from '../config/game-config';
 import { TEXT } from '../i18n/text';
-import { PLAYER } from '../data/player';
 import { MENU_SECRET } from '../data/rules';
 import { NO_MENU_TAPS, startFromMenu, type MenuTaps } from '../logic/menu-secret';
 import { enterFullscreenLandscape } from '../systems/fullscreen';
 import { makeHowlingWolf } from '../ui/howling-wolf';
 import { addInstallButton } from '../ui/install-button';
-import { drawMenuBackdrop } from '../ui/menu-backdrop';
+import { drawMenuBackdrop, menuHeroTexture } from '../ui/menu-backdrop';
 import { addPlayerCountLabel } from '../ui/player-count-label';
 import { makeSquishySlime } from '../ui/squishy-slime';
 import { TextButton } from '../ui/text-button';
 import { addTitle } from '../ui/title-text';
 import { addVersionLabel } from '../ui/version-label';
 import type { SavesSceneData } from './saves-scene';
-import type { WorldSceneData } from './world-scene';
+import type { HeroSceneData } from './hero-scene';
 
-// Alkuruutu: PELAA aloittaa uuden pelin Valkeakoskelta, LATAA avaa tallennukset,
+// Alkuruutu: PELAA aloittaa uuden pelin (ensin hahmonluonti, scenes/hero-scene.ts), LATAA avaa tallennukset,
 // ASETUKSET avaa valon ja äänten säädöt ja LÄHDE lopettaa pelin.
 // Oikeassa alakulmassa näkyy pelin versio (data/game-info.ts), vasemmassa pelaajamäärä.
 // Oikeassa yläkulmassa on ASENNA-nappi, kun Chrome tarjoaa pelin asennusta (ui/install-button.ts).
@@ -46,7 +45,7 @@ export class MenuScene extends Phaser.Scene {
     });
     makeSquishySlime(this, slime, () => {
       this.taps = { ...this.taps, slime: true };
-      hero.setTexture(PLAYER.eyeSprites[MENU_SECRET.slimeEyeColor]);
+      hero.setTexture(menuHeroTexture(this, MENU_SECRET.slimeEyeColor));
     });
     addTitle(this, MENU_VIEW.titleY, TEXT.gameTitle);
     addVersionLabel(this);
@@ -72,7 +71,7 @@ export class MenuScene extends Phaser.Scene {
 
   private play(): void {
     const start = startFromMenu(this.taps);
-    this.open(SCENES.world, start satisfies WorldSceneData);
+    this.open(SCENES.hero, start satisfies HeroSceneData);
   }
 
   /** Koko näytön tila ja vaakasuunta pyydetään napautuksesta (selain vaatii kosketuksen). */

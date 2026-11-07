@@ -1,6 +1,8 @@
 import type Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH, MENU_VIEW, TILE_SIZE } from '../config/game-config';
+import { DEFAULT_LOOK } from '../data/hero-looks';
 import { PLAYER } from '../data/player';
+import { heroTexture } from '../systems/hero-texture';
 
 // Alkuruudun pixelart-tausta: metsää ja peltoa ruudun alareunassa,
 // sankari vasemmalla ja viholliset oikealla. Hahmot keinuvat hiljaa.
@@ -28,10 +30,15 @@ export function drawMenuBackdrop(scene: Phaser.Scene): MenuCharacters {
   const feetY = groundTop + tile / 2;
   const [slimeX, wolfX] = MENU_VIEW.enemyXs;
   return {
-    hero: addCharacter(scene, MENU_VIEW.heroX, feetY, PLAYER.eyeSprites[PLAYER.eyeColor]),
+    hero: addCharacter(scene, MENU_VIEW.heroX, feetY, menuHeroTexture(scene)),
     slime: addCharacter(scene, slimeX, feetY, 'slime'),
     wolf: addCharacter(scene, wolfX, feetY, 'wolf'),
   };
+}
+
+/** Alkuruudun sankari oletusulkonäöllä (oma ulkonäkö valitaan vasta PELAA-napin jälkeen). */
+export function menuHeroTexture(scene: Phaser.Scene, eyeColor = PLAYER.eyeColor): string {
+  return heroTexture(scene.textures, { look: DEFAULT_LOOK, eyeColor });
 }
 
 function addCharacter(
