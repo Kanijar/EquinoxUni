@@ -1,6 +1,7 @@
 import { buildXpTable } from './level-curve';
 import type {
   BattleRules,
+  BurgerSecretRules,
   LevelCurve,
   MagicRules,
   MenuSecretRules,
@@ -65,4 +66,15 @@ export const MENU_SECRET: MenuSecretRules = {
   bonusItems: [{ id: 'potion', count: 3 }],
   spiritSprite: 'wolf-spirit',
   slimeEyeColor: 'black',
+};
+
+/**
+ * Salaisuus: alkuruudun vasemmassa reunassa on pieni burgeri. Kun sitä napauttaa ja sitten
+ * aloittaa uuden pelin tai lataa tallennuksen, sankari saa parhaat varusteet käyttöön
+ * (jokaiseen paikkaan pisteiltään paras, gearWeights) ja Bugattin avaimet. Tasot eivät nouse.
+ * Omistettua esinettä ei anneta toista kertaa (logic/burger-secret.ts).
+ */
+export const BURGER_SECRET: BurgerSecretRules = {
+  gearWeights: { attack: 1, defense: 2, maxHp: 0.5, critPercent: 1, magic: 2 },
+  extraItems: ['bugatti-keys'],
 };

@@ -20,9 +20,9 @@ const rules: MenuSecretRules = {
   slimeEyeColor: 'black',
 };
 
-const WOLF = { wolf: true, slime: false };
-const SLIME = { wolf: false, slime: true };
-const BOTH = { wolf: true, slime: true };
+const WOLF = { ...NO_MENU_TAPS, wolf: true };
+const SLIME = { ...NO_MENU_TAPS, slime: true };
+const BOTH = { ...NO_MENU_TAPS, wolf: true, slime: true };
 
 describe('alkuruudun suden salaisuus', () => {
   it('ilman suden napautusta peli alkaa nollasta ilman viestiä', () => {

@@ -247,6 +247,14 @@ export interface MenuSecretRules {
   readonly slimeEyeColor: EyeColor;
 }
 
+/** Alkuruudun salainen burgeri (data/rules.ts BURGER_SECRET, logic/burger-secret.ts). */
+export interface BurgerSecretRules {
+  /** Paras varuste valitaan pisteillä: kunkin arvon lisäys kerrotaan tällä ja lasketaan yhteen. */
+  readonly gearWeights: Readonly<Record<GearStat, number>>;
+  /** Muut esineet, jotka burgeri antaa (yksi kutakin, ei toista kertaa). */
+  readonly extraItems: readonly string[];
+}
+
 export interface MagicRules {
   /**
    * Palamisen tahti millisekunteina: palava vihollinen menettää elämää näin usein.
