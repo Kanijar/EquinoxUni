@@ -32,6 +32,8 @@ export const FI_SHOP = {
   /** Monen kappaleen erä (esim. madot). */
   pack: (count: number): string => `${count} kpl yhdellä ostolla`,
   boughtMany: (item: string, count: number): string => `Ostit: ${item} ×${count}!`,
+  /** Esine vaatii tason (ItemDef.minLevel). */
+  needLevel: (level: number): string => `Myydään vasta tasolta ${level}.`,
   bought: (item: string): string => `Ostit: ${item}!`,
   boughtPower: 'Sait kykypisteen! Käytä se paikkakunnassa.',
   sold: (item: string, coins: number): string => `Myit: ${item}. Sait ${coins} kolikkoa!`,

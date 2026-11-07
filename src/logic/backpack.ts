@@ -1,5 +1,5 @@
 import { getItem } from '../data';
-import type { GearSlot } from '../data/types';
+import type { GearSlot, ItemKind } from '../data/types';
 import { equipItem, unequipSlot } from './equipment';
 import { playerStats, type GameState } from './game-state';
 
@@ -64,8 +64,19 @@ export type BackpackSelection =
   | { readonly kind: 'bag'; readonly itemId: string }
   | { readonly kind: 'slot'; readonly slot: GearSlot };
 
-/** Mitä valitulle esineelle voi tehdä: laittaa käyttöön, ottaa pois, juoda tai syödä. */
-export type BackpackAction = 'equip' | 'unequip' | 'drink' | 'eat';
+/**
+ * Mitä valitulle esineelle voi tehdä: laittaa käyttöön, ottaa pois, juoda, syödä tai
+ * valita syötiksi (kalastus, logic/fishing-gear.ts).
+ */
+export type BackpackAction = 'equip' | 'unequip' | 'drink' | 'eat' | 'bait';
+
+/** Esinetyypin toiminto repussa (ei toimintoa: avain, onki, kulkuneuvo). */
+const KIND_ACTIONS: Partial<Record<ItemKind, BackpackAction>> = {
+  gear: 'equip',
+  heal: 'drink',
+  food: 'eat',
+  bait: 'bait',
+};
 
 /** Valitun esineen tunniste, tai null, jos valittu paikka on tyhjä tai esine loppui repusta. */
 export function selectedItemId(state: GameState, selection: BackpackSelection): string | null {
@@ -87,12 +98,5 @@ export function selectionAction(
   if (selection.kind === 'slot') {
     return 'unequip';
   }
-  const kind = getItem(id).kind;
-  if (kind === 'gear') {
-    return 'equip';
-  }
-  if (kind === 'food') {
-    return 'eat';
-  }
-  return kind === 'heal' ? 'drink' : null;
+  return KIND_ACTIONS[getItem(id).kind] ?? null;
 }

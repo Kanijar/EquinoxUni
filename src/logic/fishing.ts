@@ -1,27 +1,34 @@
 import { FISHING } from '../data/fishing';
-import type { FishingCatchDef, FishingRules } from '../data/types';
+import type { BaitDef, FishingCatchDef, FishingRules, RodDef } from '../data/types';
 import type { Rng } from './battle';
 import { findGear, ownsItem } from './equipment';
+import { baitInUse, bestRod } from './fishing-gear';
 import type { GameState } from './game-state';
 import type { Vec2 } from './vector';
 import { terrainAt, type WorldGrid } from './world-grid';
 
-// Kalastuksen säännöt (data/fishing.ts). Sankari tarvitsee ongen ja matoja, ja hänen pitää
+// Kalastuksen säännöt (data/fishing.ts). Sankari tarvitsee ongen ja syöttiä, ja hänen pitää
 // seistä veden (meri tai järvi) vieressä. Heitto: kala nappaa satunnaisen ajan päästä, ja
-// silloin pitää nykäistä biteWindowMs:n sisällä. Mato kuluu, kun kala nappaa (nykäisi pelaaja
-// ajoissa tai ei). Liian aikainen nykäisy vain säikäyttää kalan, eikä mato kulu.
-// Saalis arvotaan painoilla: kalaa, harvinainen panssari tai hai (taistelu).
+// silloin pitää nykäistä ongen biteWindowMs:n sisällä. Syötti kuluu, kun kala nappaa (nykäisi
+// pelaaja ajoissa tai ei). Liian aikainen nykäisy vain säikäyttää kalan, eikä syötti kulu.
+// Saalis arvotaan syötin painoilla: parempi onki kertoo harvinaisten saaliiden painot.
+// Mikä onki ja syötti ovat käytössä: logic/fishing-gear.ts.
 // Aika annetaan ulkoa millisekunteina, joten säännöt voi testata ilman peliä.
 
-/** Miksi kalastus ei onnistu: ei onkea tai ei matoja. */
+/** Miksi kalastus ei onnistu: ei onkea tai ei syöttiä. */
 export type FishingBlock = 'noRod' | 'noBait';
 
-/** Heitto: milloin kala nappaa (ms heitosta). */
+/** Heitto: milloin kala nappaa ja kauanko on aikaa nykäistä (ms heitosta), ja millä välineillä. */
 export interface Cast {
   readonly biteAtMs: number;
+  readonly windowMs: number;
+  /** Syötti, joka kuluu, kun kala nappaa. Sen saaliit arvotaan. */
+  readonly bait: BaitDef;
+  /** Ongen kerroin harvinaisille saaliille. */
+  readonly rareMultiplier: number;
 }
 
-/** Heiton vaihe: odotetaan, kala nappaa nyt tai kala ehti karata madon kanssa. */
+/** Heiton vaihe: odotetaan, kala nappaa nyt tai kala ehti karata syötin kanssa. */
 export type CastPhase = 'waiting' | 'bite' | 'escaped';
 
 /** Nykäisyn tulos: liian aikaisin, kala tarttui tai liian myöhään. */
@@ -34,20 +41,22 @@ export type FishingCatch =
 
 /** Voiko vihollinen tarttua onkeen (esim. hai): taistelun aloitusviesti on silloin oma. */
 export function isFishedEnemy(enemyId: string, rules: FishingRules = FISHING): boolean {
-  return rules.catches.some((entry) => entry.kind === 'enemy' && entry.enemy === enemyId);
+  return rules.baits.some((bait) =>
+    bait.catches.some((entry) => entry.kind === 'enemy' && entry.enemy === enemyId),
+  );
 }
 
-/** Miksi sankari ei voi kalastaa, tai null, kun onki ja matoja on. */
+/** Miksi sankari ei voi kalastaa, tai null, kun onki ja syöttiä on. */
 export function fishingBlock(state: GameState, rules: FishingRules = FISHING): FishingBlock | null {
-  if ((state.inventory[rules.rodItem] ?? 0) <= 0) {
+  if (!bestRod(state.inventory, rules)) {
     return 'noRod';
   }
-  return (state.inventory[rules.baitItem] ?? 0) > 0 ? null : 'noBait';
+  return baitInUse(state, state.inventory, rules) ? null : 'noBait';
 }
 
 /** Onko sankarilla onki (silloin KALASTA-nappi näkyy rannalla). */
 export function hasRod(state: GameState, rules: FishingRules = FISHING): boolean {
-  return (state.inventory[rules.rodItem] ?? 0) > 0;
+  return bestRod(state.inventory, rules) !== null;
 }
 
 /**
@@ -76,23 +85,44 @@ export function fishingSpot(
   return best;
 }
 
-/** Heittää kohon veteen: kala nappaa satunnaisen ajan päästä. */
-export function startCast(rng: Rng, rules: FishingRules = FISHING): Cast {
+/**
+ * Heittää kohon veteen parhaalla ongella ja valitulla syötillä. Kala nappaa satunnaisen
+ * ajan päästä (parempi onki: nopeammin). null, jos onkea tai syöttiä ei ole.
+ */
+export function startCast(state: GameState, rng: Rng, rules: FishingRules = FISHING): Cast | null {
+  const rod = bestRod(state.inventory, rules);
+  const bait = baitInUse(state, state.inventory, rules);
+  return rod && bait ? castWith(rod, bait, rng, rules) : null;
+}
+
+/** Heitto annetulla ongella ja syötillä. */
+export function castWith(
+  rod: RodDef,
+  bait: BaitDef,
+  rng: Rng,
+  rules: FishingRules = FISHING,
+): Cast {
   const { min, max } = rules.biteDelayMs;
-  return { biteAtMs: Math.round(min + rng() * (max - min)) };
+  const delay = (min + rng() * (max - min)) * rod.biteDelayFactor;
+  return {
+    biteAtMs: Math.round(delay),
+    windowMs: rod.biteWindowMs,
+    bait,
+    rareMultiplier: rod.rareMultiplier,
+  };
 }
 
 /** Heiton vaihe, kun heitosta on kulunut elapsedMs. */
-export function castPhase(cast: Cast, elapsedMs: number, rules: FishingRules = FISHING): CastPhase {
+export function castPhase(cast: Cast, elapsedMs: number): CastPhase {
   if (elapsedMs < cast.biteAtMs) {
     return 'waiting';
   }
-  return elapsedMs < cast.biteAtMs + rules.biteWindowMs ? 'bite' : 'escaped';
+  return elapsedMs < cast.biteAtMs + cast.windowMs ? 'bite' : 'escaped';
 }
 
 /** Mitä nykäisy tekee, kun heitosta on kulunut elapsedMs. */
-export function reel(cast: Cast, elapsedMs: number, rules: FishingRules = FISHING): ReelResult {
-  const phase = castPhase(cast, elapsedMs, rules);
+export function reel(cast: Cast, elapsedMs: number): ReelResult {
+  const phase = castPhase(cast, elapsedMs);
   if (phase === 'waiting') {
     return 'early';
   }
@@ -100,8 +130,8 @@ export function reel(cast: Cast, elapsedMs: number, rules: FishingRules = FISHIN
 }
 
 /** Saaliit, jotka voivat tulla: varustetta, joka pelaajalla jo on, ei saa toista kertaa. */
-function possibleCatches(state: GameState, rules: FishingRules): FishingCatchDef[] {
-  return rules.catches.filter(
+function possibleCatches(state: GameState, bait: BaitDef): FishingCatchDef[] {
+  return bait.catches.filter(
     (entry) =>
       entry.kind === 'enemy' ||
       findGear(entry.item) === null ||
@@ -109,21 +139,32 @@ function possibleCatches(state: GameState, rules: FishingRules): FishingCatchDef
   );
 }
 
-/** Arpoo saaliin painojen mukaan. */
-export function rollCatch(state: GameState, rng: Rng, rules: FishingRules = FISHING): FishingCatch {
-  const options = possibleCatches(state, rules);
-  const total = options.reduce((sum, entry) => sum + entry.weight, 0);
+/** Saaliin paino ongella: harvinaisen saaliin paino kerrotaan ongen kertoimella. */
+export function catchWeight(entry: FishingCatchDef, rareMultiplier: number): number {
+  return entry.rare ? entry.weight * rareMultiplier : entry.weight;
+}
+
+/** Arpoo saaliin syötin painojen mukaan (harvinaiset kerrottuna ongen kertoimella). */
+export function rollCatch(
+  state: GameState,
+  bait: BaitDef,
+  rareMultiplier: number,
+  rng: Rng,
+): FishingCatch {
+  const options = possibleCatches(state, bait);
+  const weight = (entry: FishingCatchDef): number => catchWeight(entry, rareMultiplier);
+  const total = options.reduce((sum, entry) => sum + weight(entry), 0);
   let roll = rng() * total;
   let picked = options.at(-1);
   for (const entry of options) {
-    if (roll < entry.weight) {
+    if (roll < weight(entry)) {
       picked = entry;
       break;
     }
-    roll -= entry.weight;
+    roll -= weight(entry);
   }
   if (!picked) {
-    throw new Error('Kalastuksella ei ole saaliita (data/fishing.ts).');
+    throw new Error(`Syötillä ${bait.item} ei ole saaliita (data/fishing.ts).`);
   }
   return picked.kind === 'item'
     ? { kind: 'item', item: picked.item }
@@ -131,24 +172,24 @@ export function rollCatch(state: GameState, rng: Rng, rules: FishingRules = FISH
 }
 
 /**
- * Nykäisyn jälkeen: mato kuluu, jos kala ehti napata, ja tarttunut saalis arvotaan.
+ * Nykäisyn jälkeen: syötti kuluu, jos kala ehti napata, ja tarttunut saalis arvotaan.
  * Esine menee reppuun. Palauttaa saaliin, tai null, jos mitään ei tullut.
  */
 export function finishCast(
   state: GameState,
+  cast: Cast,
   result: ReelResult,
   rng: Rng,
-  rules: FishingRules = FISHING,
 ): FishingCatch | null {
+  const { bait } = cast;
   if (result === 'early') {
     return null;
   }
-  const bait = rules.baitItem;
-  state.inventory[bait] = Math.max(0, (state.inventory[bait] ?? 0) - 1);
+  state.inventory[bait.item] = Math.max(0, (state.inventory[bait.item] ?? 0) - 1);
   if (result === 'escaped') {
     return null;
   }
-  const caught = rollCatch(state, rng, rules);
+  const caught = rollCatch(state, bait, cast.rareMultiplier, rng);
   if (caught.kind === 'item') {
     state.inventory[caught.item] = (state.inventory[caught.item] ?? 0) + 1;
   }

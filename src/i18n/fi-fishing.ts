@@ -10,17 +10,25 @@ export const FI_FISHING = {
   bite: 'NYKÄISE!',
   /** Huutomerkki kohon päällä, kun kala nappaa. */
   mark: '!',
-  cast: 'Heitit kohon veteen. Nykäise, kun kala nappaa!',
-  noBait: (merchant: string): string => `Ei matoja! Osta niitä kauppias ${merchant}lta.`,
+  cast: (bait: string): string =>
+    `Heitit kohon veteen. Syötti: ${bait}.\nNykäise, kun kala nappaa!`,
+  noBait: (merchant: string): string => `Ei syöttiä! Osta matoja kauppias ${merchant}lta.`,
   early: 'Liian aikaisin! Kala säikähti.',
-  escaped: 'Liian myöhään! Kala vei madon.',
+  escaped: 'Liian myöhään! Kala vei syötin.',
   cancelled: 'Lopetit kalastuksen.',
   caught: (item: string): string => `Sait saaliin: ${item}!`,
   /** Harvinainen varuste (Kalan suomupanssari). */
   caughtGear: (item: string): string => `Mikä saalis: ${item}!\nLaita se käyttöön repussa.`,
-  /** Hai tarttui onkeen: taistelu alkaa. */
+  /** Hai tai jättimustekala tarttui onkeen: taistelu alkaa. */
   enemy: (enemy: string): string => `${enemy} tarttui onkeen ja hyökkää!`,
-  baitLeft: (count: number): string => `Matoja jäljellä ${count}.`,
+  baitLeft: (bait: string, count: number): string => `${bait}: jäljellä ${count}.`,
   /** Taistelun aloitus, kun hai tarttui onkeen. */
   battleIntro: (enemy: string): string => `${enemy} loikkaa vedestä kimppuusi!`,
+  baitChosen: (bait: string): string => `${bait} on nyt syöttinä.`,
+  baitInUse: 'Tämä on nyt syöttinä.',
+  /** Ongen ominaisuudet repussa ja kaupassa. */
+  rodStats: (windowMs: number, rare: number): string =>
+    `Nykäisyaika ${(windowMs / 1000).toFixed(1).replace('.', ',')} s, harvinaiset ×${String(rare).replace('.', ',')}`,
+  /** Ongen ominaisuudet, kun sankarilla on parempi onki. */
+  rodWorse: 'Sinulla on parempi onki.',
 };

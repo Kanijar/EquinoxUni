@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { getEnemy, getItem, getSprite, WORLD } from '../src/data';
 import { FISHING } from '../src/data/fishing';
 import { MERCHANT } from '../src/data/merchant';
-import type { FishingRules } from '../src/data/types';
+import type { BaitDef } from '../src/data/types';
 import { canDrink, drinkFromBag, selectionAction } from '../src/logic/backpack';
 import {
   castPhase,
+  castWith,
   finishCast,
   fishingBlock,
   fishingSpot,
@@ -42,6 +43,14 @@ const lakeGrid: WorldGrid = {
   ],
 };
 
+const WORM = FISHING.baits[0] as BaitDef;
+const BASIC_ROD = FISHING.rods[0] as (typeof FISHING.rods)[number];
+
+/** Heitto tavallisella ongella ja madolla: kala nappaa 2 s kohdalla. */
+function wormCast(bait: BaitDef = WORM) {
+  return { biteAtMs: 2000, windowMs: BASIC_ROD.biteWindowMs, bait, rareMultiplier: 1 };
+}
+
 /** Arpa, joka antaa luvut järjestyksessä. */
 function sequence(...values: number[]): () => number {
   let index = 0;
@@ -50,10 +59,10 @@ function sequence(...values: number[]): () => number {
 
 describe('kalastustarvikkeet kauppiaalla', () => {
   it('Kaapo myy ongen ja matoja', () => {
-    expect(MERCHANT.stock).toContain(FISHING.rodItem);
-    expect(MERCHANT.stock).toContain(FISHING.baitItem);
-    expect(getItem(FISHING.rodItem).kind).toBe('tool');
-    expect(getItem(FISHING.baitItem).kind).toBe('bait');
+    expect(MERCHANT.stock).toContain('fishing-rod');
+    expect(MERCHANT.stock).toContain('worm');
+    expect(getItem('fishing-rod').kind).toBe('tool');
+    expect(getItem('worm').kind).toBe('bait');
   });
 
   it('madot ostetaan viiden pussissa yhden madon hinnalla kerrottuna', () => {
@@ -127,31 +136,33 @@ describe('heitto ja nykäisy', () => {
 
   it('kala nappaa sääntöjen aikavälillä', () => {
     const { min, max } = FISHING.biteDelayMs;
-    expect(startCast(() => 0).biteAtMs).toBe(min);
-    expect(startCast(() => 0.999).biteAtMs).toBeLessThanOrEqual(max);
+    expect(startCast(fisher(), () => 0)?.biteAtMs).toBe(min);
+    expect(startCast(fisher(), () => 0.999)?.biteAtMs).toBeLessThanOrEqual(max);
+    expect(startCast(createNewGame(), () => 0)).toBeNull();
+    expect(castWith(BASIC_ROD, WORM, () => 0).bait.item).toBe('worm');
   });
 
   it('nykäisy: liian aikaisin, ajoissa tai liian myöhään', () => {
-    const cast = { biteAtMs: 2000 };
+    const cast = wormCast();
     expect(castPhase(cast, 1999)).toBe('waiting');
     expect(reel(cast, 1000)).toBe('early');
     expect(castPhase(cast, 2000)).toBe('bite');
-    expect(reel(cast, 2000 + FISHING.biteWindowMs - 1)).toBe('caught');
-    expect(castPhase(cast, 2000 + FISHING.biteWindowMs)).toBe('escaped');
+    expect(reel(cast, 2000 + cast.windowMs - 1)).toBe('caught');
+    expect(castPhase(cast, 2000 + cast.windowMs)).toBe('escaped');
     expect(reel(cast, 9999)).toBe('escaped');
   });
 
   it('liian aikainen nykäisy ei vie matoa, myöhäinen vie', () => {
     const state = fisher(3);
-    expect(finishCast(state, 'early', () => 0)).toBeNull();
+    expect(finishCast(state, wormCast(), 'early', () => 0)).toBeNull();
     expect(state.inventory['worm']).toBe(3);
-    expect(finishCast(state, 'escaped', () => 0)).toBeNull();
+    expect(finishCast(state, wormCast(), 'escaped', () => 0)).toBeNull();
     expect(state.inventory['worm']).toBe(2);
   });
 
   it('saalis menee reppuun ja mato kuluu', () => {
     const state = fisher(1);
-    const caught = finishCast(state, 'caught', () => 0);
+    const caught = finishCast(state, wormCast(), 'caught', () => 0);
     expect(caught).toEqual({ kind: 'item', item: 'perch' });
     expect(state.inventory['perch']).toBe(1);
     expect(state.inventory['worm']).toBe(0);
@@ -160,7 +171,7 @@ describe('heitto ja nykäisy', () => {
 
 describe('saaliit', () => {
   it('saaliit ovat olemassa: kaloja, panssari ja hai', () => {
-    for (const entry of FISHING.catches) {
+    for (const entry of FISHING.baits.flatMap((bait) => bait.catches)) {
       if (entry.kind === 'item') {
         expect(() => getItem(entry.item), entry.item).not.toThrow();
       } else {
@@ -172,54 +183,55 @@ describe('saaliit', () => {
     expect(getSprite('bobber').rows.length).toBe(6);
   });
 
-  it('yleensä tulee kalaa', () => {
-    const fish = FISHING.catches.filter(
+  it.each(FISHING.baits)('syötillä $item tulee yleensä kalaa', (bait) => {
+    const fish = bait.catches.filter(
       (entry) => entry.kind === 'item' && getItem(entry.item).kind === 'food',
     );
-    const total = FISHING.catches.reduce((sum, entry) => sum + entry.weight, 0);
+    const total = bait.catches.reduce((sum, entry) => sum + entry.weight, 0);
     const fishWeight = fish.reduce((sum, entry) => sum + entry.weight, 0);
     expect(fishWeight / total).toBeGreaterThan(0.5);
+    expect(total).toBe(100);
   });
 
   it('painot valitsevat saaliin järjestyksessä', () => {
-    const rules: FishingRules = {
-      ...FISHING,
+    const bait: BaitDef = {
+      item: 'worm',
       catches: [
         { kind: 'item', item: 'perch', weight: 1 },
         { kind: 'enemy', enemy: 'shark', weight: 1 },
       ],
     };
     const state = fisher();
-    expect(rollCatch(state, () => 0.2, rules)).toEqual({ kind: 'item', item: 'perch' });
-    expect(rollCatch(state, () => 0.7, rules)).toEqual({ kind: 'enemy', enemy: 'shark' });
+    expect(rollCatch(state, bait, 1, () => 0.2)).toEqual({ kind: 'item', item: 'perch' });
+    expect(rollCatch(state, bait, 1, () => 0.7)).toEqual({ kind: 'enemy', enemy: 'shark' });
   });
 
   it('hai ei mene reppuun vaan aloittaa taistelun', () => {
-    const rules: FishingRules = {
-      ...FISHING,
-      catches: [{ kind: 'enemy', enemy: 'shark', weight: 1 }],
-    };
+    const bait: BaitDef = { item: 'worm', catches: [{ kind: 'enemy', enemy: 'shark', weight: 1 }] };
     const state = fisher(2);
-    expect(finishCast(state, 'caught', () => 0, rules)).toEqual({ kind: 'enemy', enemy: 'shark' });
+    expect(finishCast(state, wormCast(bait), 'caught', () => 0)).toEqual({
+      kind: 'enemy',
+      enemy: 'shark',
+    });
     expect(state.inventory['shark']).toBeUndefined();
     expect(state.inventory['worm']).toBe(1);
   });
 
   it('Kalan suomupanssaria ei saa toista kertaa', () => {
-    const rules: FishingRules = {
-      ...FISHING,
+    const bait: BaitDef = {
+      item: 'worm',
       catches: [
         { kind: 'item', item: 'fish-scale-armor', weight: 100 },
         { kind: 'item', item: 'perch', weight: 1 },
       ],
     };
     const state = fisher();
-    expect(rollCatch(state, sequence(0), rules)).toEqual({
+    expect(rollCatch(state, bait, 1, sequence(0))).toEqual({
       kind: 'item',
       item: 'fish-scale-armor',
     });
     state.equipped.body = 'fish-scale-armor';
-    expect(rollCatch(state, sequence(0), rules)).toEqual({ kind: 'item', item: 'perch' });
+    expect(rollCatch(state, bait, 1, sequence(0))).toEqual({ kind: 'item', item: 'perch' });
   });
 });
 
@@ -254,6 +266,7 @@ describe('kalan syöminen', () => {
 describe('hai taistelussa', () => {
   it('hai tunnistetaan onkeen tarttuneeksi viholliseksi, susi ei', () => {
     expect(isFishedEnemy('shark')).toBe(true);
+    expect(isFishedEnemy('octopus')).toBe(true);
     expect(isFishedEnemy('wolf')).toBe(false);
   });
 });

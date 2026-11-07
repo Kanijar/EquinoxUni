@@ -193,6 +193,8 @@ interface ItemBase {
   readonly price?: number;
   /** Montako kappaletta tulee yhdellä ostolla kauppiaalta (valinnainen, esim. 5 matoa). */
   readonly buyCount?: number;
+  /** Kauppias myy esineen vasta tältä tasolta (valinnainen, esim. parempi onki). */
+  readonly minLevel?: number;
 }
 
 export interface HealItemDef extends ItemBase {
@@ -233,12 +235,12 @@ export interface PowerItemDef extends ItemBase {
   readonly priceStep: number;
 }
 
-/** Työkalu (esim. onki): tallessa repussa, yksi riittää. Kauppias ei myy toista. */
+/** Työkalu (esim. onki, ominaisuudet data/fishing.ts): yksi riittää, kauppias ei myy toista. */
 export interface ToolItemDef extends ItemBase {
   readonly kind: 'tool';
 }
 
-/** Syötti (esim. madot): kalastaessa yksi kuluu, kun kala nappaa (logic/fishing.ts). */
+/** Syötti (esim. madot): valitaan repussa, ja yksi kuluu, kun kala nappaa (logic/fishing.ts). */
 export interface BaitItemDef extends ItemBase {
   readonly kind: 'bait';
 }
@@ -452,4 +454,4 @@ export type { CoinRules, MerchantDef, ShopRules } from './types-shop';
 
 // --- Kalastus (data/types-fishing.ts) ---
 
-export type { FishingCatchDef, FishingRules } from './types-fishing';
+export type { BaitDef, FishingCatchDef, FishingRules, RodDef } from './types-fishing';

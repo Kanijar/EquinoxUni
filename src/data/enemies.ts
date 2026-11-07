@@ -188,4 +188,16 @@ export const ENEMIES: readonly EnemyDef[] = [
     drops: [{ item: 'salmon', chance: 0.5 }],
     backdrop: 'beach',
   },
+  {
+    // Ei kulje kartalla: tarttuu joskus kiiltävään uistimeen (data/fishing.ts). Kahdeksan
+    // lonkeroa lyö kovaa. Taso 18–22. Voi pudottaa kultakalan.
+    id: 'octopus',
+    name: 'Jättimustekala',
+    sprite: 'octopus',
+    stats: { maxHp: 150, attack: 30, defense: 10, speed: 0 },
+    aggroRange: 0,
+    xp: 120,
+    drops: [{ item: 'golden-fish', chance: 0.4 }],
+    backdrop: 'beach',
+  },
 ];

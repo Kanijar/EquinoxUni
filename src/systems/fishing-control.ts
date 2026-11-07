@@ -2,7 +2,6 @@ import type Phaser from 'phaser';
 import { FISHING_VIEW } from '../config/fishing-config';
 import { FONT } from '../config/game-config';
 import { getEnemy, getItem } from '../data';
-import { FISHING } from '../data/fishing';
 import { MERCHANT } from '../data/merchant';
 import { TEXT } from '../i18n/text';
 import {
@@ -27,7 +26,8 @@ import { getWorldGrid, tileToWorld, worldToTile } from './world-map';
 // vieressä, alariviin tulee KALASTA-nappi (tietokoneella F). Napautus heittää kohon lähimpään
 // vesiruutuun, ja nappi muuttuu NYKÄISE-napiksi. Kun kala nappaa, koho sukeltaa, sen päälle
 // tulee huutomerkki ja kuuluu ääni: nyt pitää nykäistä. Liikkuminen lopettaa kalastuksen.
-// Saalis menee reppuun, ja hain kanssa alkaa taistelu (onEnemy).
+// Käytössä on paras onki ja repussa valittu syötti (logic/fishing-gear.ts).
+// Saalis menee reppuun, ja hain tai jättimustekalan kanssa alkaa taistelu (onEnemy).
 
 export interface FishingCallbacks {
   /** Ilmoitus kartan yläosaan. */
@@ -102,12 +102,13 @@ export class FishingControl {
   }
 
   private cast(spot: Vec2): void {
-    if (fishingBlock(this.state) !== null) {
+    const cast = startCast(this.state, Math.random);
+    if (fishingBlock(this.state) !== null || cast === null) {
       this.callbacks.message(TEXT.fishing.noBait(MERCHANT.name));
       return;
     }
     const bobberAt = tileToWorld(spot);
-    this.active = { cast: startCast(Math.random), bobberAt, elapsedMs: 0, bitten: false };
+    this.active = { cast, bobberAt, elapsedMs: 0, bitten: false };
     this.bobber.setPosition(bobberAt.x, bobberAt.y).setVisible(true);
     this.scene.tweens.add({
       targets: this.bobber,
@@ -117,10 +118,10 @@ export class FishingControl {
       repeat: -1,
     });
     playSound('splash');
-    this.callbacks.message(TEXT.fishing.cast);
+    this.callbacks.message(TEXT.fishing.cast(TEXT.names.item(getItem(cast.bait.item))));
   }
 
-  /** Aika kuluu: kala nappaa tai karkaa madon kanssa. */
+  /** Aika kuluu: kala nappaa tai karkaa syötin kanssa. */
   private advance(active: ActiveCast, deltaMs: number): void {
     active.elapsedMs += deltaMs;
     const phase = castPhase(active.cast, active.elapsedMs);
@@ -149,19 +150,24 @@ export class FishingControl {
   }
 
   private finish(result: ReelResult): void {
+    const active = this.active;
     this.stop();
-    const caught = finishCast(this.state, result, Math.random);
+    if (!active) {
+      return;
+    }
+    const caught = finishCast(this.state, active.cast, result, Math.random);
     if (caught?.kind === 'enemy') {
       this.callbacks.message(TEXT.fishing.enemy(TEXT.names.enemy(getEnemy(caught.enemy))));
       this.callbacks.onEnemy(caught.enemy);
       return;
     }
-    this.callbacks.message(this.resultText(result, caught));
+    this.callbacks.message(this.resultText(result, caught, active.cast.bait.item));
     playSound(caught ? 'loot' : 'hurt');
   }
 
-  private resultText(result: ReelResult, caught: FishingCatch | null): string {
-    const left = TEXT.fishing.baitLeft(this.state.inventory[FISHING.baitItem] ?? 0);
+  private resultText(result: ReelResult, caught: FishingCatch | null, bait: string): string {
+    const baitName = TEXT.names.item(getItem(bait));
+    const left = TEXT.fishing.baitLeft(baitName, this.state.inventory[bait] ?? 0);
     if (caught?.kind === 'item') {
       const item = getItem(caught.item);
       const name = TEXT.names.item(item);

@@ -240,6 +240,8 @@ export const FI = {
     unequip: 'OTA POIS',
     drink: 'JUO',
     eat: 'SYÖ',
+    /** Syötti valitaan kalastukseen (logic/fishing-gear.ts). */
+    bait: 'SYÖTIKSI',
     done: 'VALMIS',
     equippedNow: (item: string): string => `${item} on nyt käytössä!`,
     unequippedNow: (item: string): string => `${item} on taas repussa.`,
