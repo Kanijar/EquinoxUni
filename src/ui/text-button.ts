@@ -54,6 +54,12 @@ export class TextButton {
     this.text.setText(label);
   }
 
+  /** Siirtää napin vaakasuunnassa (esim. kartan alarivi, jossa näkyvät napit vaihtelevat). */
+  setX(x: number): void {
+    this.box.setX(x);
+    this.text.setX(x);
+  }
+
   setVisible(visible: boolean): void {
     this.box.setVisible(visible);
     this.text.setVisible(visible);

@@ -15,6 +15,7 @@ import { TEXT } from '../i18n/text';
 import { clampPage, pageCount, pageItems, turnPage } from '../logic/bag-pages';
 import type { GameState } from '../logic/game-state';
 import {
+  buyCount,
   buyItem,
   sellItem,
   shopEntries,
@@ -182,8 +183,10 @@ export class ShopScene extends Phaser.Scene {
       return;
     }
     playSound(item.kind === 'power' ? 'level-up' : 'coin');
-    this.message =
-      item.kind === 'power' ? TEXT.shop.boughtPower : TEXT.shop.bought(TEXT.names.item(item));
+    const name = TEXT.names.item(item);
+    const count = buyCount(item);
+    const bought = count > 1 ? TEXT.shop.boughtMany(name, count) : TEXT.shop.bought(name);
+    this.message = item.kind === 'power' ? TEXT.shop.boughtPower : bought;
   }
 
   /** Varusteen myynti kysyy ensin varmistuksen: toinen painallus myy. */
@@ -264,10 +267,13 @@ export class ShopScene extends Phaser.Scene {
     }
   }
 
-  /** Varusteen lisäykset tai voiman kykypisteet keltaisella. */
+  /** Varusteen lisäykset, voiman kykypisteet tai erän koko (madot) keltaisella. */
   private bonusText(item: ItemDef): string {
     if (item.kind === 'gear') {
       return TEXT.backpack.bonus(item.bonus);
+    }
+    if (this.mode === 'buy' && buyCount(item) > 1) {
+      return TEXT.shop.pack(buyCount(item));
     }
     return item.kind === 'power' ? TEXT.shop.powerBonus(item.skillPoints) : '';
   }

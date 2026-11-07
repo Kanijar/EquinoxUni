@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ENEMIES, ITEMS, QUESTS } from '../src/data';
 import { FINAL_BOSS } from '../src/data/boss';
+import { FISHING } from '../src/data/fishing';
 import { MERCHANT } from '../src/data/merchant';
 
 // Saaren hirviöiden ja varusteiden sisältötestit.
@@ -17,6 +18,10 @@ const dropped = new Set(ENEMIES.flatMap((enemy) => enemy.drops ?? []).map((drop)
 const rewarded = new Set(QUESTS.flatMap((quest) => quest.reward.items).map((stack) => stack.id));
 /** Kulkevan kauppiaan tavarat (data/merchant.ts). */
 const sold = new Set(MERCHANT.stock);
+/** Kalastuksen saaliit (data/fishing.ts). */
+const fished = new Set(
+  FISHING.catches.flatMap((entry) => (entry.kind === 'item' ? [entry.item] : [])),
+);
 
 describe('saaren hirviöt ja varusteet', () => {
   it.each(ISLAND_MONSTERS)('%s pudottaa varusteen', (id) => {
@@ -24,9 +29,9 @@ describe('saaren hirviöt ja varusteet', () => {
     expect(enemy?.drops?.some((drop) => gearIds.has(drop.item))).toBe(true);
   });
 
-  it('jokaisen varusteen voi saada viholliselta, tehtävän palkintona tai kauppiaalta', () => {
+  it('jokaisen varusteen voi saada viholliselta, tehtävän palkintona, kauppiaalta tai kalastamalla', () => {
     for (const id of gearIds) {
-      expect(dropped.has(id) || rewarded.has(id) || sold.has(id), id).toBe(true);
+      expect(dropped.has(id) || rewarded.has(id) || sold.has(id) || fished.has(id), id).toBe(true);
     }
   });
 

@@ -2,8 +2,9 @@ import type { CoinRules, MerchantDef, ShopRules } from './types';
 
 // Kulkeva kauppias Kaapo. Hän kävelee teitä pitkin paikkakunnasta toiseen ja pysähtyy
 // jokaiseen hetkeksi. Kun sankari kävelee hänen viereensä, kauppa aukeaa KAUPPA-napista
-// tai Kaapoa napauttamalla. Kaapolta voi ostaa aseita, varusteita, juomia ja voimia ja
-// myydä hänelle repun tavaroita. Säännöt: logic/shop.ts, kulku kartalla: logic/merchant-route.ts.
+// tai Kaapoa napauttamalla. Kaapolta voi ostaa aseita, varusteita, juomia, voimia ja
+// kalastustarvikkeita (onki, madot) ja myydä hänelle repun tavaroita (myös kalat).
+// Säännöt: logic/shop.ts, kulku kartalla: logic/merchant-route.ts.
 
 export const MERCHANT: MerchantDef = {
   id: 'merchant',
@@ -18,6 +19,9 @@ export const MERCHANT: MerchantDef = {
   stock: [
     'potion',
     'big-potion',
+    // Kalastus (data/fishing.ts): ensimmäisellä sivulla, jotta ne löytyvät helposti.
+    'fishing-rod',
+    'worm',
     'power-crystal',
     'iron-sword',
     'chain-mail',

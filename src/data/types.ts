@@ -163,8 +163,10 @@ export interface DropDef {
  * käyttöön repussa, logic/equipment.ts), avain/tehtäväesine (tallessa repussa, esim. tuodaan
  * tehtävänantajalle, data/quests.ts), kulkuneuvo (kytketään päälle kartalla, logic/vehicle.ts)
  * tai voima (ostetaan kauppiaalta ja otetaan heti käyttöön, esim. kykypiste, logic/shop.ts).
+ * Kalastus (data/fishing.ts): työkalu (onki, yksi riittää), syötti (madot, kuluvat) ja
+ * ruoka (kala, syödään repusta elämän palauttamiseksi).
  */
-export type ItemKind = 'heal' | 'gear' | 'key' | 'vehicle' | 'power';
+export type ItemKind = 'heal' | 'gear' | 'key' | 'vehicle' | 'power' | 'tool' | 'bait' | 'food';
 
 /** Varustepaikka: jokaisessa paikassa voi olla yksi varuste kerrallaan. */
 export type GearSlot = 'hand' | 'body' | 'neck';
@@ -186,8 +188,11 @@ interface ItemBase {
   /**
    * Hinta kolikkoina kulkevalla kauppiaalla (data/merchant.ts). Kauppias ostaa esineen
    * pienemmällä hinnalla (SHOP_RULES.sellFactor). Puuttuu = esinettä ei voi myydä.
+   * Kun buyCount on annettu, price on yhden kappaleen hinta.
    */
   readonly price?: number;
+  /** Montako kappaletta tulee yhdellä ostolla kauppiaalta (valinnainen, esim. 5 matoa). */
+  readonly buyCount?: number;
 }
 
 export interface HealItemDef extends ItemBase {
@@ -228,7 +233,32 @@ export interface PowerItemDef extends ItemBase {
   readonly priceStep: number;
 }
 
-export type ItemDef = HealItemDef | GearItemDef | KeyItemDef | VehicleItemDef | PowerItemDef;
+/** Työkalu (esim. onki): tallessa repussa, yksi riittää. Kauppias ei myy toista. */
+export interface ToolItemDef extends ItemBase {
+  readonly kind: 'tool';
+}
+
+/** Syötti (esim. madot): kalastaessa yksi kuluu, kun kala nappaa (logic/fishing.ts). */
+export interface BaitItemDef extends ItemBase {
+  readonly kind: 'bait';
+}
+
+/** Ruoka (esim. kala): syödään repusta, palauttaa elämää. Ei käy taistelun JUOMA-nappiin. */
+export interface FoodItemDef extends ItemBase {
+  readonly kind: 'food';
+  /** Paljonko elämää ruoka palauttaa. */
+  readonly value: number;
+}
+
+export type ItemDef =
+  | HealItemDef
+  | GearItemDef
+  | KeyItemDef
+  | VehicleItemDef
+  | PowerItemDef
+  | ToolItemDef
+  | BaitItemDef
+  | FoodItemDef;
 
 /** Väijytys: tietyssä maastossa kulkiessa vihollinen voi hyökätä yllättäen. */
 export interface AmbushRule {
@@ -417,3 +447,7 @@ export type { NpcDef, QuestDef, QuestGoal, QuestRewardDef } from './types-quests
 // --- Kulkeva kauppias ja kolikot (data/types-shop.ts) ---
 
 export type { CoinRules, MerchantDef, ShopRules } from './types-shop';
+
+// --- Kalastus (data/types-fishing.ts) ---
+
+export type { FishingCatchDef, FishingRules } from './types-fishing';

@@ -21,6 +21,7 @@ import { terrainAt, townTile } from '../logic/world-grid';
 import { AmbushWatch } from '../systems/ambush-watch';
 import { heroTexture } from '../systems/hero-texture';
 import { Controls } from '../systems/controls';
+import { FishingControl } from '../systems/fishing-control';
 import { MapEncounters } from '../systems/map-encounters';
 import { MerchantWalker } from '../systems/merchant-walker';
 import { NpcMarkers } from '../systems/npc-markers';
@@ -63,6 +64,7 @@ import type { VictorySceneData } from './victory-scene';
 // KYKYPISTEET-napista ja tallentaa pelin TALLENNA-napista. Jussi Ketola seisoo kotipaikkakuntansa
 // vieressä: hänen kanssaan puhutaan puhenapista tai napauttamalla häntä (tehtävät).
 // Kulkeva kauppias Kaapo kävelee teitä pitkin: hänen vieressään aukeaa kauppa KAUPPA-napista.
+// Ongen kanssa rannalla voi kalastaa KALASTA-napista (systems/fishing-control.ts).
 // Tämä scene vain kokoaa osat.
 
 export interface WorldSceneData {
@@ -93,6 +95,7 @@ export class WorldScene extends Phaser.Scene {
   private questTracker!: QuestTracker;
   private vehicle!: VehicleControl;
   private merchant!: MerchantWalker;
+  private fishing!: FishingControl;
   private toast!: Toast;
   private bossPointer: BossPointer | null = null;
   private encountersFrom = 0;
@@ -141,6 +144,10 @@ export class WorldScene extends Phaser.Scene {
       onOpen: () => this.openShop(),
       onTooFar: () => this.toast.show(TEXT.shop.tooFar(MERCHANT.name)),
     });
+    this.fishing = new FishingControl(this, this.state, {
+      message: (text) => this.toast.show(text),
+      onEnemy: (enemyId) => this.startBattle(enemyId, null),
+    });
     const boss = this.encounters.boss;
     this.bossPointer = boss ? new BossPointer(this, boss.sprite) : null;
     if (data.bossAwakened) {
@@ -162,14 +169,19 @@ export class WorldScene extends Phaser.Scene {
     if (this.leaving) {
       return;
     }
-    this.walk();
+    const moving = this.walk();
     const position = this.player.position;
     this.state.position = position;
     const arrived = this.towns.update(position);
     if (arrived) {
       this.rest(arrived);
     }
-    this.merchant.update(position, delta, this.vehicle.buttonShown);
+    const driveShown = this.vehicle.buttonShown;
+    this.merchant.update(position, delta, driveShown);
+    this.fishing.update(position, moving, delta, {
+      driveShown,
+      shopShown: this.merchant.shopShown,
+    });
     this.updateHud();
     this.bossPointer?.update();
     if (celebrateCompletion(this.state)) {
@@ -192,13 +204,15 @@ export class WorldScene extends Phaser.Scene {
 
   /**
    * Sankari kävelee tikun suuntaan. Metsässä kulku hidastuu, ja jaloista lentää lehtiä.
-   * Bugatti (E tai BUGATTI-nappi) nopeuttaa kulkua, myös metsässä.
+   * Bugatti (E tai BUGATTI-nappi) nopeuttaa kulkua, myös metsässä. Palauttaa, liikkuuko sankari.
    */
-  private walk(): void {
+  private walk(): boolean {
     const move = this.controls.read().move;
     const speedFactor = speedFactorAt(getWorldGrid(), worldToTile(this.player.position));
     this.player.move(move, speedFactor * this.vehicle.speedFactor);
-    this.leaves.update(isSlowTerrain(speedFactor) && length(move) > 0);
+    const moving = length(move) > 0;
+    this.leaves.update(isSlowTerrain(speedFactor) && moving);
+    return moving;
   }
 
   /**

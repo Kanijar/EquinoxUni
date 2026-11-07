@@ -173,4 +173,17 @@ export const ENEMIES: readonly EnemyDef[] = [
     moves: { chargeChance: 0.25, chargeMultiplier: 2.5, specialChance: 0, specialPower: 0 },
     respawnMs: 300_000,
   },
+  {
+    // Ei kulje kartalla: tarttuu joskus onkeen kalastaessa (data/fishing.ts), ja taistelu
+    // alkaa rannalla. Vähän rantakrapua vahvempi. Taso 9–12. Vatsasta voi löytyä lohi.
+    id: 'shark',
+    name: 'Hai',
+    sprite: 'shark',
+    stats: { maxHp: 60, attack: 15, defense: 4, speed: 0 },
+    aggroRange: 0,
+    xp: 40,
+    critChance: 0.1,
+    drops: [{ item: 'salmon', chance: 0.5 }],
+    backdrop: 'beach',
+  },
 ];
