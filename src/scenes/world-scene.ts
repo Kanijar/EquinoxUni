@@ -315,10 +315,11 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  /** Kartta nukkuu toisen näkymän alla ja herää samaan kohtaan. */
+  /** Kartta nukkuu toisen näkymän alla ja herää samaan kohtaan (varusteet ehkä vaihtuneet). */
   private sleepUnder(key: string, data: BackpackSceneData | QuestSceneData | ShopSceneData): void {
     this.events.once(Phaser.Scenes.Events.WAKE, () => {
       this.encountersFrom = this.time.now + WORLD_VIEW.graceMs.afterBattle;
+      this.vehicle.refreshLook();
     });
     this.scene.sleep();
     this.scene.launch(key, data);

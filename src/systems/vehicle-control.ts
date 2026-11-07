@@ -33,7 +33,7 @@ export class VehicleControl {
     this.button = new DriveButton(scene, () => this.tap());
     scene.input.keyboard?.on('keydown-E', () => this.toggleCar());
     scene.input.keyboard?.on('keydown-V', () => this.toggleBoat());
-    this.updateLook();
+    this.refreshLook();
   }
 
   /** Nopeuskerroin kulkuneuvosta (kerrotaan maaston kertoimella). */
@@ -75,7 +75,7 @@ export class VehicleControl {
 
   private toggleBoat(): void {
     if (this.boat.toggle()) {
-      this.updateLook();
+      this.refreshLook();
     }
   }
 
@@ -88,12 +88,15 @@ export class VehicleControl {
       return;
     }
     playSound(driving ? 'engine' : 'engine-off');
-    this.updateLook();
+    this.refreshLook();
     this.options.events.message(driving ? TEXT.vehicle.on : TEXT.vehicle.off);
   }
 
-  /** Sankari veneessä, autossa tai jalan (kuskilla ja kävelijällä pelaajan ulkonäkö). */
-  private updateLook(): void {
+  /**
+   * Sankari veneessä, autossa tai jalan (kuskilla ja kävelijällä pelaajan ulkonäkö).
+   * Kutsutaan myös, kun reppu suljetaan, koska varusteet näkyvät kävelijän päällä.
+   */
+  refreshLook(): void {
     const { textures } = this.scene;
     const boat = this.boat.mapSprite;
     const car = ownedVehicle(this.state);

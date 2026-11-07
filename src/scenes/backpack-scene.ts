@@ -25,6 +25,7 @@ import { clampPage, pageCount, pageItems, pageOfIndex, turnPage } from '../logic
 import { bagItems, findGear } from '../logic/equipment';
 import { chooseBait } from '../logic/fishing-gear';
 import { playerStats, type GameState } from '../logic/game-state';
+import { heroTexture } from '../systems/hero-texture';
 import { BagPager } from '../ui/bag-pager';
 import { fishingDetail, isBaitInUse } from '../ui/fishing-detail';
 import { GearSlotRow } from '../ui/gear-slot-row';
@@ -37,7 +38,7 @@ import { addLabel, addTitle } from '../ui/title-text';
 // vartalo, koru), oikealla repun esineet sivuittain: nuolinapeista näkee seuraavan sivun,
 // kun esineitä on enemmän kuin yhdelle sivulle mahtuu. Esinettä napauttamalla näkee, mitä se tekee,
 // ja alareunan napista sen voi laittaa käyttöön, ottaa pois, juoda (juoma), syödä (kala) tai
-// valita syötiksi (kalastus).
+// valita syötiksi (kalastus). Yläreunassa sankari näyttää käytössä olevat varusteet päällään.
 // Kartta odottaa taustalla (nukkuu), kunnes reppu suljetaan VALMIS-napista.
 // Säännöt: logic/backpack.ts, logic/equipment.ts ja logic/bag-pages.ts (sivut).
 
@@ -58,6 +59,8 @@ export class BackpackScene extends Phaser.Scene {
   private statsTexts: Phaser.GameObjects.Text[] = [];
   private bagEmptyText!: Phaser.GameObjects.Text;
   private info!: ItemInfo;
+  /** Sankari varusteineen yläreunassa (logic/hero-gear.ts). */
+  private hero!: Phaser.GameObjects.Image;
 
   constructor() {
     super(SCENES.backpack);
@@ -72,6 +75,9 @@ export class BackpackScene extends Phaser.Scene {
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, COLORS.panel).setOrigin(0);
     addTitle(this, BACKPACK_VIEW.titleY, TEXT.backpack.title);
     this.addDoneButton();
+    const { heroX, heroY, heroScale } = BACKPACK_VIEW;
+    this.hero = this.add.image(heroX, heroY, heroTexture(this.textures, this.state));
+    this.hero.setScale(heroScale);
     this.addSlots();
     this.addBag();
     this.info = new ItemInfo(this, () => this.act());
@@ -197,6 +203,7 @@ export class BackpackScene extends Phaser.Scene {
   private refresh(): void {
     const stats = TEXT.backpack.stats(playerStats(this.state), this.state.hp);
     this.statsTexts.forEach((text, line) => text.setText(stats[line] ?? ''));
+    this.hero.setTexture(heroTexture(this.textures, this.state));
     const selected = this.selection;
     for (const { slot, row } of this.slotRows) {
       const id = this.state.equipped[slot];

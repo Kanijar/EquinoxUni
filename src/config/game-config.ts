@@ -238,6 +238,10 @@ export const BACKPACK_VIEW = {
   statsX: 8,
   statsFirstY: 14,
   statsGap: 13,
+  /** Sankari varusteineen otsikon ja VALMIS-napin välissä, 16 px → 48 px. */
+  heroX: 318,
+  heroY: 28,
+  heroScale: 3,
   /** Valitun esineen tiedot ja toimintonappi alareunassa. */
   infoX: 12,
   infoNameY: 222,
