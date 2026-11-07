@@ -9,7 +9,7 @@ import type { QuestDef } from './types';
 // Tehtävät seuraavat saaren alueita ja niiden tasoja (data/map-enemies.ts): pellot, metsät,
 // tunturit, suo ja tulivuori. Tasapaino: palkinnon KP on noin yhden tason verran tehtävän
 // minLevel-tasolla (KP-rajat data/rules.ts: taso 5 → 6 vaatii 49 KP, taso 22 → 23 noin 430 KP).
-// Liskovahdin voi tehdä yhä uudelleen, joten tasoille 34–50 riittää tekemistä. Viimeinen
+// Liskovahdin voi tehdä yhä uudelleen, joten tasoille 34–100 riittää tekemistä. Viimeinen
 // tehtävä on Lohikäärmeiden tuho: palkintona Bugattin avaimet (nopeampi kulku kartalla).
 // Jussin veli Ossi Ketola odottaa tulivuoren kraatterissa (data/npcs.ts). Hänen luokseen pääsee,
 // kun lohikäärmeiden voitot ovat nostaneet rappuset laavasta (data/volcano-stairs.ts).

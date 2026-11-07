@@ -194,10 +194,12 @@ scenes  →  systems / ui  →  entities  →  logic
   Uusi tulipallo aloittaa palamisen alusta. `BattleDirector` kutsuu `burnTick()`ia ajastimella.
   Säännöt ovat `logic/battle.ts`:ssä (palauttaa tapahtumalistan), näyttäminen
   `systems/battle-director.ts`:ssä ja `ui/battle-*.ts`:ssä.
-- **Tasot:** tasoja on 1–50 (taso 50 on huipputaso). KP-rajoja ei kirjoiteta käsin, vaan ne
+- **Tasot:** tasoja on 1–100 (taso 100 on huipputaso). KP-rajoja ei kirjoiteta käsin, vaan ne
   lasketaan kaavasta `LEVEL_CURVE` (`data/rules.ts`, laskenta `data/level-curve.ts`):
   raja = cubic × n³ + quadratic × n² + linear × n, kun n = taso − 1. Tasot 1–10 eivät vaadi
   enempää kuin vanha käsin kirjoitettu taulukko, joten vanhojen tallennusten taso ei laske.
+  Kun huipputaso nostettiin 50:stä 100:aan, kaava pysyi samana: tasot 1–50 ovat ennallaan
+  (taso 50 = 32178 KP, taso 100 = 228858 KP). Viholliset eivät vahvistu pelaajan mukana.
   Tallennukseen menee vain KP; taso lasketaan siitä aina uudelleen (`logic/progression.ts`).
 - **Taistelun ulkoasu:** taustakuva valitaan maaston mukaan, jossa taistelu alkaa
   (`data/battle-backdrops.ts`: pelto, kuusimetsä, lumiset tunturit, kylätie punaisine

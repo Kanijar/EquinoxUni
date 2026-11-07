@@ -52,8 +52,9 @@ export const BATTLE_STAGE = {
 /** Nimikyltit ja elämäpalkit ruudun yläreunassa. */
 export const BATTLE_PANEL = {
   margin: 6,
-  width: 158,
-  playerHeight: 60,
+  // Leveys riittää pisimpään KP-tekstiin "Level 99  XP 226342/228858" (26 merkkiä × 6 px).
+  width: 172,
+  playerHeight: 64,
   enemyHeight: 44,
   padding: 6,
   barY: 21,

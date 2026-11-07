@@ -59,18 +59,19 @@ describe('alkuruudun suden salaisuus', () => {
     expect(secret.hp).toBe(PLAYER.stats.maxHp);
   });
 
-  it('susi vie huipputasolle 50: 147 kykypistettä ja KP-palkki täynnä', () => {
+  it('susi vie tasolle 50: 147 kykypistettä, ja matka huipputasolle 100 jatkuu', () => {
     expect(MENU_SECRET.wolfStartLevel).toBe(50);
-    expect(PROGRESSION.xpForLevel.length).toBe(50);
+    expect(PROGRESSION.xpForLevel.length).toBe(100);
     const start = startFromMenu(WOLF);
     expect(playerLevel(start.state)).toBe(50);
     expect(unspentSkillPoints(start.state)).toBe(147);
-    expect(xpProgress(start.state.xp).nextLevelXp).toBeNull();
+    expect(xpProgress(start.state.xp).fraction).toBe(0);
+    expect(xpProgress(start.state.xp).nextLevelXp).toBe(PROGRESSION.xpForLevel[50]);
     expect(start.message).toContain('Taso 50!');
   });
 
   it('liian suuri tai pieni salaisuuden taso rajataan tasotaulukkoon', () => {
-    expect(playerLevel(createMenuGame(WOLF, { ...rules, wolfStartLevel: 999 }))).toBe(50);
+    expect(playerLevel(createMenuGame(WOLF, { ...rules, wolfStartLevel: 999 }))).toBe(100);
     expect(createMenuGame(WOLF, { ...rules, wolfStartLevel: 0 }).xp).toBe(0);
   });
 
