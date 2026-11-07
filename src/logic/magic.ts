@@ -1,4 +1,4 @@
-import type { BattleRules, SpellDef } from '../data/types';
+import type { BattleRules, FireSpellDef, SpellDef } from '../data/types';
 import type { Battle } from './battle';
 import { applyDamage, isDefeated, type Fighter } from './combat';
 
@@ -37,13 +37,30 @@ export function spellPower(spell: SpellDef, magic: number): number {
 }
 
 /** Kuinka monta sekuntia loitsu polttaa. */
-export function burnSeconds(spell: SpellDef, magic: number): number {
+export function burnSeconds(spell: FireSpellDef, magic: number): number {
   return spell.burnSeconds + Math.max(0, magic) * spell.burnSecondsPerMagic;
 }
 
 /** Polttovoima: paljonko palava vihollinen menettää elämää sekunnissa (voi olla desimaaliluku). */
-export function burnDamage(spell: SpellDef, magic: number): number {
+export function burnDamage(spell: FireSpellDef, magic: number): number {
   return spell.burnDamage + Math.max(0, magic) * spell.burnDamagePerMagic;
+}
+
+/**
+ * Loitsun osuman vahinko: tulivoima, satunnaisvaihtelu ja kriittinen osuma loitsijan
+ * tarkkuuden mukaan. Vahinko on aina vähintään 1. Puolustus ei auta.
+ */
+export function rollSpellHit(
+  caster: Fighter,
+  spell: SpellDef,
+  rng: Rng,
+  rules: BattleRules,
+): { readonly damage: number; readonly crit: boolean } {
+  const variance = 1 + (rng() * 2 - 1) * rules.damageVariance;
+  const crit = rng() < (caster.critChance ?? rules.critChance);
+  const base = spellPower(spell, caster.magic ?? 0);
+  const damage = Math.max(1, Math.round(base * variance * (crit ? rules.critMultiplier : 1)));
+  return { damage, crit };
 }
 
 /**
@@ -52,15 +69,12 @@ export function burnDamage(spell: SpellDef, magic: number): number {
  */
 export function castSpell(
   caster: Fighter,
-  spell: SpellDef,
+  spell: FireSpellDef,
   rng: Rng,
   rules: BattleRules,
 ): { readonly damage: number; readonly crit: boolean; readonly burn: Burn } {
   const magic = caster.magic ?? 0;
-  const variance = 1 + (rng() * 2 - 1) * rules.damageVariance;
-  const crit = rng() < (caster.critChance ?? rules.critChance);
-  const base = spellPower(spell, magic);
-  const damage = Math.max(1, Math.round(base * variance * (crit ? rules.critMultiplier : 1)));
+  const { damage, crit } = rollSpellHit(caster, spell, rng, rules);
   const burn = {
     damage: burnDamage(spell, magic),
     secondsLeft: burnSeconds(spell, magic),

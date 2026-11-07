@@ -34,6 +34,8 @@ export const COLORS = {
   critText: '#ffd23f',
   /** Loitsun osuman ja palamisen välähdys sekä palamisen vahinkoteksti. */
   spellFlash: 0xff7a1a,
+  boltFlash: 0xfff6a8,
+  iceFlash: 0x9fe0ff,
   /** Loppubossin lumimyrsky osuu pelaajaan. */
   stormFlash: 0x9fd0ff,
   burnText: '#ff9a3c',
@@ -60,6 +62,7 @@ export const SCENES = {
   backpack: 'backpack',
   quests: 'quests',
   shop: 'shop',
+  cave: 'cave',
   exit: 'exit',
 } as const;
 
@@ -289,6 +292,18 @@ export const BATTLE_VIEW = {
     arcPx: 34,
     flickerMs: 60,
   },
+  /** Salama iskee ylhäältä viholliseen sahalaitaisena viivana (ui/battle/spell-fx.ts). */
+  lightning: {
+    color: 0xfff6a8,
+    glowColor: 0xffe14a,
+    width: 3,
+    glowWidth: 7,
+    segments: 7,
+    jitterPx: 10,
+    flashMs: 260,
+  },
+  /** Jäänuoli lentää suoraan viholliseen (ui/battle/spell-fx.ts). */
+  iceArrow: { color: 0x9fe0ff, coreColor: 0xffffff, length: 18, width: 5, flightMs: 300 },
   /** Kriittinen osuma: ruutu tärähtää ja kohteen yläpuolelle nousee teksti. */
   crit: { shakeMs: 200, shakeIntensity: 0.012, popupMs: 800, popupRisePx: 24, popupOffsetY: 84 },
   /** Pudonnut esine nousee kaatuneen vihollisen kohdalta (ui/loot-popup.ts). */

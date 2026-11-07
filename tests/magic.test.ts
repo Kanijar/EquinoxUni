@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { getSpell } from '../src/data';
 import { PLAYER } from '../src/data/player';
+import { FIREBALL } from '../src/data/spells';
 import { MAGIC_RULES } from '../src/data/rules';
-import type { BattleRules, SpellDef } from '../src/data/types';
+import type { BattleRules, FireSpellDef } from '../src/data/types';
 import { createBattle, takeTurn, type Rng } from '../src/logic/battle';
 import type { Fighter } from '../src/logic/combat';
 import { getSkill } from '../src/logic/skill-points';
@@ -18,7 +18,8 @@ const rules: BattleRules = {
   defendMultiplier: 0.5,
   fleeChance: 0.6,
 };
-const spell: SpellDef = {
+const spell: FireSpellDef = {
+  effect: 'burn',
   id: 'fireball',
   power: 1,
   powerPerMagic: 1,
@@ -41,7 +42,7 @@ describe('tulipallo', () => {
   it('ilman kykypisteitä lyönti tekee 4 ja tulipallo 1 + palaminen 3 × 1', () => {
     expect(PLAYER.stats.attack).toBe(4);
     expect(PLAYER.stats.magic).toBe(0);
-    const fireball = getSpell('fireball');
+    const fireball = FIREBALL;
     expect(spellPower(fireball, 0)).toBe(1);
     expect(burnSeconds(fireball, 0)).toBe(3);
     expect(burnDamage(fireball, 0)).toBe(1);
@@ -58,7 +59,7 @@ describe('tulipallo', () => {
   });
 
   it('jokainen Maagia-piste nostaa tulipallon polttovoimaa 0,5:llä', () => {
-    const fireball = getSpell('fireball');
+    const fireball = FIREBALL;
     expect(fireball.burnDamagePerMagic).toBe(0.5);
     expect([0, 1, 2, 3].map((magic) => burnDamage(fireball, magic))).toEqual([1, 1.5, 2, 2.5]);
   });

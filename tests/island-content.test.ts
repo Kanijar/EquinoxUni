@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ENEMIES, ITEMS, QUESTS } from '../src/data';
 import { FINAL_BOSS } from '../src/data/boss';
+import { CAVE } from '../src/data/cave';
 import { FISHING } from '../src/data/fishing';
 import { MERCHANT } from '../src/data/merchant';
 
@@ -25,15 +26,19 @@ const fished = new Set(
   ),
 );
 
+/** Peikkokuninkaan luolan kivestä vedettävä miekka (data/cave.ts). */
+const fromCave = new Set([CAVE.sword]);
+
 describe('saaren hirviöt ja varusteet', () => {
   it.each(ISLAND_MONSTERS)('%s pudottaa varusteen', (id) => {
     const enemy = ENEMIES.find((e) => e.id === id);
     expect(enemy?.drops?.some((drop) => gearIds.has(drop.item))).toBe(true);
   });
 
-  it('jokaisen varusteen voi saada viholliselta, tehtävän palkintona, kauppiaalta tai kalastamalla', () => {
+  it('jokaisen varusteen voi saada viholliselta, palkintona, kauppiaalta, kalastamalla tai luolasta', () => {
     for (const id of gearIds) {
-      expect(dropped.has(id) || rewarded.has(id) || sold.has(id) || fished.has(id), id).toBe(true);
+      const found = [dropped, rewarded, sold, fished, fromCave].some((source) => source.has(id));
+      expect(found, id).toBe(true);
     }
   });
 

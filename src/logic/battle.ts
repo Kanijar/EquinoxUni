@@ -1,10 +1,11 @@
-import { getItem, getSpell } from '../data';
+import { getItem } from '../data';
 import { BATTLE_RULES } from '../data/rules';
 import type { BattleRules, EnemyDef, EnemyMovesDef, ItemStack, SpellId } from '../data/types';
 import { applyDamage, heal, isDefeated, type Fighter } from './combat';
 import { rollDamage, type Rng } from './damage-roll';
 import { enemyAct } from './enemy-turn';
-import { castSpell, type Burn } from './magic';
+import type { Burn } from './magic';
+import { canCast, castPlayerSpell, thawEnemy, tickCooldowns, type SpellCooldowns } from './spells';
 
 // Vuoropohjainen taistelu. Pelaaja valitsee toiminnon, sitten vihollinen vastaa.
 // Puhdasta logiikkaa: palauttaa tapahtumat, jotka taistelunäkymä näyttää järjestyksessä.
@@ -35,9 +36,15 @@ export type BattleEvent =
       readonly spellId: SpellId;
       readonly damage: number;
       readonly crit: boolean;
-      /** Kuinka monta sekuntia vihollinen palaa. */
+      /** Kuinka monta sekuntia vihollinen palaa (0 = loitsu ei sytytä). */
       readonly burnSeconds: number;
+      /** true, jos jäänuoli jäädytti vihollisen (se ei lyö tällä vuorolla). */
+      readonly frozen?: boolean;
     }
+  /** Parannusloitsu: sankari sai elämää. */
+  | { readonly kind: 'spellHeal'; readonly spellId: SpellId; readonly amount: number }
+  /** Jäätynyt vihollinen ei voinut lyödä. */
+  | { readonly kind: 'frozen' }
   | { readonly kind: 'defend' }
   | { readonly kind: 'heal'; readonly itemId: string; readonly amount: number }
   | { readonly kind: 'steal'; readonly itemId: string }
@@ -70,6 +77,10 @@ export interface Battle {
   enemyCharging: boolean;
   /** Vihollisen palaminen tulipallon jäljiltä, tai null (logic/magic.ts). */
   enemyBurn: Burn | null;
+  /** Jäänuoli jäädytti vihollisen: se ei lyö tällä vuorolla (logic/spells.ts). */
+  enemyFrozen: boolean;
+  /** Montako vuoroa kutakin loitsua pitää vielä odottaa (logic/spells.ts). */
+  readonly spellCooldowns: SpellCooldowns;
   outcome: BattleOutcome;
 }
 
@@ -96,6 +107,8 @@ export function createBattle(
     enemyMoves: traits.moves ?? null,
     enemyCharging: false,
     enemyBurn: null,
+    enemyFrozen: false,
+    spellCooldowns: {},
     outcome: 'ongoing',
   };
 }
@@ -112,6 +125,9 @@ export function canChoose(battle: Battle, action: BattleAction): boolean {
   if (battle.outcome !== 'ongoing') {
     return false;
   }
+  if (action.kind === 'spell') {
+    return canCast(battle, action.spellId);
+  }
   return action.kind !== 'item' || (battle.inventory[action.itemId] ?? 0) > 0;
 }
 
@@ -125,9 +141,11 @@ export function takeTurn(
   if (!canChoose(battle, action)) {
     return [];
   }
+  tickCooldowns(battle.spellCooldowns);
   const events = [playerAct(battle, action, rng, rules)];
   if (battle.outcome === 'ongoing') {
-    events.push(enemyAct(battle, action.kind === 'defend', rng, rules));
+    const defending = action.kind === 'defend';
+    events.push(battle.enemyFrozen ? thawEnemy(battle) : enemyAct(battle, defending, rng, rules));
   }
   return events;
 }
@@ -148,7 +166,7 @@ function playerAct(
       return { kind: 'hit', attacker: 'player', damage, crit, defended: false };
     }
     case 'spell':
-      return castAtEnemy(battle, action.spellId, rng, rules);
+      return castPlayerSpell(battle, action.spellId, rng, rules);
     case 'defend':
       return { kind: 'defend' };
     case 'item':
@@ -161,18 +179,6 @@ function playerAct(
       return { kind: 'flee', success };
     }
   }
-}
-
-/** Loitsu osuu viholliseen ja sytyttää sen palamaan (uusi loitsu aloittaa palamisen alusta). */
-function castAtEnemy(battle: Battle, spellId: SpellId, rng: Rng, rules: BattleRules): BattleEvent {
-  const { damage, crit, burn } = castSpell(battle.player, getSpell(spellId), rng, rules);
-  applyDamage(battle.enemy, damage);
-  if (isDefeated(battle.enemy)) {
-    battle.outcome = 'won';
-  } else {
-    battle.enemyBurn = burn;
-  }
-  return { kind: 'spell', spellId, damage, crit, burnSeconds: burn.secondsLeft };
 }
 
 function useItem(battle: Battle, itemId: string): BattleEvent {

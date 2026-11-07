@@ -1,4 +1,4 @@
-import { getSpell } from '../data';
+import { FIREBALL } from '../data/spells';
 import type { PlayerStats, SkillDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import { burnDamage } from '../logic/magic';
@@ -11,7 +11,7 @@ export function skillDetail(skill: SkillDef, stats: PlayerStats): string | null 
   if (skill.stat !== 'magic') {
     return null;
   }
-  const fireball = getSpell('fireball');
+  const fireball = FIREBALL;
   const perPoint = fireball.burnDamagePerMagic * skill.perPoint;
   return TEXT.skills.burnPower(burnDamage(fireball, stats.magic), perPoint);
 }

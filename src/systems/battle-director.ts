@@ -13,7 +13,8 @@ import { isFishedEnemy } from '../logic/fishing';
 import { isBoss } from '../logic/boss';
 import { applyBattleResult, type GameState, type VictoryReward } from '../logic/game-state';
 import { burnTick } from '../logic/magic';
-import { BattleMenu } from '../ui/battle-menu';
+import { learnedSpells } from '../logic/spells';
+import { BattleMenu, type MenuPage } from '../ui/battle-menu';
 import type { BattleView } from '../ui/battle-view';
 import { eventStep, playSteps, type BattleStep } from './battle-steps';
 import { victorySteps } from './victory-steps';
@@ -43,10 +44,11 @@ export class BattleDirector {
     /** Kutsutaan taistelun lopuksi. reward on voiton palkinto, tai null. */
     private readonly onEnd: (outcome: FinishedOutcome, reward: VictoryReward | null) => void,
   ) {
-    this.menu = new BattleMenu(scene, {
-      onChoose: (action) => this.choose(action),
-      onAttackMenu: (open) => setup.view.say(open ? TEXT.battle.chooseAttack : TEXT.battle.choose),
-    });
+    const callbacks = {
+      onChoose: (action: BattleAction) => this.choose(action),
+      onPage: (page: MenuPage) => setup.view.say(menuPrompt(page)),
+    };
+    this.menu = new BattleMenu(scene, callbacks, learnedSpells(setup.battle.inventory));
     setup.view.syncHp(setup.battle, false);
     setup.view.intro();
     setup.view.say(introText(setup));
@@ -112,6 +114,14 @@ export class BattleDirector {
     }
     playSteps(this.scene, view, steps, () => this.onEnd(outcome, reward));
   }
+}
+
+/** Valikon kehotus viestilaatikossa. */
+function menuPrompt(page: MenuPage): string {
+  if (page === 'attack') {
+    return TEXT.battle.chooseAttack;
+  }
+  return page === 'spells' ? TEXT.magic.chooseSpell : TEXT.battle.choose;
 }
 
 /** Taistelun aloitusviesti: loppuboss, onkeen tarttunut (hai), väijytys tai kartan vihollinen. */

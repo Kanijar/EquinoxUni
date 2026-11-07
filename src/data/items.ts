@@ -1,3 +1,4 @@
+import { CAVE_ITEMS } from './cave-items';
 import { FISHING_ITEMS } from './fishing-items';
 import { ISLE_ITEMS } from './isle-items';
 import { MERCHANT_ITEMS } from './merchant-items';
@@ -254,6 +255,8 @@ export const ITEMS: readonly ItemDef[] = [
   ...FISHING_ITEMS,
   // --- Pienet saaret: vene, pudotukset ja tehtävien palkinnot (data/isle-items.ts) ---
   ...ISLE_ITEMS,
+  // --- Peikkokuninkaan luola: Excalibur ja Noidan loitsukirjat (data/cave-items.ts) ---
+  ...CAVE_ITEMS,
 ];
 
 /** Varustepaikat repussa tässä järjestyksessä: käsi (ase), vartalo (vaatteet), kaula (koru). */

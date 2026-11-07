@@ -16,6 +16,7 @@ import type {
 } from '../data/types';
 import { localDateParts, twoDigits, type DateParts } from './date-parts';
 import { FI_BOAT, FI_VEHICLE } from './fi-boat';
+import { FI_CAVE, FI_MAGIC, FI_SPELL_BUTTONS, FI_SPELLS } from './fi-cave';
 import { FI_QUESTS } from './fi-quests';
 import { FI_SHOP } from './fi-shop';
 import { FI_STAIRS } from './fi-stairs';
@@ -334,14 +335,13 @@ export const FI = {
   fishing: FI_FISHING,
   /** Vene ja pienet saaret (i18n/fi-boat.ts). */
   boat: FI_BOAT,
-  /** Loitsujen nimet (data/spells.ts). */
-  spells: {
-    fireball: 'Tulipallo',
-  },
-  /** Loitsujen napit taistelussa. */
-  spellButtons: {
-    fireball: 'TULIPALLO',
-  },
+  /** Loitsujen nimet ja napit taistelussa (data/spells.ts, i18n/fi-cave.ts). */
+  spells: FI_SPELLS,
+  spellButtons: FI_SPELL_BUTTONS,
+  /** Loitsut taistelussa (logic/spells.ts). */
+  magic: FI_MAGIC,
+  /** Peikkokuninkaan luola (data/cave.ts). */
+  cave: FI_CAVE,
   /** Loppuboss (data/boss.ts): peikkolaskuri, herääminen ja voitto. */
   boss: {
     progress: (count: number, needed: number): string =>

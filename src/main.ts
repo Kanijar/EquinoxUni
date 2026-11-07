@@ -3,6 +3,7 @@ import { COLORS, GAME_HEIGHT, GAME_WIDTH } from './config/game-config';
 import { BackpackScene } from './scenes/backpack-scene';
 import { BattleScene } from './scenes/battle-scene';
 import { BootScene } from './scenes/boot-scene';
+import { CaveScene } from './scenes/cave-scene';
 import { ExitScene } from './scenes/exit-scene';
 import { HeroScene } from './scenes/hero-scene';
 import { MenuScene } from './scenes/menu-scene';
@@ -49,6 +50,7 @@ new Phaser.Game({
     BackpackScene,
     QuestScene,
     ShopScene,
+    CaveScene,
     ExitScene,
   ],
 });

@@ -2,6 +2,7 @@ import { GAME_INFO } from '../data/game-info';
 import type { GearStat, PlayerStats, SkillStat, StatBonus } from '../data/types';
 import { localDateParts, twoDigits, type DateParts } from './date-parts';
 import { EN_BOAT, EN_VEHICLE } from './en-boat';
+import { EN_CAVE, EN_MAGIC, EN_SPELL_BUTTONS, EN_SPELLS } from './en-cave';
 import { EN_CONTENT } from './en-content';
 import { EN_QUESTS } from './en-quests';
 import { EN_SHOP } from './en-shop';
@@ -268,12 +269,10 @@ export const EN: Texts = {
   stairs: EN_STAIRS,
   fishing: EN_FISHING,
   boat: EN_BOAT,
-  spells: {
-    fireball: 'Fireball',
-  },
-  spellButtons: {
-    fireball: 'FIREBALL',
-  },
+  spells: EN_SPELLS,
+  spellButtons: EN_SPELL_BUTTONS,
+  magic: EN_MAGIC,
+  cave: EN_CAVE,
   boss: {
     progress: (count: number, needed: number): string =>
       `Mountain trolls defeated ${count}/${needed}.`,

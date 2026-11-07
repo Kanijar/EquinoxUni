@@ -109,6 +109,10 @@ export const ACTION_BUTTON = {
     punch: 'icon-fist',
     spell: 'icon-fire',
     back: 'icon-back',
+    spells: 'icon-magic',
+    bolt: 'icon-bolt',
+    ice: 'icon-ice',
+    heal: 'icon-heal',
   },
   accents: {
     attack: 0xe0503a,
@@ -118,7 +122,13 @@ export const ACTION_BUTTON = {
     punch: 0xf08a3a,
     spell: 0xff7a1a,
     back: 0x9aa3b5,
+    spells: 0xb05ae0,
+    bolt: 0xffe14a,
+    ice: 0x7ad0ff,
+    heal: 0xff6a8a,
   },
+  /** Kunkin loitsun napin ikoni ja väri (avain icons- ja accents-listoissa). */
+  spellKinds: { fireball: 'spell', lightning: 'bolt', 'ice-arrow': 'ice', healing: 'heal' },
 } as const;
 
 /** Lentävät vahinkonumerot. */

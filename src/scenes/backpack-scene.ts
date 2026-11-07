@@ -31,6 +31,7 @@ import { fishingDetail, isBaitInUse } from '../ui/fishing-detail';
 import { GearSlotRow } from '../ui/gear-slot-row';
 import { ItemInfo, type ItemInfoContent } from '../ui/item-info';
 import { ItemTile } from '../ui/item-tile';
+import { spellInfo } from '../ui/shop-texts';
 import { TextButton } from '../ui/text-button';
 import { addLabel, addTitle } from '../ui/title-text';
 
@@ -247,7 +248,9 @@ export class BackpackScene extends Phaser.Scene {
   ): Pick<ItemInfoContent, 'detail' | 'action' | 'actionEnabled'> {
     const drinkBlocked = (action === 'drink' || action === 'eat') && !canDrink(this.state, item.id);
     const baitBlocked = action === 'bait' && isBaitInUse(this.state, item.id);
-    const bonus = item.kind === 'gear' ? TEXT.backpack.bonus(item.bonus) : '';
+    const magic = playerStats(this.state).magic;
+    const spell = item.kind === 'spell' ? spellInfo(item.spell, magic) : '';
+    const bonus = item.kind === 'gear' ? TEXT.backpack.bonus(item.bonus) : spell;
     const detail = drinkBlocked
       ? TEXT.backpack.fullHp
       : (fishingDetail(this.state, item.id) ?? bonus);

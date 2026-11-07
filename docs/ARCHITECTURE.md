@@ -150,6 +150,29 @@ scenes  →  systems / ui  →  entities  →  logic
   puolustuksen ja sammuttaa tulipallon liekit. Säännöt `logic/boss.ts` ja `logic/enemy-turn.ts`.
   Voitosta saa 800 KP, harvinaisen varusteen Kuninkaan viitta ja juoman. Voiton jälkeen
   näytetään voittoruutu, ja peli jatkuu kartalla.
+- **Peikkokuninkaan luola, Excalibur ja Noita:** Peikkokuninkaan paikan pohjoispuolella
+  tunturin rinteellä on luolan suu (`data/cave.ts`, ruutu 30, 37). Ennen bossin voittoa suun
+  tukkii iso kivi, ja suulle tultaessa kerrotaan, että Peikkokuningas vartioi sitä. Voiton jälkeen
+  (`GameState.bossDefeated`) kivi on poissa, ja suulla oikean alakulman pinoon tulee LUOLA-nappi
+  (`systems/cave-entrance.ts`). Luola (`scenes/cave-scene.ts`) avautuu kartan päälle kuten reppu:
+  vasemmalla Excalibur kivessä, oikealla Noita Nokkonen. VEDÄ MIEKKA vetää Excaliburin kivestä
+  ja laittaa sen käteen, kun taso on vähintään `CAVE.swordMinLevel` (50). Miekan saa vain kerran
+  (`GameState.swordTaken`, puuttuva = false, joten `SAVE_VERSION`ia ei tarvinnut nostaa), ja jos
+  Excalibur on jo saatu salaisesta burgerista, kivi on tyhjä. Säännöt `logic/cave.ts`.
+  Excalibur (`data/cave-items.ts`) on pelin paras ase, joten burgerin "parhaat varusteet" antaa sen.
+  NOIDAN KAUPPA on sama `ShopScene` kuin Kaapolla (`keeper: WITCH`, `returnTo`: kauppa palaa
+  luolaan). Noita myy loitsukirjoja (`kind: 'spell'`) ja voimakristalleja. Loitsukirjaa ei
+  osteta toista kertaa eikä sitä voi myydä.
+- **Loitsut:** tulipallo osataan alusta asti, muut opitaan loitsukirjoista: kun kirja on repussa,
+  loitsu näkyy taistelussa (`logic/spells.ts` `learnedSpells`). Loitsut ovat dataa
+  (`data/spells.ts`, tyypit `data/types-magic.ts`), ja loitsun `effect` kertoo, mitä se tekee:
+  `burn` (tulipallo, palaminen), `bolt` (Salama: iso osuma), `freeze` (Jäänuoli: osuma, ja
+  vihollinen jäätyy eikä lyö tällä vuorolla) tai `heal` (Parannus: elämää). Kaikki kasvavat
+  tulivoimasta (`powerPerMagic`), eikä puolustus auta niitä vastaan. Loitsulla voi olla odotus
+  (`cooldownTurns`): käytön jälkeen sitä ei voi käyttää ennen kuin niin monta vuoroa on kulunut
+  (`Battle.spellCooldowns`, lyhenee joka vuoron alussa). Taistelussa HYÖKKÄÄ-valikkoon tulee
+  LOITSUT-nappi, joka avaa loitsuvalikon (enintään kolme loitsua ja TAKAISIN,
+  `ui/battle-menu.ts`); odotettava loitsu näyttää "ODOTA 2". Efektit `ui/battle/spell-fx.ts`.
 - **Läpäisy:** kun jokainen karttavihollinen on voitettu ainakin kerran ("Voittamatta 0"),
   voittoruutu näytetään kerran (`GameState.completed`), ja peli jatkuu kartalla. Ruutu kertoo,
   odottaako loppuboss vielä.

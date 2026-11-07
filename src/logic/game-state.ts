@@ -4,6 +4,7 @@ import { WORLD } from '../data/world';
 import type { EnemyDef, ItemStack, PlayerStats, SkillId } from '../data/types';
 import { recoverStolen, type Battle, type Rng } from './battle';
 import { recordBossVictory, type BossNews, type BossProgress } from './boss';
+import type { CaveProgress } from './cave';
 import type { Fighter } from './combat';
 import { rollDrops } from './drops';
 import { victoryCoins } from './coins';
@@ -35,13 +36,15 @@ import { recordStairsVictory, type StairsNews, type StairsProgress } from './vol
 
 // Pelin eteneminen, joka säilyy kartan ja taistelun välillä: sankarin nimi ja ulkonäkö,
 // elämä, kokemus, kykypisteet, esineet ja varusteet, sijainti, voitetut viholliset ja niiden paluu
-// sekä tehtävät, kolikot, kulkevan kauppiaan paikka, tulivuoren rappuset ja vene (saaret).
+// sekä tehtävät, kolikot, kulkevan kauppiaan paikka, tulivuoren rappuset, vene (saaret) ja
+// luolan miekka (logic/cave.ts).
 // Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
 // tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
 export interface GameState
   extends
     BossProgress,
+    CaveProgress,
     HeroAppearance,
     MerchantProgress,
     StairsProgress,
@@ -106,6 +109,7 @@ export function createNewGame(startXp = 0): GameState {
     ...newAppearance(),
     bossProgress: 0,
     bossDefeated: false,
+    swordTaken: false,
     completed: false,
     quests: {},
     driving: false,

@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 import { BATTLE_VIEW } from '../config/game-config';
-import { getItem } from '../data';
+import { getItem, getSpell } from '../data';
 import { TEXT } from '../i18n/text';
 import type { BattleEvent } from '../logic/battle';
 import type { BattleView } from '../ui/battle-view';
@@ -23,8 +23,12 @@ export function eventStep(event: BattleEvent, view: BattleView, enemyName: strin
     case 'spell':
       return {
         text: spellText(event, enemyName),
-        effect: () => view.playSpell(event.damage, event.crit),
+        effect: () => view.playSpell({ ...event, effect: getSpell(event.spellId).effect }),
       };
+    case 'spellHeal':
+      return { text: TEXT.magic.healed(event.amount), effect: () => view.playHeal(event.amount) };
+    case 'frozen':
+      return { text: TEXT.magic.frozen(enemyName), effect: () => view.playFrozen() };
     case 'defend':
       return { text: TEXT.battle.defending, effect: () => view.playDefend() };
     case 'heal':
@@ -84,9 +88,15 @@ function hitText(event: Extract<BattleEvent, { kind: 'hit' }>, enemyName: string
   return crit + text;
 }
 
+/** Tulipallo sytyttää, jäänuoli jäädyttää, salama vain osuu. */
 function spellText(event: Extract<BattleEvent, { kind: 'spell' }>, enemyName: string): string {
   const crit = event.crit ? TEXT.battle.crit : '';
-  return crit + TEXT.battle.spellHit(TEXT.spells[event.spellId], enemyName, event.damage);
+  const name = TEXT.spells[event.spellId];
+  if (event.frozen) {
+    return crit + TEXT.magic.freezeHit(enemyName, event.damage);
+  }
+  const text = event.burnSeconds > 0 ? TEXT.battle.spellHit : TEXT.magic.spellStrike;
+  return crit + text(name, enemyName, event.damage);
 }
 
 function stormText(event: Extract<BattleEvent, { kind: 'special' }>, enemyName: string): string {

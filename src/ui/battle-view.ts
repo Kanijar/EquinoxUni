@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import { BATTLE_CAMERA, BATTLE_STAGE, DAMAGE_NUMBERS } from '../config/battle-config';
 import { BATTLE_VIEW, COLORS } from '../config/game-config';
-import type { BattleBackdropDef } from '../data/types';
+import type { BattleBackdropDef, SpellDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import type { Battle, Side } from '../logic/battle';
 import { playSound } from '../systems/sound-fx';
@@ -11,6 +11,7 @@ import { critImpact, shakeHit, showBanner, showShield, throwItem } from './battl
 import { showDamageNumber } from './battle/damage-number';
 import { FighterSprite } from './battle/fighter-sprite';
 import { showFireball } from './battle/fireball';
+import { showIceArrow, showLightning } from './battle/spell-fx';
 import { MessageBox } from './battle/message-box';
 import { hitColor, numberSpot, paletteColors } from './battle/view-helpers';
 import { StatusPanel } from './battle/status-panel';
@@ -47,6 +48,13 @@ export interface StormInfo {
   readonly damage: number;
   readonly defended: boolean;
   readonly extinguished: boolean;
+}
+
+/** Loitsun osuman tiedot näkymää varten (logic/battle.ts:n 'spell'-tapahtuma). */
+export interface SpellCast {
+  readonly damage: number;
+  readonly crit: boolean;
+  readonly effect: SpellDef['effect'];
 }
 
 interface ShownHp {
@@ -132,30 +140,57 @@ export class BattleView {
     });
   }
 
-  /** Tulipallo lentää viholliseen, räjähtää ja sytyttää sen palamaan. */
-  playSpell(damage: number, crit: boolean): void {
+  /**
+   * Loitsu osuu viholliseen: tulipallo lentää kaarena ja sytyttää palamaan, salama iskee
+   * ylhäältä ja jäänuoli lentää suoraan ja jäädyttää.
+   */
+  playSpell(cast: SpellCast): void {
     const player = this.fighters.player.center;
     const target = this.fighters.enemy;
     this.fighters.player.lunge();
     const path = { from: { x: player.x + 20, y: player.y }, to: target.center };
-    showFireball(this.scene, this.particles, path, () => {
-      playSound(crit ? 'crit' : 'boom');
-      target.hurt(crit ? COLORS.critFlash : COLORS.spellFlash);
-      this.changeHp('enemy', -damage);
-      showDamageNumber(
-        this.scene,
-        numberSpot(target.center),
-        TEXT.battle.damagePopup(damage),
-        crit ? 'crit' : 'burn',
-      );
-      this.setBurning(true);
-      if (crit) {
-        critImpact(this.scene);
-        showCritPopup(this.scene, target.sprite.x, target.sprite.y);
-      } else {
-        shakeHit(this.scene);
-      }
-    });
+    if (cast.effect === 'bolt') {
+      showLightning(this.scene, target.center, () => this.spellImpact(cast, COLORS.boltFlash));
+    } else if (cast.effect === 'freeze') {
+      showIceArrow(this.scene, path, () => this.spellImpact(cast, COLORS.iceFlash));
+    } else {
+      showFireball(this.scene, this.particles, path, () => {
+        this.spellImpact(cast, COLORS.spellFlash);
+        this.setBurning(true);
+      });
+    }
+  }
+
+  /** Loitsun osuma: välähdys, vahinkonumero, kipinät ja tärähdys. */
+  private spellImpact(cast: SpellCast, flash: number): void {
+    const { damage, crit, effect } = cast;
+    const target = this.fighters.enemy;
+    const at = target.center;
+    playSound(crit ? 'crit' : effect === 'freeze' ? 'storm' : 'boom');
+    target.hurt(crit ? COLORS.critFlash : flash);
+    this.changeHp('enemy', -damage);
+    showDamageNumber(
+      this.scene,
+      numberSpot(at),
+      TEXT.battle.damagePopup(damage),
+      crit ? 'crit' : 'burn',
+    );
+    if (effect !== 'burn') {
+      this.particles.burst(effect === 'bolt' ? 'spark' : 'frost', at.x, at.y);
+    }
+    if (crit) {
+      critImpact(this.scene);
+      showCritPopup(this.scene, target.sprite.x, target.sprite.y);
+    } else {
+      shakeHit(this.scene);
+    }
+  }
+
+  /** Jäätynyt vihollinen hohtaa sinisenä eikä lyö. */
+  playFrozen(): void {
+    const enemy = this.fighters.enemy;
+    enemy.glow(COLORS.iceFlash, BATTLE_STAGE.hurt.flashMs * 3);
+    this.particles.burst('frost', enemy.center.x, enemy.center.y);
   }
 
   /** Pudonnut esine (sprite) ponnahtaa kaatuneen vihollisen kohdalta. */

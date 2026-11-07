@@ -1,3 +1,5 @@
+import type { MapPoint } from './types-world';
+
 // Kulkevan kauppiaan ja kolikoiden tyypit. Kauppias: data/merchant.ts, säännöt:
 // logic/shop.ts (ostaminen ja myyminen), logic/merchant-route.ts (kulku kartalla)
 // ja logic/coins.ts (kolikot voitoista).
@@ -19,6 +21,21 @@ export interface ShopKeeperDef {
 export interface TownShopDef extends ShopKeeperDef {
   /** Paikkakunta (data/towns.ts), jonka vieressä kauppias seisoo. */
   readonly town: string;
+}
+
+/**
+ * Peikkokuninkaan luola (data/cave.ts): suuaukko kartalla (x, y ruutuina). Luola aukeaa, kun
+ * loppuboss on voitettu. Luolassa on miekka kivessä ja Noita, jolta voi ostaa loitsuja.
+ */
+export interface CaveDef extends MapPoint {
+  /** Noita ja hänen kauppansa (loitsukirjat ja voimat). */
+  readonly witch: ShopKeeperDef;
+  /** Kivessä odottava miekka (esineen tunniste, data/items.ts). Sen saa vain kerran. */
+  readonly sword: string;
+  /** Miekan voi vetää kivestä vasta tältä tasolta. */
+  readonly swordMinLevel: number;
+  /** Kuinka monen ruudun päästä suuaukosta luolaan voi mennä. */
+  readonly enterTiles: number;
 }
 
 /** Kauppias, joka kulkee kartalla paikkakunnasta toiseen teitä pitkin. */

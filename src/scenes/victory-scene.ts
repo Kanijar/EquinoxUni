@@ -107,11 +107,15 @@ export class VictoryScene extends Phaser.Scene {
   }
 }
 
-/** Otsikko, teksti ja vihje. Läpäisyssä vihje kertoo, odottaako loppuboss vielä. */
+/**
+ * Otsikko, teksti ja vihje. Bossin voitossa vihje kertoo luolan aukeamisesta, läpäisyssä
+ * siitä, odottaako loppuboss vielä.
+ */
 function victoryTexts(data: VictorySceneData): [string, string, string | null] {
   const name = bossName();
   if (data.kind === 'boss') {
-    return [TEXT.victory.bossTitle, TEXT.victory.bossText(name), null];
+    // Peikkokuninkaan voitto avaa luolan tuntureilla (data/cave.ts).
+    return [TEXT.victory.bossTitle, TEXT.victory.bossText(name), TEXT.cave.opened];
   }
   const { state } = data;
   let hint: string | null = null;
