@@ -153,7 +153,7 @@ scenes  →  systems / ui  →  entities  →  logic
 - **Läpäisy:** kun jokainen karttavihollinen on voitettu ainakin kerran ("Voittamatta 0"),
   voittoruutu näytetään kerran (`GameState.completed`), ja peli jatkuu kartalla. Ruutu kertoo,
   odottaako loppuboss vielä.
-- **Saaren kartta:** pelimaailma on iso keksitty saari (198 × 124 ruutua). Kaikki sijainnit
+- **Saaren kartta:** pelimaailma on iso keksitty saari keskellä merta (250 × 160 ruutua, ks. myös Vene ja pienet saaret). Kaikki sijainnit
   ovat ruutuina (`MapPoint`: x itään, y etelään). `logic/world-grid.ts` rakentaa ruudukon
   `data/island.ts`:n tiedoista: rantaviivan (monikulmio, ulkopuolella merta), järvet ja
   laavajärven (ympyröitä), alueet (monikulmioita, joiden rajat kiemurtelevat
@@ -275,6 +275,26 @@ scenes  →  systems / ui  →  entities  →  logic
   (`systems/vehicle-control.ts`). Säännöt `logic/vehicle.ts`: kerroin kerrotaan maaston kertoimella,
   joten metsä hidastaa autoakin. Taisteluun auto ei vaikuta. Tila on `GameState.driving`
   (puuttuva = pois, joten `SAVE_VERSION`ia ei tarvinnut nostaa).
+- **Vene ja pienet saaret:** Venesatamassa (Kotirannan eteläpuolella rannalla) on
+  venekauppias Veikko (`data/boat-shop.ts`, `TownShopDef`), joka myy Purjeveneen
+  (`kind: 'boat'`, `data/isle-items.ts`) ja juomia. Kauppa on sama `ShopScene` kuin Kaapolla
+  (`keeper`-parametri), ja kartalla laituri, Veikko ja kauppanappi piirretään
+  `systems/boat-dock.ts`:ssä. Kun vene on repussa ja sankari seisoo meren vieressä, REPPU-napin
+  vasemmalla oleva kulkuneuvonappi näyttää VENEESEEN (V-näppäin tekee saman): sankari siirtyy
+  viereiseen meriruutuun ja kulkee veneellä 1,6 kertaa nopeammin. Merellä rannan vieressä nappi
+  näyttää MAIHIN. Muualla nappi on BUGATTI, jos avaimet ovat repussa (`systems/vehicle-control.ts`,
+  `systems/boat-control.ts`). Merellä ei taistella eikä kalasteta, ja Bugatti sammuu. Kartalla
+  on toinen, näkymätön tilemap-kerros (`seaLayer`), jossa kaikki paitsi meri on estettä; veneessä
+  käytetään sitä. Säännöt `logic/sailing.ts` + testi `tests/sailing.test.ts`.
+  Pienet saaret ovat `data/isles.ts`:ssä (ympyröiden yhdiste, oma maasto ja suositustaso):
+  Palmusaari (taso 50, viidakko), Sumusaari (62, hautausmaa), Pakkassaari (76, ikijää) ja
+  Myrskysaari (90, basaltti). Jokaisella on oma paikkakunta, kaksi omaa vihollista
+  (`data/isle-enemies.ts`, kartalla `data/map-enemies.ts`:n lopussa), varusteet
+  (`data/isle-items.ts`) ja tehtävänantaja kahdella tehtävällä (`data/isle-quests.ts`, hahmot
+  `data/npcs.ts`). Myrskysaaren Merikäärme on saarten vahvin vihollinen. Ensimmäinen
+  rantautuminen saarelle näyttää viestin ja tallentuu (`GameState.isles`). Tila on
+  `GameState.sailing` ja `isles` (puuttuva = ei veneessä, ei saaria, joten `SAVE_VERSION`ia ei
+  tarvinnut nostaa). Läpäisyyn kuuluvat myös saarten viholliset.
 - **Kulkeva kauppias ja kolikot:** kauppias Kaapo (`data/merchant.ts`) kävelee teitä pitkin
   paikkakunnasta toiseen (Kotiranta → Peltola → Myllykylä → Havula → Kuusela ja takaisin) ja
   pysähtyy jokaiseen 15 sekunniksi. Reitti lasketaan samasta ruutuviivasta kuin kartan tiet,

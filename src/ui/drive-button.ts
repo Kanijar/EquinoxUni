@@ -4,9 +4,10 @@ import { TEXT } from '../i18n/text';
 import { cornerButton } from './corner-stack';
 import { TextButton } from './text-button';
 
-// BUGATTI-nappi kartan alareunassa REPPU-napin vasemmalla puolella (peukalon alla).
-// Näkyy vain, kun Bugattin avaimet ovat repussa. Napautus kytkee auton päälle tai pois
-// (sama kuin E-näppäin). Kun auto on päällä, napilla on keltainen reunus.
+// Kulkuneuvonappi kartan alareunassa REPPU-napin vasemmalla puolella (peukalon alla):
+// BUGATTI (auto päälle tai pois, sama kuin E), rannalla VENEESEEN ja merellä MAIHIN
+// (sama kuin V). Teksti tulee systems/vehicle-control.ts:stä. Kun auto on päällä tai sankari
+// on veneessä, napilla on keltainen reunus.
 
 export class DriveButton {
   private readonly button: TextButton;
@@ -20,8 +21,12 @@ export class DriveButton {
     this.button.setVisible(false);
   }
 
-  update(owned: boolean, driving: boolean): void {
-    this.button.setVisible(owned);
-    this.button.setSelected(driving);
+  /** label = napin teksti, tai null, jolloin nappi on piilossa. */
+  update(label: string | null, selected: boolean): void {
+    this.button.setVisible(label !== null);
+    if (label !== null) {
+      this.button.setLabel(label);
+      this.button.setSelected(selected);
+    }
   }
 }

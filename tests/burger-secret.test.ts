@@ -12,9 +12,9 @@ const BURGER = { ...NO_MENU_TAPS, burger: true };
 
 describe('alkuruudun salainen burgeri', () => {
   it('jokaiseen paikkaan valitaan pisteiltään paras varuste', () => {
-    expect(bestGear('hand')?.id).toBe('dragon-sword');
-    expect(bestGear('body')?.id).toBe('lava-armor');
-    expect(bestGear('neck')?.id).toBe('dragon-charm');
+    expect(bestGear('hand')?.id).toBe('serpent-spear');
+    expect(bestGear('body')?.id).toBe('storm-cloak');
+    expect(bestGear('neck')?.id).toBe('storm-heart');
     for (const slot of GEAR_SLOTS) {
       const best = bestGear(slot);
       expect(best?.slot).toBe(slot);
@@ -31,12 +31,12 @@ describe('alkuruudun salainen burgeri', () => {
     const state = createNewGame();
     const gained = eatBurger(state);
     expect(state.equipped).toEqual({
-      hand: 'dragon-sword',
-      body: 'lava-armor',
-      neck: 'dragon-charm',
+      hand: 'serpent-spear',
+      body: 'storm-cloak',
+      neck: 'storm-heart',
     });
     expect(state.inventory['bugatti-keys']).toBe(1);
-    expect(gained.items).toEqual(['dragon-sword', 'lava-armor', 'dragon-charm', 'bugatti-keys']);
+    expect(gained.items).toEqual(['serpent-spear', 'storm-cloak', 'storm-heart', 'bugatti-keys']);
     expect(gained.coins).toBe(1_000_000 - createNewGame().coins);
     expect(state.coins).toBe(1_000_000);
     expect(getItem('bugatti-keys').kind).toBe('vehicle');
@@ -67,14 +67,14 @@ describe('alkuruudun salainen burgeri', () => {
   it('aiemmat varusteet palaavat reppuun ja omistettu paras varuste otetaan käyttöön', () => {
     const state = createNewGame();
     state.equipped.hand = 'club';
-    state.inventory['lava-armor'] = 1;
+    state.inventory['storm-cloak'] = 1;
     state.inventory['bugatti-keys'] = 1;
     const gained = eatBurger(state);
     expect(state.inventory['club']).toBe(1);
-    expect(state.inventory['lava-armor']).toBe(0);
-    expect(state.equipped.body).toBe('lava-armor');
+    expect(state.inventory['storm-cloak']).toBe(0);
+    expect(state.equipped.body).toBe('storm-cloak');
     expect(state.inventory['bugatti-keys']).toBe(1);
-    expect(gained.items).toEqual(['dragon-sword', 'dragon-charm']);
+    expect(gained.items).toEqual(['serpent-spear', 'storm-heart']);
   });
 
   it('ladatun pelin elämä kasvaa yhtä paljon kuin maksimielämä, ei yli', () => {
@@ -93,7 +93,7 @@ describe('alkuruudun salainen burgeri', () => {
     const both = startFromMenu({ ...BURGER, wolf: true });
     expect(both.message).toContain('Susi siunasi sinut!');
     expect(both.message).toContain('salainen burgeri');
-    expect(both.state.equipped.hand).toBe('dragon-sword');
+    expect(both.state.equipped.hand).toBe('serpent-spear');
     expect(startFromMenu(NO_MENU_TAPS).state.equipped).toEqual({});
   });
 

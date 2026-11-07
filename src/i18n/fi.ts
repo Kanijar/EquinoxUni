@@ -4,6 +4,7 @@ import type {
   EnemyDef,
   GearSlot,
   GearStat,
+  IsleDef,
   ItemDef,
   LookPart,
   NpcDef,
@@ -14,6 +15,7 @@ import type {
   TownDef,
 } from '../data/types';
 import { localDateParts, twoDigits, type DateParts } from './date-parts';
+import { FI_BOAT, FI_VEHICLE } from './fi-boat';
 import { FI_QUESTS } from './fi-quests';
 import { FI_SHOP } from './fi-shop';
 import { FI_STAIRS } from './fi-stairs';
@@ -187,12 +189,8 @@ export const FI = {
     skillPointsWaiting: (points: number): string =>
       `Sinulla on ${points} kykypistettä. Paina KYKYPISTEET.`,
   },
-  /** Bugattin avaimet kartalla (logic/vehicle.ts): nappi ja ilmoitukset. */
-  vehicle: {
-    button: 'BUGATTI',
-    on: 'Brrrm! Vauhtia +80 %!',
-    off: 'Bugatti sammui. Kävelet taas.',
-  },
+  /** Bugattin avaimet kartalla (logic/vehicle.ts): nappi ja ilmoitukset (i18n/fi-boat.ts). */
+  vehicle: FI_VEHICLE,
   skills: {
     button: (points: number): string => `KYKYPISTEET ${points}`,
     title: 'Kykypisteet',
@@ -320,6 +318,8 @@ export const FI = {
     item: (item: ItemDef): string => item.name,
     itemDescription: (item: ItemDef): string => item.description,
     town: (town: TownDef): string => town.name,
+    /** Pienen saaren nimi (data/isles.ts). */
+    isle: (isle: IsleDef): string => isle.name,
     npc: (npc: NpcDef): string => npc.name,
     /** Tehtävän nimi, tarjous ja kiitos (data/quests.ts). */
     quest: (quest: QuestDef): { title: string; story: string; thanks: string } => quest,
@@ -332,6 +332,8 @@ export const FI = {
   stairs: FI_STAIRS,
   /** Kalastus (i18n/fi-fishing.ts). */
   fishing: FI_FISHING,
+  /** Vene ja pienet saaret (i18n/fi-boat.ts). */
+  boat: FI_BOAT,
   /** Loitsujen nimet (data/spells.ts). */
   spells: {
     fireball: 'Tulipallo',

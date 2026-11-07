@@ -27,6 +27,35 @@ export const NPCS: readonly NpcDef[] = [
     sprite: 'ossi',
     tile: VOLCANO_STAIRS.goal,
   },
+  // Pienten saarten tehtävänantajat (data/isles.ts) asuvat saarten kylissä (data/isle-quests.ts).
+  {
+    id: 'kalle',
+    name: 'Kalle Kompassi',
+    nameGenitive: 'Kalle Kompassin',
+    sprite: 'kalle',
+    town: 'kookoskyla',
+  },
+  {
+    id: 'veera',
+    name: 'Veera Varjo',
+    nameGenitive: 'Veera Varjon',
+    sprite: 'veera',
+    town: 'sumula',
+  },
+  {
+    id: 'pekka',
+    name: 'Pekka Pakkanen',
+    nameGenitive: 'Pekka Pakkasen',
+    sprite: 'pekka',
+    town: 'kidela',
+  },
+  {
+    id: 'matti',
+    name: 'Matti Myrsky',
+    nameGenitive: 'Matti Myrskyn',
+    sprite: 'matti',
+    town: 'ukkola',
+  },
 ];
 
 /** Paikkansa (tile) omaavan hahmon kanssa voi puhua näin monen ruudun päästä. */

@@ -2,12 +2,27 @@
 // logic/shop.ts (ostaminen ja myyminen), logic/merchant-route.ts (kulku kartalla)
 // ja logic/coins.ts (kolikot voitoista).
 
-/** Kauppias, joka kulkee kartalla paikkakunnasta toiseen teitä pitkin. */
-export interface MerchantDef {
+/** Kauppias, jolta voi ostaa ja jolle voi myydä (scenes/shop-scene.ts). */
+export interface ShopKeeperDef {
   readonly id: string;
   /** Nimi pelaajalle. Henkilön nimi on sama molemmilla kielillä. */
   readonly name: string;
   readonly sprite: string;
+  /** Mitä kauppias myy (esineiden tunnisteet, data/items.ts). Hinta on esineen price. */
+  readonly stock: readonly string[];
+}
+
+/**
+ * Kauppa, joka pysyy paikallaan paikkakunnassa (esim. Venesataman venekauppa). Kauppa aukeaa
+ * KAUPPA-napista, kun sankari on paikkakunnassa.
+ */
+export interface TownShopDef extends ShopKeeperDef {
+  /** Paikkakunta (data/towns.ts), jonka vieressä kauppias seisoo. */
+  readonly town: string;
+}
+
+/** Kauppias, joka kulkee kartalla paikkakunnasta toiseen teitä pitkin. */
+export interface MerchantDef extends ShopKeeperDef {
   /**
    * Paikkakunnat (data/towns.ts), joiden kautta kauppias kulkee järjestyksessä. Viimeisestä
    * hän palaa ensimmäiseen. Peräkkäisten paikkakuntien välillä pitää olla tie (ROADS).
@@ -19,8 +34,6 @@ export interface MerchantDef {
   readonly stopMs: number;
   /** Etäisyys pikseleinä, jolta kauppiaan kanssa voi puhua. Silloin hän odottaa paikallaan. */
   readonly talkRangePx: number;
-  /** Mitä kauppias myy (esineiden tunnisteet, data/items.ts). Hinta on esineen price. */
-  readonly stock: readonly string[];
 }
 
 export interface ShopRules {

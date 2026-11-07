@@ -113,6 +113,60 @@ export const BATTLE_BACKDROPS: Readonly<Record<BattleBackdropId, BattleBackdropD
     // Kipinät ja tuhka leijuvat.
     weather: { kind: 'float', colors: [0xffa040, 0xff5a1e], count: 14 },
   },
+  // --- Pienten saarten taustat (data/isles.ts) ---
+  // Palmusaari: turkoosi taivas, vehreä viidakko ja kuuma hiekka.
+  jungle: {
+    id: 'jungle',
+    sky: ['#1f8fd0', '#2a9cd8', '#3eaedf', '#5cc0e4', '#86d2e8', '#b8e6ee'],
+    sun: { x: 50, y: 20, radius: 10, color: '#fff6a8' },
+    hills: { color: '#2f8a4a', height: 20, peaks: false },
+    trees: { kind: 'birch', color: '#1f7a3a', shade: '#2f9a4a', count: 9 },
+    houses: 0,
+    ground: ['#e8d08a', '#e0c67e', '#d8bc74', '#cfb26a', '#c6a862', '#bd9e5a'],
+    speckles: ['#f7e7b0', '#3fa65a', '#e85a8a'],
+    path: null,
+    weather: { kind: 'float', colors: [0xfff6a0, 0x9cf0c0], count: 10 },
+  },
+  // Sumusaari: harmaa sumu, kuolleet puut ja hautausmaan nurmi.
+  grave: {
+    id: 'grave',
+    sky: ['#1e2230', '#262b3b', '#303646', '#3d4352', '#4c5260', '#5e636e'],
+    sun: { x: 186, y: 22, radius: 8, color: '#dfe6ee' },
+    hills: { color: '#2e3540', height: 18, peaks: false },
+    trees: { kind: 'birch', color: '#3a3a3a', shade: '#262626', count: 7 },
+    houses: 0,
+    ground: ['#3f4f3c', '#3a4838', '#354234', '#303c30', '#2b362c', '#263028'],
+    speckles: ['#8a8f96', '#c8ced6', '#5a6a52'],
+    path: null,
+    // Sumu ja haamujen valot leijuvat.
+    weather: { kind: 'float', colors: [0xc8d0dc, 0x9fffe0], count: 14 },
+  },
+  // Pakkassaari: kirkas pakkastaivas, jäiset huiput ja kimaltava ikijää.
+  ice: {
+    id: 'ice',
+    sky: ['#3b5fb0', '#4a70bd', '#5f86ca', '#7ea0d8', '#a4c0e6', '#cfe0f4'],
+    sun: { x: 60, y: 26, radius: 8, color: '#ffffff' },
+    hills: { color: '#7fb8e0', height: 42, peaks: true, cap: '#e8f8ff' },
+    trees: null,
+    houses: 0,
+    ground: ['#bfe6f8', '#b2dcf2', '#a6d2ec', '#9ac8e6', '#8ebee0', '#82b4da'],
+    speckles: ['#ffffff', '#d8f4ff', '#b48aff'],
+    path: null,
+    weather: { kind: 'fall', colors: [0xffffff, 0xd8f4ff], count: 22 },
+  },
+  // Myrskysaari: musta myrskytaivas, basalttikalliot ja salamoiden kipinät.
+  storm: {
+    id: 'storm',
+    sky: ['#0e1020', '#161a2e', '#1f243c', '#2a304a', '#363d58', '#434a66'],
+    sun: { x: 200, y: 20, radius: 6, color: '#c8d8ff' },
+    hills: { color: '#1c1c24', height: 40, peaks: true, cap: '#6a7aff' },
+    trees: null,
+    houses: 0,
+    ground: ['#2e2e36', '#2a2a32', '#26262e', '#22222a', '#1e1e26', '#1a1a22'],
+    speckles: ['#ffe066', '#8a9aff', '#4a4a56'],
+    path: null,
+    weather: { kind: 'fall', colors: [0x8a9aff, 0xc8d8ff], count: 24 },
+  },
 };
 
 /** Mikä tausta näytetään missäkin maastossa. Tie kulkee kylien välillä. */
@@ -126,6 +180,10 @@ export const BACKDROP_BY_TERRAIN: Readonly<Record<TerrainId, BattleBackdropId>> 
   ash: 'volcano',
   lava: 'volcano',
   stairs: 'volcano',
+  jungle: 'jungle',
+  grave: 'grave',
+  ice: 'ice',
+  basalt: 'storm',
   // Kiven päällä ei seistä, mutta kivet ovat metsässä.
   rock: 'forest',
   // Vesillä ei taistella, mutta varmuuden vuoksi niillekin on tausta.

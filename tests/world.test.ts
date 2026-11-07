@@ -5,22 +5,26 @@ import type { TerrainId } from '../src/data/types';
 import type { Vec2 } from '../src/logic/vector';
 import {
   buildWorldGrid,
+  isleAt,
   isWalkable,
   pointTile,
   terrainAt,
   townAt,
   townTile,
 } from '../src/logic/world-grid';
-import { reachableFrom, tileKey } from './walk-reach';
+import { reachableFrom, reachableWithBoat, tileKey } from './walk-reach';
 
 // Saaren kartan testit: paikkakunnat ovat maalla, kaikkialle pääsee kävellen
-// Kotirannasta ja viholliset ovat omalla alueellaan paikoissa, joihin pääsee.
+// Kotirannasta (pienille saarille veneellä) ja viholliset ovat omalla alueellaan paikoissa, joihin pääsee.
 
 const grid = buildWorldGrid(WORLD);
 const key = tileKey;
 
 const start = townTile(getTown(WORLD.startTown));
-const reachable = reachableFrom(grid, start);
+const onFoot = reachableFrom(grid, start);
+/** Pienille saarille (data/isles.ts) pääsee vain veneellä. */
+const reachable = reachableWithBoat(grid, start);
+const onIsle = (tile: Vec2): boolean => isleAt(WORLD, tile) !== undefined;
 
 /** Millä alueella kukin hirviö asuu (maasto, jossa se seisoo kartalla). */
 const HOME_TERRAIN: Readonly<Record<string, readonly TerrainId[]>> = {
@@ -34,6 +38,15 @@ const HOME_TERRAIN: Readonly<Record<string, readonly TerrainId[]>> = {
   giant: ['snow', 'forest'],
   lizard: ['ash'],
   dragon: ['ash'],
+  // Pienet saaret (data/isles.ts): saaren maasto tai hiekkaranta.
+  pirate: ['jungle', 'sand'],
+  'jungle-snake': ['jungle', 'sand'],
+  skeleton: ['grave', 'swamp', 'sand'],
+  ghost: ['grave', 'swamp', 'sand'],
+  'ice-golem': ['ice', 'snow', 'sand'],
+  'crystal-spider': ['ice', 'snow', 'sand'],
+  thunderbird: ['basalt', 'ash', 'sand'],
+  'sea-serpent': ['basalt', 'ash', 'sand'],
 };
 
 const spawns = MAP_ENEMIES.map((spawn, index) => ({ ...spawn, index }));
@@ -84,13 +97,29 @@ describe('saaren kartta', () => {
     expect(isWalkable(grid, tile)).toBe(true);
     expect(townAt(WORLD, tile)?.id).toBe(town.id);
     expect(reachable.has(key(tile))).toBe(true);
+    // Pääsaaren paikkakuntiin pääsee kävellen, pienten saarten kyliin vain veneellä.
+    expect(onFoot.has(key(tile))).toBe(!onIsle(tile));
   });
 
   it.each(spawns)('vihollinen $index ($enemy) on paikassa, johon pääsee', (spawn) => {
     const tile = pointTile(spawn);
     expect(isWalkable(grid, tile)).toBe(true);
     expect(reachable.has(key(tile))).toBe(true);
+    expect(onFoot.has(key(tile))).toBe(!onIsle(tile));
     expect(townAt(WORLD, tile)).toBeUndefined();
+  });
+
+  it.each(WORLD.isles)('pienellä saarella $name on kylä ja vihollisia', (isle) => {
+    const here = (point: { x: number; y: number }): boolean =>
+      isleAt(WORLD, pointTile(point))?.id === isle.id;
+    expect(TOWNS.filter(here).length).toBe(1);
+    expect(MAP_ENEMIES.filter(here).length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('saaret ovat sitä vaarallisempia, mitä myöhempänä ne ovat listassa', () => {
+    const levels = WORLD.isles.map((isle) => isle.level);
+    expect([...levels].sort((a, b) => a - b)).toEqual(levels);
+    expect(new Set(levels).size).toBe(levels.length);
   });
 
   it.each(spawns)('vihollinen $index ($enemy) on omalla alueellaan', (spawn) => {
@@ -104,7 +133,7 @@ describe('saaren kartta', () => {
   it('loppuboss odottaa tuntureilla paikassa, johon pääsee kävellen', () => {
     const tile = pointTile(FINAL_BOSS);
     expect(isWalkable(grid, tile)).toBe(true);
-    expect(reachable.has(key(tile))).toBe(true);
+    expect(onFoot.has(key(tile))).toBe(true);
     expect(townAt(WORLD, tile)).toBeUndefined();
     expect(terrainAt(grid, tile)).toBe('snow');
   });

@@ -13,7 +13,7 @@ import {
   townTile,
   type WorldGrid,
 } from '../src/logic/world-grid';
-import { reachableFrom, tileKey } from './walk-reach';
+import { reachableFrom, reachableWithBoat, tileKey } from './walk-reach';
 
 // Metsän kivet: niiden läpi ei pääse, mutta ne eivät koskaan estä pääsyä mihinkään.
 // Testit eivät riipu kartan muodosta: ne vertaavat karttaa ilman kiviä ja kivien kanssa.
@@ -84,8 +84,10 @@ describe('metsän kivet', () => {
     expectNothingCutOff(grid);
   });
 
+  const reachable = reachableWithBoat(grid, start);
   it.each(importantPlaces)('$name: sinne pääsee, eikä lähellä ole kiveä', ({ tile }) => {
-    expect(reachableFrom(grid, start).has(tileKey(tile))).toBe(true);
+    // Pienille saarille pääsee veneellä (logic/sailing.ts).
+    expect(reachable.has(tileKey(tile))).toBe(true);
     const r = WORLD.rocks.clearRadius;
     for (const rock of rockTiles(grid)) {
       const distance = Math.max(Math.abs(rock.x - tile.x), Math.abs(rock.y - tile.y));

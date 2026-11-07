@@ -29,17 +29,24 @@ import {
   skillPointsLeft,
   type SkillPoints,
 } from './skill-points';
+import type { SailorState } from './sailing';
 import type { Vec2 } from './vector';
 import { recordStairsVictory, type StairsNews, type StairsProgress } from './volcano-stairs';
 
 // Pelin eteneminen, joka säilyy kartan ja taistelun välillä: sankarin nimi ja ulkonäkö,
 // elämä, kokemus, kykypisteet, esineet ja varusteet, sijainti, voitetut viholliset ja niiden paluu
-// sekä tehtävät, kolikot, kulkevan kauppiaan paikka ja tulivuoren rappuset.
+// sekä tehtävät, kolikot, kulkevan kauppiaan paikka, tulivuoren rappuset ja vene (saaret).
 // Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
 // tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
 export interface GameState
-  extends BossProgress, HeroAppearance, MerchantProgress, StairsProgress, FishingProgress {
+  extends
+    BossProgress,
+    HeroAppearance,
+    MerchantProgress,
+    StairsProgress,
+    FishingProgress,
+    SailorState {
   hp: number;
   xp: number;
   /** Kuhunkin kykyyn käytetyt kykypisteet. Käyttämättömät: unspentSkillPoints(). */
@@ -107,6 +114,8 @@ export function createNewGame(startXp = 0): GameState {
     merchantMs: 0,
     stairSteps: 0,
     bait: null,
+    sailing: false,
+    isles: [],
   };
 }
 

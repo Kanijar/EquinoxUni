@@ -15,10 +15,13 @@ import {
 import { recordQuestVisit } from '../logic/quest-log';
 import { npcNearby, npcMarker } from '../logic/quests';
 import { isSlowTerrain, speedFactorAt } from '../logic/terrain-speed';
+import { isSailing } from '../logic/sailing';
 import { lastVisitedTown, visitTown } from '../logic/town-visits';
-import { length } from '../logic/vector';
+import { length, type Vec2 } from '../logic/vector';
 import { terrainAt, townTile } from '../logic/world-grid';
 import { AmbushWatch } from '../systems/ambush-watch';
+import type { BoatColliders } from '../systems/boat-control';
+import { BoatDock } from '../systems/boat-dock';
 import { heroTexture } from '../systems/hero-texture';
 import { Controls } from '../systems/controls';
 import { FishingControl } from '../systems/fishing-control';
@@ -31,13 +34,15 @@ import { playSound } from '../systems/sound-fx';
 import {
   buildWorldMap,
   getWorldGrid,
+  sailablePosition,
   showStairs,
   tileToWorld,
   walkablePosition,
   worldToTile,
 } from '../systems/world-map';
+import { BOAT_SHOP } from '../data/boat-shop';
 import { MERCHANT } from '../data/merchant';
-import type { NpcDef, TownDef } from '../data/types';
+import type { NpcDef, ShopKeeperDef, TownDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import { Hud } from '../ui/hud';
 import { LeafRustle } from '../ui/leaf-rustle';
@@ -67,6 +72,8 @@ import type { VictorySceneData } from './victory-scene';
 // Ossi odottaa tulivuoren kraatterissa: lohikäärmeiden voitot nostavat rappuset laavasta.
 // Kulkeva kauppias Kaapo kävelee teitä pitkin: hänen vieressään aukeaa kauppa KAUPPA-napista.
 // Ongen kanssa rannalla voi kalastaa KALASTA-napista (systems/fishing-control.ts).
+// Venesatamassa myydään venettä, jolla purjehditaan pienille saarille (systems/boat-dock.ts,
+// systems/boat-control.ts). Merellä ei taistella.
 // Tämä scene vain kokoaa osat.
 
 export interface WorldSceneData {
@@ -97,6 +104,7 @@ export class WorldScene extends Phaser.Scene {
   private questTracker!: QuestTracker;
   private vehicle!: VehicleControl;
   private merchant!: MerchantWalker;
+  private dock!: BoatDock;
   private fishing!: FishingControl;
   private toast!: Toast;
   private bossPointer: BossPointer | null = null;
@@ -117,13 +125,11 @@ export class WorldScene extends Phaser.Scene {
     const built = buildWorldMap(this, showStairs(this.state.stairSteps));
     placeTownMarkers(this);
     this.npcs = new NpcMarkers(this, (npc) => this.talkTo(npc));
-    const saved = this.state.position;
-    const start = saved
-      ? walkablePosition(getWorldGrid(), saved)
-      : tileToWorld(townTile(lastVisitedTown(this.state)));
+    const start = this.startPosition();
     const speed = playerStats(this.state).speed;
     this.player = new Player(this, start, speed, heroTexture(this.textures, this.state));
-    this.physics.add.collider(this.player.sprite, built.layer);
+    const walk = this.physics.add.collider(this.player.sprite, built.layer);
+    const sail = this.physics.add.collider(this.player.sprite, built.seaLayer);
     this.leaves = new LeafRustle(this, this.player.sprite);
     this.encounters = new MapEncounters(this, this.state, built.layer);
     this.ambushes = new AmbushWatch(getWorldGrid());
@@ -139,9 +145,7 @@ export class WorldScene extends Phaser.Scene {
     this.questTracker = new QuestTracker(this);
     addBackpackButton(this, () => this.openBackpack());
     this.toast = new Toast(this);
-    this.vehicle = new VehicleControl(this, this.state, this.player, (text) =>
-      this.toast.show(text),
-    );
+    this.addVehicles({ walk, sail });
     this.merchant = new MerchantWalker(this, this.state, {
       onOpen: () => this.openShop(),
       onTooFar: () => this.toast.show(TEXT.shop.tooFar(MERCHANT.name)),
@@ -180,9 +184,10 @@ export class WorldScene extends Phaser.Scene {
     }
     const driveShown = this.vehicle.buttonShown;
     this.merchant.update(position, delta, driveShown);
+    this.dock.update(this.towns.town?.id, driveShown);
     this.fishing.update(position, moving, delta, {
       driveShown,
-      shopShown: this.merchant.shopShown,
+      shopShown: this.merchant.shopShown || this.dock.shopShown,
     });
     this.updateHud();
     this.bossPointer?.update();
@@ -192,7 +197,8 @@ export class WorldScene extends Phaser.Scene {
       this.scene.start(SCENES.victory, victory);
       return;
     }
-    const active = time >= this.encountersFrom;
+    // Merellä veneessä viholliset eivät hyökkää.
+    const active = time >= this.encountersFrom && !this.vehicle.sailing;
     const enemy = this.encounters.update(position, active, delta);
     if (enemy) {
       this.startBattle(enemy.def.id, enemy.mapIndex);
@@ -215,6 +221,38 @@ export class WorldScene extends Phaser.Scene {
     const moving = length(move) > 0;
     this.leaves.update(isSlowTerrain(speedFactor) && moving);
     return moving;
+  }
+
+  /** Bugatti ja vene (systems/vehicle-control.ts) sekä Venesataman venekauppa. */
+  private addVehicles(colliders: BoatColliders): void {
+    this.vehicle = new VehicleControl(this, this.state, this.player, {
+      colliders,
+      events: {
+        message: (text) => this.toast.show(text),
+        landed: () => (this.encountersFrom = this.time.now + WORLD_VIEW.graceMs.afterBattle),
+      },
+    });
+    this.dock = new BoatDock(this, this.state, {
+      onOpen: () => this.openShop(BOAT_SHOP),
+      onTooFar: () => this.toast.show(TEXT.shop.tooFar(BOAT_SHOP.name)),
+    });
+  }
+
+  /**
+   * Mistä sankari aloittaa: tallennettu paikka (veneessä merellä, muuten maalla), tai
+   * viimeisin paikkakunta (pelin alussa ja kaatumisen jälkeen, jolloin vene jää rantaan).
+   */
+  private startPosition(): Vec2 {
+    const saved = this.state.position;
+    const grid = getWorldGrid();
+    const sea = saved && isSailing(this.state) ? sailablePosition(grid, saved) : null;
+    if (sea) {
+      return sea;
+    }
+    this.state.sailing = false;
+    return saved
+      ? walkablePosition(grid, saved)
+      : tileToWorld(townTile(lastVisitedTown(this.state)));
   }
 
   /**
@@ -266,10 +304,13 @@ export class WorldScene extends Phaser.Scene {
     this.sleepUnder(SCENES.backpack, data);
   }
 
-  /** Kauppa avautuu kartan päälle (kuten reppu), kun sankari on kauppiaan vieressä. */
-  private openShop(): void {
+  /**
+   * Kauppa avautuu kartan päälle (kuten reppu), kun sankari on kauppiaan vieressä tai
+   * Venesatamassa (keeper = venekauppa).
+   */
+  private openShop(keeper: ShopKeeperDef = MERCHANT): void {
     if (!this.leaving) {
-      const data: ShopSceneData = { state: this.state };
+      const data: ShopSceneData = { state: this.state, keeper };
       this.sleepUnder(SCENES.shop, data);
     }
   }
