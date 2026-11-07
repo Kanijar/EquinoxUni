@@ -3,9 +3,9 @@
 // Napautusalue on kuvaa vähän isompi, jotta sen osuu peukalolla, kun sen on löytänyt.
 
 export const BURGER_VIEW = {
-  /** Burgerin keskikohta: vasen reuna, otsikon korkeudella. */
+  /** Burgerin keskikohta: vasen reuna, vähän otsikkoa ylempänä. */
   x: 7,
-  y: 30,
+  y: 18,
   scale: 1,
   /** Napautusalueen leveys ja korkeus. */
   hitSize: 22,
