@@ -2,17 +2,17 @@ import { getItem } from '../data';
 import { MERCHANT, SHOP_RULES } from '../data/merchant';
 import type { ItemDef } from '../data/types';
 import { bagItems, findGear, ownsItem } from './equipment';
-import type { GameState } from './game-state';
+import { playerLevel, type GameState } from './game-state';
 
 // Kulkevan kauppiaan kauppa: tavaroita ostetaan kolikoilla ja repun tavaroita myydään
 // kauppiaalle. Hinta on esineen price (data/items.ts), ja kauppias ostaa esineen
 // pienemmällä hinnalla (SHOP_RULES.sellFactor). Voima (esim. Voimakristalli) otetaan käyttöön
 // heti ostaessa, eikä se mene reppuun. Varustetta tai työkalua (onki), joka pelaajalla jo on,
-// ei osteta toista kertaa. Osa tavaroista myydään monen kappaleen erissä (buyCount, esim. madot).
+// ei osteta toista kertaa. Osa tavaroista myydään vasta tietyltä tasolta (minLevel). Osa tavaroista myydään monen kappaleen erissä (buyCount, esim. madot).
 // Käytössä olevaa varustetta ei voi myydä: se pitää ensin ottaa pois repussa.
 
-/** Miksi esinettä ei voi ostaa: kolikot eivät riitä tai varuste on jo pelaajalla. */
-export type BuyBlock = 'noMoney' | 'owned';
+/** Miksi esinettä ei voi ostaa: kolikot eivät riitä, varuste on jo pelaajalla tai taso ei riitä. */
+export type BuyBlock = 'noMoney' | 'owned' | 'level';
 
 /** Kauppiaan tavarat järjestyksessä (MERCHANT.stock). */
 export function shopStock(): ItemDef[] {
@@ -50,6 +50,9 @@ export function buyBlock(state: GameState, itemId: string): BuyBlock | null {
   const onlyOne = findGear(itemId) !== null || item.kind === 'tool';
   if (onlyOne && ownsItem(state.inventory, state.equipped, itemId)) {
     return 'owned';
+  }
+  if (playerLevel(state) < (item.minLevel ?? 1)) {
+    return 'level';
   }
   const price = buyPrice(state, item);
   return price === null || state.coins < price ? 'noMoney' : null;

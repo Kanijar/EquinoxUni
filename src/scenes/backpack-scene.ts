@@ -9,7 +9,7 @@ import {
 } from '../config/game-config';
 import { getItem } from '../data';
 import { GEAR_SLOTS } from '../data/items';
-import type { GearSlot } from '../data/types';
+import type { GearSlot, ItemDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import {
   canDrink,
@@ -18,12 +18,15 @@ import {
   selectedItemId,
   selectionAction,
   unequipToBag,
+  type BackpackAction,
   type BackpackSelection,
 } from '../logic/backpack';
 import { clampPage, pageCount, pageItems, pageOfIndex, turnPage } from '../logic/bag-pages';
 import { bagItems, findGear } from '../logic/equipment';
+import { chooseBait } from '../logic/fishing-gear';
 import { playerStats, type GameState } from '../logic/game-state';
 import { BagPager } from '../ui/bag-pager';
+import { fishingDetail, isBaitInUse } from '../ui/fishing-detail';
 import { GearSlotRow } from '../ui/gear-slot-row';
 import { ItemInfo, type ItemInfoContent } from '../ui/item-info';
 import { ItemTile } from '../ui/item-tile';
@@ -33,7 +36,8 @@ import { addLabel, addTitle } from '../ui/title-text';
 // Reppu. Avataan kartalta REPPU-napista. Vasemmalla käytössä olevat varusteet (käsi,
 // vartalo, koru), oikealla repun esineet sivuittain: nuolinapeista näkee seuraavan sivun,
 // kun esineitä on enemmän kuin yhdelle sivulle mahtuu. Esinettä napauttamalla näkee, mitä se tekee,
-// ja alareunan napista sen voi laittaa käyttöön, ottaa pois, juoda (juoma) tai syödä (kala).
+// ja alareunan napista sen voi laittaa käyttöön, ottaa pois, juoda (juoma), syödä (kala) tai
+// valita syötiksi (kalastus).
 // Kartta odottaa taustalla (nukkuu), kunnes reppu suljetaan VALMIS-napista.
 // Säännöt: logic/backpack.ts, logic/equipment.ts ja logic/bag-pages.ts (sivut).
 
@@ -174,12 +178,20 @@ export class BackpackScene extends Phaser.Scene {
       this.selection = { kind: 'bag', itemId: id };
       this.showPageOf(id);
       this.message = TEXT.backpack.unequippedNow(name);
-    } else if (action === 'drink' || action === 'eat') {
-      const healed = drinkFromBag(this.state, id);
-      this.message =
-        action === 'eat' ? TEXT.backpack.ate(name, healed) : TEXT.backpack.drank(healed);
+    } else if (action === 'drink' || action === 'eat' || action === 'bait') {
+      this.message = this.use(action, id, name);
     }
     this.refresh();
+  }
+
+  /** Juo, syö tai valitse syötiksi. Palauttaa viestin. */
+  private use(action: 'drink' | 'eat' | 'bait', id: string, name: string): string {
+    if (action === 'bait') {
+      chooseBait(this.state, this.state.inventory, id);
+      return TEXT.fishing.baitChosen(name);
+    }
+    const healed = drinkFromBag(this.state, id);
+    return action === 'eat' ? TEXT.backpack.ate(name, healed) : TEXT.backpack.drank(healed);
   }
 
   private refresh(): void {
@@ -214,17 +226,28 @@ export class BackpackScene extends Phaser.Scene {
     }
     const item = getItem(id);
     const action = selectionAction(this.state, selection);
-    const drinkBlocked = (action === 'drink' || action === 'eat') && !canDrink(this.state, id);
-    let detail = item.kind === 'gear' ? TEXT.backpack.bonus(item.bonus) : '';
-    if (drinkBlocked) {
-      detail = TEXT.backpack.fullHp;
-    }
     return {
       name: TEXT.names.item(item),
       text: this.message ?? TEXT.names.itemDescription(item),
+      ...this.actionInfo(item, action),
+    };
+  }
+
+  /** Keltainen lisätieto ja toimintonappi: täysillä elämillä ei juoda, käytössä olevaa syöttiä ei valita. */
+  private actionInfo(
+    item: ItemDef,
+    action: BackpackAction | null,
+  ): Pick<ItemInfoContent, 'detail' | 'action' | 'actionEnabled'> {
+    const drinkBlocked = (action === 'drink' || action === 'eat') && !canDrink(this.state, item.id);
+    const baitBlocked = action === 'bait' && isBaitInUse(this.state, item.id);
+    const bonus = item.kind === 'gear' ? TEXT.backpack.bonus(item.bonus) : '';
+    const detail = drinkBlocked
+      ? TEXT.backpack.fullHp
+      : (fishingDetail(this.state, item.id) ?? bonus);
+    return {
       detail,
       action: action === null ? null : TEXT.backpack[action],
-      actionEnabled: !drinkBlocked,
+      actionEnabled: !drinkBlocked && !baitBlocked,
     };
   }
 

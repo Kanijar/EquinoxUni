@@ -23,6 +23,7 @@ import {
   type ShopEntry,
   type ShopMode,
 } from '../logic/shop';
+import { findRod } from '../logic/fishing-gear';
 import { playSound } from '../systems/sound-fx';
 import { BagPager } from '../ui/bag-pager';
 import { ItemInfo, type ItemInfoContent } from '../ui/item-info';
@@ -250,18 +251,23 @@ export class ShopScene extends Phaser.Scene {
     return {
       name: TEXT.names.item(item),
       text: this.message ?? TEXT.names.itemDescription(item),
-      detail: block ? this.blockText(block) : this.bonusText(item),
+      detail: block ? this.blockText(block, item) : this.bonusText(item),
       action: this.armed === id ? TEXT.shop.confirm : label(price ?? 0),
       actionEnabled: block === null,
     };
   }
 
-  private blockText(block: NonNullable<ReturnType<typeof shopOffer>['block']>): string {
+  private blockText(
+    block: NonNullable<ReturnType<typeof shopOffer>['block']>,
+    item: ItemDef,
+  ): string {
     switch (block) {
       case 'noMoney':
         return TEXT.shop.noMoney;
       case 'owned':
         return TEXT.shop.owned;
+      case 'level':
+        return TEXT.shop.needLevel(item.minLevel ?? 1);
       case 'notBought':
         return TEXT.shop.notBought(MERCHANT.name);
     }
@@ -274,6 +280,10 @@ export class ShopScene extends Phaser.Scene {
     }
     if (this.mode === 'buy' && buyCount(item) > 1) {
       return TEXT.shop.pack(buyCount(item));
+    }
+    const rod = findRod(item.id);
+    if (rod) {
+      return TEXT.fishing.rodStats(rod.biteWindowMs, rod.rareMultiplier);
     }
     return item.kind === 'power' ? TEXT.shop.powerBonus(item.skillPoints) : '';
   }

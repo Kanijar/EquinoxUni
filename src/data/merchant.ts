@@ -19,9 +19,12 @@ export const MERCHANT: MerchantDef = {
   stock: [
     'potion',
     'big-potion',
-    // Kalastus (data/fishing.ts): ensimmäisellä sivulla, jotta ne löytyvät helposti.
+    // Kalastus (data/fishing.ts): onki ja syötit ensimmäisellä sivulla.
     'fishing-rod',
     'worm',
+    'fly',
+    'shrimp',
+    'lure',
     'power-crystal',
     'iron-sword',
     'chain-mail',
@@ -29,6 +32,10 @@ export const MERCHANT: MerchantDef = {
     'rune-axe',
     'steel-armor',
     'moon-charm',
+    // Paremmat onget (vaativat tason).
+    'carbon-rod',
+    'golden-rod',
+    'sea-king-rod',
   ],
 };
 

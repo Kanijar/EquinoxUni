@@ -20,6 +20,7 @@ export const ENEMY_NAMES_EN: Readonly<Record<string, string>> = {
   lizard: 'Fire Lizard',
   dragon: 'Dragon',
   shark: 'Shark',
+  octopus: 'Giant Octopus',
 };
 
 /** Esineiden nimet ja kuvaukset englanniksi tunnisteen (ItemDef.id) mukaan. */
@@ -81,6 +82,15 @@ export const ITEM_TEXTS_EN: Readonly<
   perch: { name: 'Perch', description: 'A small fish. Eat: HP +12.' },
   pike: { name: 'Pike', description: 'A big fish. Eat: HP +25.' },
   salmon: { name: 'Salmon', description: 'A rare treat. Eat: HP +50.' },
+  fly: { name: 'Fly', description: 'Trout and salmon love flies!' },
+  shrimp: { name: 'Shrimp', description: 'Attracts sharks and goldfish.' },
+  lure: { name: 'Shiny Lure', description: 'It shines! Giant octopus and treasures.' },
+  'carbon-rod': { name: 'Carbon Rod', description: 'A light rod: more time to reel in.' },
+  'golden-rod': { name: 'Golden Rod', description: 'Rare catches come more often!' },
+  'sea-king-rod': { name: 'Sea King Rod', description: 'The best rod. Treasures and giant fish!' },
+  trout: { name: 'Trout', description: 'A spotted fish. Eat: HP +35.' },
+  'golden-fish': { name: 'Goldfish', description: 'A sparkling treasure! Eat: HP +80.' },
+  'pearl-necklace': { name: 'Pearl Necklace', description: 'Sea pearls. Toughness and magic!' },
   'fish-scale-armor': {
     name: 'Fish Scale Armor',
     description: 'Shiny scales. Slippery and tough!',

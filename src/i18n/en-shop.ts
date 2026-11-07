@@ -27,6 +27,7 @@ export const EN_SHOP: typeof FI_SHOP = {
   powerBonus: (points: number): string => `+${points} skill point now`,
   pack: (count: number): string => `${count} per purchase`,
   boughtMany: (item: string, count: number): string => `You bought: ${item} ×${count}!`,
+  needLevel: (level: number): string => `Available from level ${level}.`,
   bought: (item: string): string => `You bought: ${item}!`,
   boughtPower: 'You got a skill point! Use it in a town.',
   sold: (item: string, coins: number): string => `You sold: ${item}. Got ${coins} coins!`,

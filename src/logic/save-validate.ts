@@ -1,3 +1,4 @@
+import { findBait } from './fishing-gear';
 import { ITEMS, MAP_ENEMIES, TOWNS, WORLD } from '../data';
 import { FINAL_BOSS } from '../data/boss';
 import { GEAR_SLOTS } from '../data/items';
@@ -162,6 +163,11 @@ function readBoss(value: RawRecord): { bossProgress: number; bossDefeated: boole
   return { bossProgress: bossDefeated ? FINAL_BOSS.unlockCount : progress, bossDefeated };
 }
 
+/** Valittu syötti (logic/fishing-gear.ts). Puuttuva tai tuntematon = ei valittu. */
+function readBait(value: unknown): string | null {
+  return typeof value === 'string' && findBait(value) ? value : null;
+}
+
 /** Lukee pelin tilan. Palauttaa null, jos tila on rikki. */
 export function readGameState(value: unknown): GameState | null {
   if (!isRecord(value) || !isCount(value['hp']) || !isCount(value['xp'])) {
@@ -196,6 +202,7 @@ export function readGameState(value: unknown): GameState | null {
     bonusSkillPoints: readCount(value['bonusSkillPoints']),
     merchantMs: readMerchantMs(value['merchantMs']),
     stairSteps: readStairSteps(value['stairSteps']),
+    bait: readBait(value['bait']),
   };
   // Elämä pysyy rajoissa: vähintään 1, enintään maksimielämä.
   state.hp = Math.min(Math.max(1, state.hp), playerStats(state).maxHp);

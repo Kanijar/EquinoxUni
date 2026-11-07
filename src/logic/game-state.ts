@@ -9,6 +9,7 @@ import { rollDrops } from './drops';
 import { victoryCoins } from './coins';
 import { applyGear, ownsItem, type Equipped } from './equipment';
 import { newAppearance, type HeroAppearance } from './hero-look';
+import type { FishingProgress } from './fishing-gear';
 import type { MerchantProgress } from './merchant-route';
 import { levelForXp } from './progression';
 import {
@@ -37,7 +38,8 @@ import { recordStairsVictory, type StairsNews, type StairsProgress } from './vol
 // Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
 // tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
-export interface GameState extends BossProgress, HeroAppearance, MerchantProgress, StairsProgress {
+export interface GameState
+  extends BossProgress, HeroAppearance, MerchantProgress, StairsProgress, FishingProgress {
   hp: number;
   xp: number;
   /** Kuhunkin kykyyn käytetyt kykypisteet. Käyttämättömät: unspentSkillPoints(). */
@@ -104,6 +106,7 @@ export function createNewGame(startXp = 0): GameState {
     bonusSkillPoints: 0,
     merchantMs: 0,
     stairSteps: 0,
+    bait: null,
   };
 }
 

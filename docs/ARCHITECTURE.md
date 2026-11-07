@@ -297,21 +297,31 @@ scenes  →  systems / ui  →  entities  →  logic
   Taistelun JUOMA-nappi juo pienimmän juoman, joka riittää (`logic/heal-choice.ts`).
   Vanhassa tallennuksessa kolikoita ja ostettuja pisteitä on 0 ja kauppias on kierroksensa
   alussa, joten `SAVE_VERSION`ia ei tarvinnut nostaa. Säännöt `logic/shop.ts`.
-- **Kalastus:** kauppias Kaapo myy ongen (`kind: 'tool'`, yksi riittää) ja matoja
-  (`kind: 'bait'`, viiden erissä: `ItemDef.buyCount`, hinta on yhden madon hinta). Kun sankarilla
-  on onki ja hän seisoo meren tai järven vieressä (`FISHING.reachTiles`), alariviin tulee
-  KALASTA-nappi (`ui/fish-button.ts`, muiden alarivin nappien vasemmalle; tietokoneella F).
-  Napautus heittää kohon lähimpään vesiruutuun ja nappi muuttuu NYKÄISE-napiksi. Kala nappaa
-  1,5–4,5 sekunnin päästä: koho sukeltaa, sen päälle tulee huutomerkki ja nappi saa keltaisen
-  reunuksen. Nykäisyyn on 0,9 sekuntia. Liian aikainen nykäisy säikäyttää kalan (mato säilyy),
-  liian myöhäinen vie madon. Liikkuminen lopettaa kalastuksen. Saalis arvotaan painoilla
-  (`data/fishing.ts`): kalat (Ahven, Hauki, Lohi, `kind: 'food'`), harvinainen Kalan
-  suomupanssari (vain kerran) tai hai, joka hyökkää: taistelu alkaa rantataustalla omalla
-  aloitustekstillä (`EnemyDef.backdrop`, `logic/fishing.ts` `isFishedEnemy`). Ruoka syödään
-  repusta SYÖ-napista (elämä palautuu); taistelun JUOMA-nappi käyttää vain juomia. Kalat voi
-  myydä kauppiaalle. Säännöt `logic/fishing.ts` (aika annetaan ulkoa), kartalla
-  `systems/fishing-control.ts`. Uusia `GameState`-kenttiä ei tarvittu: onki, madot ja kalat ovat
-  repussa, joten vanhat tallennukset toimivat.
+- **Kalastus:** kauppias Kaapo myy onkia (`kind: 'tool'`, yksi kutakin) ja syöttejä
+  (`kind: 'bait'`, erissä: `ItemDef.buyCount`, hinta on yhden kappaleen hinta). Paremmat onget ja
+  syötit myydään vasta tietyltä tasolta (`ItemDef.minLevel`, kauppa näyttää "Myydään vasta
+  tasolta N"). Kun sankarilla on onki ja hän seisoo meren tai järven vieressä
+  (`FISHING.reachTiles`), alariviin tulee KALASTA-nappi (`ui/fish-button.ts`, muiden alarivin
+  nappien vasemmalle; tietokoneella F). Napautus heittää kohon lähimpään vesiruutuun ja nappi
+  muuttuu NYKÄISE-napiksi. Kala nappaa 1,5–4,5 sekunnin päästä: koho sukeltaa, sen päälle tulee
+  huutomerkki ja nappi saa keltaisen reunuksen. Liian aikainen nykäisy säikäyttää kalan (syötti
+  säilyy), liian myöhäinen vie syötin. Liikkuminen lopettaa kalastuksen.
+  **Onget** (`FISHING.rods`, huonoimmasta parhaaseen: Onki, Hiilikuituvapa, Kultainen vapa,
+  Merenkuninkaan vapa): sankari käyttää aina parasta onkeaan. Parempi onki antaa enemmän aikaa
+  nykäistä (`biteWindowMs`), kala nappaa nopeammin (`biteDelayFactor`) ja harvinaisten saaliiden
+  (`rare: true`) painot kerrotaan (`rareMultiplier`).
+  **Syötit** (`FISHING.baits`: Mato, Kärpänen, Katkarapu, Kiiltävä uistin): jokaisella on oma
+  saalistaulukkonsa (painot yhteensä 100). Syötti valitaan repun SYÖTIKSI-napista
+  (`GameState.bait`, `logic/fishing-gear.ts`); jos valittu loppuu, käytetään ensimmäistä listan
+  syöttiä, jota repussa on. Saaliit: kalat (Ahven, Hauki, Taimen, Lohi, Kultakala, `kind: 'food'`),
+  harvinaiset varusteet (Kalan suomupanssari, Helmikoru, vain kerran) ja viholliset (hai,
+  jättimustekala), joiden kanssa taistelu alkaa rantataustalla omalla aloitustekstillä
+  (`EnemyDef.backdrop`, `logic/fishing.ts` `isFishedEnemy`). Ruoka syödään repusta SYÖ-napista;
+  taistelun JUOMA-nappi käyttää vain juomia. Kalat voi myydä kauppiaalle.
+  Säännöt `logic/fishing.ts` (heitto, nykäisy ja saaliin arvonta, aika annetaan ulkoa) ja
+  `logic/fishing-gear.ts` (onki ja syötti), kartalla `systems/fishing-control.ts`, lisätieto
+  repussa ja kaupassa `ui/fishing-detail.ts`. Vanhassa tallennuksessa syöttiä ei ole valittu
+  (`bait: null`), joten `SAVE_VERSION`ia ei tarvinnut nostaa.
 - **Pudotukset:** vihollisella on `drops: [{ item, chance }]` (`data/enemies.ts`). Jokainen
   arvotaan voitossa erikseen (`logic/drops.ts`); varustetta, joka pelaajalla jo on, ei pudoteta
   uudelleen. Voittoruudulla esineen kuva ponnahtaa ja teksti "Löysit: Peikon nuija!".

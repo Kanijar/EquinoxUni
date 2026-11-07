@@ -1,7 +1,7 @@
 import type { ItemDef } from './types';
 
-// Kalastuksen esineet (data/fishing.ts). Onki ja madot ostetaan kulkevalta kauppiaalta,
-// kalat ja panssari saadaan kalastamalla. Kalat syödään repusta (elämä palautuu) tai
+// Kalastuksen esineet (data/fishing.ts). Onget ja syötit ostetaan kulkevalta kauppiaalta
+// (paremmat vasta korkeammalla tasolla, minLevel), kalat, panssari ja koru saadaan kalastamalla. Kalat syödään repusta (elämä palautuu) tai
 // myydään kauppiaalle puoleen hintaan. Sprite: data/sprites-fishing.ts.
 // Englanninkieliset nimet: i18n/en-content.ts.
 
@@ -24,6 +24,64 @@ export const FISHING_ITEMS: readonly ItemDef[] = [
     price: 2,
     buyCount: 5,
   },
+  {
+    id: 'fly',
+    name: 'Kärpänen',
+    description: 'Taimenet ja lohet rakastavat kärpäsiä!',
+    kind: 'bait',
+    sprite: 'fly',
+    price: 3,
+    buyCount: 5,
+  },
+  {
+    id: 'shrimp',
+    name: 'Katkarapu',
+    description: 'Houkuttelee haita ja kultakaloja.',
+    kind: 'bait',
+    sprite: 'shrimp',
+    price: 5,
+    buyCount: 5,
+    minLevel: 8,
+  },
+  {
+    id: 'lure',
+    name: 'Kiiltävä uistin',
+    description: 'Kiiltää! Jättimustekala ja aarteet.',
+    kind: 'bait',
+    sprite: 'lure',
+    price: 10,
+    buyCount: 3,
+    minLevel: 15,
+  },
+  // --- Paremmat onget (ominaisuudet data/fishing.ts) ---
+  {
+    id: 'carbon-rod',
+    name: 'Hiilikuituvapa',
+    description: 'Kevyt vapa: enemmän aikaa nykäistä.',
+    kind: 'tool',
+    sprite: 'carbon-rod',
+    price: 200,
+    minLevel: 8,
+  },
+  {
+    id: 'golden-rod',
+    name: 'Kultainen vapa',
+    description: 'Harvinaiset saaliit tulevat useammin!',
+    kind: 'tool',
+    sprite: 'golden-rod',
+    price: 700,
+    minLevel: 18,
+  },
+  {
+    id: 'sea-king-rod',
+    name: 'Merenkuninkaan vapa',
+    description: 'Paras vapa. Aarteita ja jättikaloja!',
+    kind: 'tool',
+    sprite: 'sea-king-rod',
+    price: 1600,
+    minLevel: 30,
+  },
+  // --- Saaliit ---
   {
     id: 'perch',
     name: 'Ahven',
@@ -52,6 +110,25 @@ export const FISHING_ITEMS: readonly ItemDef[] = [
     value: 50,
   },
   {
+    id: 'trout',
+    name: 'Taimen',
+    description: 'Täplikäs kala. Syö: elämä +35.',
+    kind: 'food',
+    sprite: 'trout',
+    price: 20,
+    value: 35,
+  },
+  {
+    // Harvinainen aarre: kannattaa myydä kauppiaalle (75 kolikkoa).
+    id: 'golden-fish',
+    name: 'Kultakala',
+    description: 'Kimaltava aarre! Syö: elämä +80.',
+    kind: 'food',
+    sprite: 'golden-fish',
+    price: 150,
+    value: 80,
+  },
+  {
     // Harvinainen saalis (5 %). Vähän parempi kuin Rapupanssari ja Rengaspaita.
     id: 'fish-scale-armor',
     name: 'Kalan suomupanssari',
@@ -61,5 +138,16 @@ export const FISHING_ITEMS: readonly ItemDef[] = [
     price: 160,
     slot: 'body',
     bonus: { defense: 4, maxHp: 14 },
+  },
+  {
+    // Kiiltävän uistimen harvinainen saalis (5 %). Taikaa ja sitkeyttä.
+    id: 'pearl-necklace',
+    name: 'Helmikoru',
+    description: 'Meren helmet. Sitkeyttä ja taikaa!',
+    kind: 'gear',
+    sprite: 'pearl-necklace',
+    price: 600,
+    slot: 'neck',
+    bonus: { maxHp: 20, defense: 2, magic: 2 },
   },
 ];

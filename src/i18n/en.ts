@@ -204,6 +204,7 @@ export const EN: Texts = {
     unequip: 'REMOVE',
     drink: 'DRINK',
     eat: 'EAT',
+    bait: 'USE AS BAIT',
     done: 'DONE',
     equippedNow: (item: string): string => `${item} is now equipped!`,
     unequippedNow: (item: string): string => `${item} is back in the bag.`,

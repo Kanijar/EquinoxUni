@@ -20,7 +20,9 @@ const rewarded = new Set(QUESTS.flatMap((quest) => quest.reward.items).map((stac
 const sold = new Set(MERCHANT.stock);
 /** Kalastuksen saaliit (data/fishing.ts). */
 const fished = new Set(
-  FISHING.catches.flatMap((entry) => (entry.kind === 'item' ? [entry.item] : [])),
+  FISHING.baits.flatMap((bait) =>
+    bait.catches.flatMap((entry) => (entry.kind === 'item' ? [entry.item] : [])),
+  ),
 );
 
 describe('saaren hirviöt ja varusteet', () => {
