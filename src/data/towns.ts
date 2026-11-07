@@ -25,6 +25,13 @@ export const TOWNS: readonly TownDef[] = [
   { id: 'revontula', name: 'Revontula', nameAt: 'Revontulassa', x: 100, y: 20 },
   // Koillisen tulivuori
   { id: 'tuhkala', name: 'Tuhkala', nameAt: 'Tuhkalassa', x: 146, y: 40 },
+  // Kotirannan eteläranta: Veikon venekauppa (data/boat-shop.ts). Täältä purjehditaan saarille.
+  { id: 'venesatama', name: 'Venesatama', nameAt: 'Venesatamassa', x: 74, y: 108 },
+  // Pienten saarten kylät (data/isles.ts): niihin pääsee vain veneellä, joten niihin ei ole teitä.
+  { id: 'kookoskyla', name: 'Kookoskylä', nameAt: 'Kookoskylässä', x: 66, y: 126 },
+  { id: 'sumula', name: 'Sumula', nameAt: 'Sumulassa', x: 27, y: 135 },
+  { id: 'kidela', name: 'Kidelä', nameAt: 'Kidelässä', x: 141, y: 136 },
+  { id: 'ukkola', name: 'Ukkola', nameAt: 'Ukkolassa', x: 213, y: 44 },
 ];
 
 /** Tiet paikkakuntien välillä. Tie kulkee suoraan ja ylittää järvet siltana. */
@@ -46,6 +53,7 @@ export const ROADS: readonly (readonly [string, string])[] = [
   ['sammalkyla', 'usvala'],
   ['sammalkyla', 'simpukkaranta'],
   ['usvala', 'simpukkaranta'],
+  ['kotiranta', 'venesatama'],
 ];
 
 export const START_TOWN = 'kotiranta';

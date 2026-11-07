@@ -50,7 +50,11 @@ export type TerrainId =
   | 'ash'
   | 'lava'
   | 'rock'
-  | 'stairs';
+  | 'stairs'
+  | 'jungle'
+  | 'grave'
+  | 'ice'
+  | 'basalt';
 
 export interface TerrainDef {
   readonly id: TerrainId;
@@ -87,6 +91,8 @@ export interface WorldDef {
   /** Hiekkaranta meren reunalla: maasto ja leveys ruutuina. */
   readonly beach: { readonly terrain: TerrainId; readonly width: number };
   readonly lakes: readonly LakeDef[];
+  /** Pienet saaret meressä (data/isles.ts). Niille pääsee vain veneellä. */
+  readonly isles: readonly IsleDef[];
   /** Alueet. Jos alueet menevät päällekkäin, listassa ensimmäinen voittaa. */
   readonly regions: readonly TerrainRegion[];
   /** Kuinka monta ruutua alueiden rajat kiemurtelevat, jotta ne eivät ole suoria viivoja. */
@@ -120,6 +126,24 @@ export interface RockRule {
   readonly clearRadius: number;
   /** Arvonnan siemen: eri luku = kivet eri paikoissa. */
   readonly seed: number;
+}
+
+/**
+ * Pieni saari meressä (data/isles.ts). Saaren muoto on yhden tai useamman ympyrän yhdiste,
+ * jonka reuna kiemurtelee (ei täydellisiä ympyröitä). Saarelle pääsee vain veneellä.
+ */
+export interface IsleDef {
+  readonly id: string;
+  /** Saaren nimi perusmuodossa, esim. "Palmusaari". Englanniksi i18n/en-content.ts. */
+  readonly name: string;
+  /** Nimi ulkopaikallissijassa (allatiivi): "Rantauduit Palmusaarelle". */
+  readonly nameTo: string;
+  /** Suositeltu taso: saaren viholliset ovat reilu vastus tällä tasolla. */
+  readonly level: number;
+  /** Ympyrät: keskipiste ja säde ruutuina. */
+  readonly circles: readonly CircleDef[];
+  /** Saaren maasto (meren reunalle tulee silti hiekkaranta). */
+  readonly terrain: TerrainMix;
 }
 
 /** Kartalla kulkeva vihollinen. Sijainti ruutuina. */

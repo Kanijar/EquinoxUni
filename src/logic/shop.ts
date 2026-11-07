@@ -1,6 +1,6 @@
 import { getItem } from '../data';
 import { MERCHANT, SHOP_RULES } from '../data/merchant';
-import type { ItemDef } from '../data/types';
+import type { ItemDef, ShopKeeperDef } from '../data/types';
 import { bagItems, findGear, ownsItem } from './equipment';
 import { playerLevel, type GameState } from './game-state';
 
@@ -8,15 +8,16 @@ import { playerLevel, type GameState } from './game-state';
 // kauppiaalle. Hinta on esineen price (data/items.ts), ja kauppias ostaa esineen
 // pienemmällä hinnalla (SHOP_RULES.sellFactor). Voima (esim. Voimakristalli) otetaan käyttöön
 // heti ostaessa, eikä se mene reppuun. Varustetta tai työkalua (onki), joka pelaajalla jo on,
-// ei osteta toista kertaa. Osa tavaroista myydään vasta tietyltä tasolta (minLevel). Osa tavaroista myydään monen kappaleen erissä (buyCount, esim. madot).
+// ei osteta toista kertaa (eikä toista venettä). Osa tavaroista myydään vasta tietyltä tasolta
+// (minLevel). Osa tavaroista myydään monen kappaleen erissä (buyCount, esim. madot).
 // Käytössä olevaa varustetta ei voi myydä: se pitää ensin ottaa pois repussa.
 
 /** Miksi esinettä ei voi ostaa: kolikot eivät riitä, varuste on jo pelaajalla tai taso ei riitä. */
 export type BuyBlock = 'noMoney' | 'owned' | 'level';
 
-/** Kauppiaan tavarat järjestyksessä (MERCHANT.stock). */
-export function shopStock(): ItemDef[] {
-  return MERCHANT.stock.map(getItem);
+/** Kauppiaan tavarat järjestyksessä (oletuksena kulkeva kauppias, MERCHANT.stock). */
+export function shopStock(keeper: ShopKeeperDef = MERCHANT): ItemDef[] {
+  return keeper.stock.map(getItem);
 }
 
 /** Montako kappaletta yhdellä ostolla tulee (esim. 5 matoa). */
@@ -47,7 +48,7 @@ export function sellPrice(item: ItemDef): number | null {
 /** Miksi esinettä ei voi ostaa nyt, tai null, kun ostaminen onnistuu. */
 export function buyBlock(state: GameState, itemId: string): BuyBlock | null {
   const item = getItem(itemId);
-  const onlyOne = findGear(itemId) !== null || item.kind === 'tool';
+  const onlyOne = findGear(itemId) !== null || item.kind === 'tool' || item.kind === 'boat';
   if (onlyOne && ownsItem(state.inventory, state.equipped, itemId)) {
     return 'owned';
   }
@@ -99,10 +100,15 @@ export interface ShopEntry {
   readonly count: number;
 }
 
-/** Kaupan ruudukon esineet järjestyksessä. */
-export function shopEntries(state: GameState, mode: ShopMode): ShopEntry[] {
+/** Kaupan ruudukon esineet järjestyksessä (keeper = kenen kauppa, oletuksena kulkeva kauppias). */
+export function shopEntries(
+  state: GameState,
+  mode: ShopMode,
+  keeper: ShopKeeperDef = MERCHANT,
+): ShopEntry[] {
   if (mode === 'buy') {
-    return shopStock().map((item) => ({ item, count: buyCount(item) > 1 ? buyCount(item) : 0 }));
+    const stock = shopStock(keeper);
+    return stock.map((item) => ({ item, count: buyCount(item) > 1 ? buyCount(item) : 0 }));
   }
   return bagItems(state.inventory);
 }

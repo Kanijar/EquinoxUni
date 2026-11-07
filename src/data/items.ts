@@ -1,4 +1,5 @@
 import { FISHING_ITEMS } from './fishing-items';
+import { ISLE_ITEMS } from './isle-items';
 import { MERCHANT_ITEMS } from './merchant-items';
 import type { GearSlot, ItemDef } from './types';
 
@@ -251,6 +252,8 @@ export const ITEMS: readonly ItemDef[] = [
   ...MERCHANT_ITEMS,
   // --- Kalastus: onki, madot, kalat ja Kalan suomupanssari (data/fishing-items.ts) ---
   ...FISHING_ITEMS,
+  // --- Pienet saaret: vene, pudotukset ja tehtävien palkinnot (data/isle-items.ts) ---
+  ...ISLE_ITEMS,
 ];
 
 /** Varustepaikat repussa tässä järjestyksessä: käsi (ase), vartalo (vaatteet), kaula (koru). */

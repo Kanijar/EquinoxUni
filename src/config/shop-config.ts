@@ -48,3 +48,15 @@ export const SHOP_VIEW = {
   speechY: 180,
   speechWrap: 210,
 } as const;
+
+/**
+ * Venesataman venekauppa kartalla (systems/boat-dock.ts): Veikko seisoo talon vieressä, ja
+ * laiturin vieressä meressä keinuu purjevene.
+ */
+export const BOAT_DOCK_VIEW = {
+  offsetX: -14,
+  offsetY: -2,
+  depth: 6,
+  boatBobPx: 1,
+  boatBobMs: 900,
+} as const;

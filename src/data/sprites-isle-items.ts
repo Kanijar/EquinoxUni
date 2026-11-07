@@ -1,0 +1,273 @@
+import type { SpriteDef } from './types';
+
+// Pienten saarten esineiden pikselispritet (16x16). Esineet: data/isle-items.ts.
+// Saman muotoiset esineet (miekat, haarniskat, viitat ja korut) käyttävät samaa muotoa
+// eri väreillä.
+
+/** Miekka vinossa: k ääriviiva, w kiilto, s terä, g väistin, h kahva. */
+const SWORD_ROWS = [
+  '................',
+  '.............kk.',
+  '............kwk.',
+  '...........kwsk.',
+  '..........kwsk..',
+  '.........kwsk...',
+  '........kwsk....',
+  '...k...kwsk.....',
+  '...kk.kwsk......',
+  '....kkwsk.......',
+  '.....kgk........',
+  '....kgkkk.......',
+  '...khk..k.......',
+  '..khk...........',
+  '..kk............',
+  '................',
+];
+
+/** Haarniska tai liivi: k ääriviiva, r pääväri, R tumma, o kiilto. */
+const ARMOR_ROWS = [
+  '................',
+  '................',
+  '....kkk..kkk....',
+  '..kkrrrkkrrrkk..',
+  '.krrorrrrrrorrk.',
+  'krrrrrrrrrrrrrrk',
+  'krrkRrrrrrrRkrrk',
+  'krrkrRrrrrRrkrrk',
+  '.kk.krRRRRrk.kk.',
+  '....krrrrrrk....',
+  '....kRRRRRRk....',
+  '....krrrrrrk....',
+  '....kRRRRRRk....',
+  '.....kkkkkk.....',
+  '................',
+  '................',
+];
+
+/** Viitta: k ääriviiva, c kangas, C reunus, y solki. */
+const CLOAK_ROWS = [
+  '................',
+  '.....kkkkkk.....',
+  '....kccyycck....',
+  '...kcccccccck...',
+  '...kCccccccCk...',
+  '..kcCccccccCck..',
+  '..kcCccccccCck..',
+  '.kcCccccccccCck.',
+  '.kcCccccccccCck.',
+  '.kcCccccccccCck.',
+  'kcCccccccccccCck',
+  'kcCccccccccccCck',
+  'kcCccccccccccCck',
+  'kkkkkkkkkkkkkkkk',
+  '................',
+  '................',
+];
+
+/** Koru ketjussa: c ketju, b reuna, C kivi, w kiilto. */
+const CHARM_ROWS = [
+  '................',
+  '................',
+  '...cc......cc...',
+  '..c..........c..',
+  '..c..........c..',
+  '..c..........c..',
+  '...c........c...',
+  '....c......c....',
+  '.....cc..cc.....',
+  '......bCCb......',
+  '.....bCwwCb.....',
+  '.....bCwCCb.....',
+  '......bCCb......',
+  '.......bb.......',
+  '................',
+  '................',
+];
+
+const GOLD_CHAIN = '#d4a017';
+
+export const ISLE_ITEM_SPRITES: readonly SpriteDef[] = [
+  {
+    // Merirosvon sapeli: kaareva terä ja kultainen kädensuoja.
+    id: 'pirate-saber',
+    palette: { k: '#1a1a1a', w: '#ffffff', s: '#c8d0dc', g: GOLD_CHAIN, h: '#7a4a20' },
+    rows: [
+      '................',
+      '..........kk....',
+      '.........kwsk...',
+      '.........kwsk...',
+      '........kwsk....',
+      '........kwsk....',
+      '.......kwsk.....',
+      '......kwsk......',
+      '.....kwsk.......',
+      '..ggkwsk........',
+      '..gkkkk.........',
+      '..gkhk..........',
+      '..gkhk..........',
+      '...kk...........',
+      '................',
+      '................',
+    ],
+  },
+  {
+    id: 'snake-vest',
+    palette: { k: '#14361a', r: '#4fc04a', R: '#1f6a2a', o: '#ffe066' },
+    rows: ARMOR_ROWS,
+  },
+  {
+    // Aarrekartan pala: revitty pergamentti, katkoviiva ja punainen rasti.
+    id: 'map-piece',
+    palette: { p: '#f0dca0', P: '#c8a870', b: '#7a5230', r: '#d0302a' },
+    rows: [
+      '................',
+      '................',
+      '..pppppppppppp..',
+      '..pbpppppppppp..',
+      '..ppbppppppppp..',
+      '..pppbpppprprp..',
+      '..ppppbbppprpp..',
+      '..pppppppbrprp..',
+      '..pppppppppppp..',
+      '..ppppppppppp...',
+      '..pppppppppp....',
+      '..pppppppp......',
+      '..PPPPPPP.......',
+      '................',
+      '................',
+      '................',
+    ],
+  },
+  {
+    id: 'compass-charm',
+    palette: { c: GOLD_CHAIN, b: '#8a6a10', C: '#f4f4f4', w: '#d0302a' },
+    rows: CHARM_ROWS,
+  },
+  {
+    id: 'bone-sword',
+    palette: { k: '#3a3428', w: '#ffffff', s: '#e8e4d8', g: '#8a8070', h: '#4a3a2a' },
+    rows: SWORD_ROWS,
+  },
+  {
+    id: 'ghost-cloak',
+    palette: { k: '#4a5a6a', c: '#c8d8ec', C: '#9fb8d0', y: '#9fffe0' },
+    rows: CLOAK_ROWS,
+  },
+  {
+    // Sumulyhty: sinisenä hehkuva lyhty.
+    id: 'fog-lantern',
+    palette: { k: '#2a2a3a', g: '#5a6a7a', C: '#7fd8ff', w: '#ffffff' },
+    rows: [
+      '................',
+      '.......kk.......',
+      '......k..k......',
+      '.....kkkkkk.....',
+      '....kggggggk....',
+      '....kgCCCCgk....',
+      '....kgCwwCgk....',
+      '....kgCwCCgk....',
+      '....kgCCCCgk....',
+      '....kgCCCCgk....',
+      '....kggggggk....',
+      '.....kkkkkk.....',
+      '......kkkk......',
+      '................',
+      '................',
+      '................',
+    ],
+  },
+  {
+    id: 'shadow-amulet',
+    palette: { c: '#5a5a6a', b: '#2a1a3a', C: '#8a4ad0', w: '#e0c8ff' },
+    rows: CHARM_ROWS,
+  },
+  {
+    // Pakkaskirves: jäinen terä ja tumma varsi.
+    id: 'frost-axe',
+    palette: { k: '#1a2a3a', w: '#ffffff', s: '#a8d8f0', b: '#3fd0ff', h: '#4a3a2a' },
+    rows: [
+      '................',
+      '........kkkk....',
+      '.......kwssskk..',
+      '......kwssbsssk.',
+      '......kwsbssssk.',
+      '......kwssbsssk.',
+      '.......kkssssk..',
+      '........khkkk...',
+      '.......khk......',
+      '......khk.......',
+      '.....khk........',
+      '....khk.........',
+      '...khk..........',
+      '..khk...........',
+      '..kk............',
+      '................',
+    ],
+  },
+  {
+    id: 'crystal-armor',
+    palette: { k: '#2a1a4a', r: '#c8a0ff', R: '#8a4ad0', o: '#ffffff' },
+    rows: ARMOR_ROWS,
+  },
+  {
+    // Ikijään kide: kimaltava jääkristalli.
+    id: 'frost-crystal',
+    palette: { c: '#4a8ad0', C: '#bfe6ff', w: '#ffffff' },
+    rows: [
+      '................',
+      '.......cc.......',
+      '......cCCc......',
+      '.....cCwCCc.....',
+      '.....cCwCCc.....',
+      '....cCCwCCCc....',
+      '....cCCCCCCc....',
+      '..c.cCCCCCCc.c..',
+      '.cCccCCCCCCccCc.',
+      '.cCCcCCCCCCcCCc.',
+      '..cCcCCCCCCcCc..',
+      '...cccCCCCccc...',
+      '.....cccccc.....',
+      '................',
+      '................',
+      '................',
+    ],
+  },
+  {
+    id: 'snowflake-charm',
+    palette: { c: '#c8d0dc', b: '#4a8ad0', C: '#bfe6ff', w: '#ffffff' },
+    rows: CHARM_ROWS,
+  },
+  {
+    id: 'storm-cloak',
+    palette: { k: '#0e1020', c: '#2a3a8a', C: '#ffe066', y: '#ffe066' },
+    rows: CLOAK_ROWS,
+  },
+  {
+    // Merikäärmeen keihäs: turkoosi kolmikärki pitkässä varressa.
+    id: 'serpent-spear',
+    palette: { w: '#9fffe0', W: '#3fb0a0', h: '#1a6a6a' },
+    rows: [
+      '................',
+      '........w.w.w...',
+      '........w.w.w...',
+      '........WwwwW...',
+      '.........ww.....',
+      '.........hh.....',
+      '........hh......',
+      '.......hh.......',
+      '......hh........',
+      '.....hh.........',
+      '....hh..........',
+      '...hh...........',
+      '..hh............',
+      '.hh.............',
+      '................',
+      '................',
+    ],
+  },
+  {
+    id: 'storm-heart',
+    palette: { c: '#c8d0dc', b: '#1a2a6a', C: '#ffe066', w: '#ffffff' },
+    rows: CHARM_ROWS,
+  },
+];

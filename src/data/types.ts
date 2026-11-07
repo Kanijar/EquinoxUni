@@ -164,9 +164,10 @@ export interface DropDef {
  * tehtävänantajalle, data/quests.ts), kulkuneuvo (kytketään päälle kartalla, logic/vehicle.ts)
  * tai voima (ostetaan kauppiaalta ja otetaan heti käyttöön, esim. kykypiste, logic/shop.ts).
  * Kalastus (data/fishing.ts): työkalu (onki, yksi riittää), syötti (madot, kuluvat) ja
- * ruoka (kala, syödään repusta elämän palauttamiseksi).
+ * ruoka (kala, syödään repusta elämän palauttamiseksi). Vene (logic/sailing.ts) vie merelle.
  */
-export type ItemKind = 'heal' | 'gear' | 'key' | 'vehicle' | 'power' | 'tool' | 'bait' | 'food';
+export type ItemKind =
+  'heal' | 'gear' | 'key' | 'vehicle' | 'power' | 'tool' | 'bait' | 'food' | 'boat';
 
 /** Varustepaikka: jokaisessa paikassa voi olla yksi varuste kerrallaan. */
 export type GearSlot = 'hand' | 'body' | 'neck';
@@ -223,6 +224,18 @@ export interface VehicleItemDef extends ItemBase {
 }
 
 /**
+ * Vene (esim. Purjevene, Venesataman venekaupasta): rannalla VENEESEEN-napista (tai V) vesille,
+ * ja merellä MAIHIN-napista rantaan (logic/sailing.ts). Veneellä pääsee pienille saarille.
+ */
+export interface BoatItemDef extends ItemBase {
+  readonly kind: 'boat';
+  /** Nopeus merellä kerrotaan tällä (1.6 = 60 % nopeammin kuin kävellen). */
+  readonly speedMultiplier: number;
+  /** Sankari veneessä kartalla (data/sprites-isles.ts). */
+  readonly mapSprite: string;
+}
+
+/**
  * Voima (esim. Voimakristalli): ostetaan kauppiaalta, ja se otetaan käyttöön heti
  * ostaessa. Se ei mene reppuun, joten sitä ei voi myydä.
  */
@@ -257,6 +270,7 @@ export type ItemDef =
   | GearItemDef
   | KeyItemDef
   | VehicleItemDef
+  | BoatItemDef
   | PowerItemDef
   | ToolItemDef
   | BaitItemDef
@@ -431,6 +445,7 @@ export type {
 
 export type {
   CircleDef,
+  IsleDef,
   LakeDef,
   MapEnemyDef,
   MapPoint,
@@ -450,7 +465,7 @@ export type { NpcDef, QuestDef, QuestGoal, QuestRewardDef } from './types-quests
 
 // --- Kulkeva kauppias ja kolikot (data/types-shop.ts) ---
 
-export type { CoinRules, MerchantDef, ShopRules } from './types-shop';
+export type { CoinRules, MerchantDef, ShopKeeperDef, ShopRules, TownShopDef } from './types-shop';
 
 // --- Kalastus (data/types-fishing.ts) ---
 

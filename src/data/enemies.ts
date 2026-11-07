@@ -1,3 +1,4 @@
+import { ISLE_ENEMIES } from './isle-enemies';
 import type { EnemyDef } from './types';
 
 // Uusi vihollinen: lisää olio tähän listaan ja sijoita se kartalle (map-enemies.ts).
@@ -200,4 +201,6 @@ export const ENEMIES: readonly EnemyDef[] = [
     drops: [{ item: 'golden-fish', chance: 0.4 }],
     backdrop: 'beach',
   },
+  // Pienten saarten viholliset (veneellä): data/isle-enemies.ts.
+  ...ISLE_ENEMIES,
 ];

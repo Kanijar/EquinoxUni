@@ -12,6 +12,7 @@ import { cleanHeroName } from './hero-name';
 import { playerStats, type GameState } from './game-state';
 import { readMerchantMs } from './merchant-route';
 import { mapEnemyRespawnMs, type RespawnTimer } from './respawn';
+import { readIsles } from './sailing';
 import { readQuests } from './save-quests';
 import { noSkillPoints, type SkillPoints } from './skill-points';
 import type { Vec2 } from './vector';
@@ -23,7 +24,8 @@ import { readStairSteps } from './volcano-stairs';
 // ja puuttuvat varusteet tyhjiä. Vanhassa tallennuksessa ei ole nimeä eikä ulkonäköä:
 // silloin sankari on oletusnimellä ja -näköinen, joten SAVE_VERSIONia ei tarvinnut nostaa.
 // Samoin puuttuvat kolikot ja ostetut kykypisteet ovat 0 ja kauppias kierroksensa alussa,
-// ja tulivuoren rappusista ei ole noussut yhtään askelmaa.
+// tulivuoren rappusista ei ole noussut yhtään askelmaa, sankari ei ole veneessä eikä ole
+// löytänyt yhtään pientä saarta.
 
 type RawRecord = Record<string, unknown>;
 
@@ -203,6 +205,8 @@ export function readGameState(value: unknown): GameState | null {
     merchantMs: readMerchantMs(value['merchantMs']),
     stairSteps: readStairSteps(value['stairSteps']),
     bait: readBait(value['bait']),
+    sailing: value['sailing'] === true,
+    isles: readIsles(value['isles'], WORLD),
   };
   // Elämä pysyy rajoissa: vähintään 1, enintään maksimielämä.
   state.hp = Math.min(Math.max(1, state.hp), playerStats(state).maxHp);

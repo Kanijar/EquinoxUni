@@ -4,7 +4,18 @@
 
 /** Taistelun tausta. Valitaan maaston mukaan tai vihollisen omana taustana (EnemyDef.backdrop). */
 export type BattleBackdropId =
-  'field' | 'forest' | 'snow' | 'village' | 'summit' | 'beach' | 'swamp' | 'volcano';
+  | 'field'
+  | 'forest'
+  | 'snow'
+  | 'village'
+  | 'summit'
+  | 'beach'
+  | 'swamp'
+  | 'volcano'
+  | 'jungle'
+  | 'grave'
+  | 'ice'
+  | 'storm';
 
 /** Taustan sää: hiutaleet putoavat ylhäältä tai hiukkaset leijuvat ilmassa. */
 export interface BattleWeatherDef {

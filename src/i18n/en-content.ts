@@ -1,4 +1,10 @@
-import type { EnemyDef, ItemDef, NpcDef, QuestDef, TownDef } from '../data/types';
+import type { EnemyDef, IsleDef, ItemDef, NpcDef, QuestDef, TownDef } from '../data/types';
+import {
+  ISLE_ENEMY_NAMES_EN,
+  ISLE_ITEM_TEXTS_EN,
+  ISLE_NAMES_EN,
+  ISLE_QUEST_TEXTS_EN,
+} from './en-isles';
 
 // Vihollisten ja esineiden nimet englanniksi. Suomenkieliset nimet ovat data-tiedostoissa
 // (data/enemies.ts, data/items.ts). Uusi vihollinen tai esine: lisää sen englanninkielinen
@@ -21,6 +27,8 @@ export const ENEMY_NAMES_EN: Readonly<Record<string, string>> = {
   dragon: 'Dragon',
   shark: 'Shark',
   octopus: 'Giant Octopus',
+  // Pienet saaret (i18n/en-isles.ts)
+  ...ISLE_ENEMY_NAMES_EN,
 };
 
 /** Esineiden nimet ja kuvaukset englanniksi tunnisteen (ItemDef.id) mukaan. */
@@ -95,6 +103,8 @@ export const ITEM_TEXTS_EN: Readonly<
     name: 'Fish Scale Armor',
     description: 'Shiny scales. Slippery and tough!',
   },
+  // Pienet saaret (i18n/en-isles.ts)
+  ...ISLE_ITEM_TEXTS_EN,
 };
 
 /** Tehtävän tekstit: nimi, tarjous (story) ja kiitos palautettaessa. */
@@ -186,6 +196,8 @@ export const QUEST_TEXTS_EN: Readonly<Record<string, QuestTexts>> = {
     story: 'Tuhkala is a village at the foot of the volcano. Do you dare to go there?',
     thanks: 'A mighty trip! You have travelled across the whole island.',
   },
+  // Pienet saaret (i18n/en-isles.ts)
+  ...ISLE_QUEST_TEXTS_EN,
 };
 
 /** TEXT.names englanniksi. Jos käännös puuttuu, näytetään suomenkielinen nimi. */
@@ -197,6 +209,8 @@ export const EN_CONTENT = {
   itemDescription: (item: ItemDef): string =>
     ITEM_TEXTS_EN[item.id]?.description ?? item.description,
   town: (town: TownDef): string => town.name,
+  /** Pienen saaren nimi (suomeksi data/isles.ts). */
+  isle: (isle: IsleDef): string => ISLE_NAMES_EN[isle.id] ?? isle.name,
   npc: (npc: NpcDef): string => npc.name,
   quest: (quest: QuestDef): QuestTexts => QUEST_TEXTS_EN[quest.id] ?? quest,
 };

@@ -9,8 +9,9 @@ import {
 } from '../config/game-config';
 import { SHOP_VIEW } from '../config/shop-config';
 import { getItem } from '../data';
+import { BOAT_SHOP } from '../data/boat-shop';
 import { MERCHANT } from '../data/merchant';
-import type { ItemDef } from '../data/types';
+import type { ItemDef, ShopKeeperDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import { clampPage, pageCount, pageItems, turnPage } from '../logic/bag-pages';
 import type { GameState } from '../logic/game-state';
@@ -32,6 +33,7 @@ import { TextButton } from '../ui/text-button';
 import { addLabel, addTitle } from '../ui/title-text';
 
 // Kulkevan kauppiaan kauppa. Avataan kartalta KAUPPA-napista tai kauppiasta napauttamalla.
+// Sama näkymä on Venesataman venekauppa (data/boat-shop.ts), kun keeper on annettu.
 // Vasemmalla kauppias ja napit OSTA ja MYY, oikealla tavarat sivuittain (kuten repussa).
 // OSTA-puolella näkyvät kauppiaan tavarat hintoineen, MYY-puolella repun tavarat.
 // Tavaraa napauttamalla näkee, mitä se tekee, ja alareunan napista sen voi ostaa tai myydä.
@@ -40,10 +42,13 @@ import { addLabel, addTitle } from '../ui/title-text';
 
 export interface ShopSceneData {
   readonly state: GameState;
+  /** Kenen kauppa: oletuksena kulkeva kauppias Kaapo, tai esim. Venesataman venekauppa. */
+  readonly keeper?: ShopKeeperDef;
 }
 
 export class ShopScene extends Phaser.Scene {
   private state!: GameState;
+  private keeper: ShopKeeperDef = MERCHANT;
   private mode: ShopMode = 'buy';
   private selected: string | null = null;
   /** Viimeisimmän kaupan viesti (esim. "Ostit: Rautamiekka!"). */
@@ -65,6 +70,7 @@ export class ShopScene extends Phaser.Scene {
 
   create(data: ShopSceneData): void {
     this.state = data.state;
+    this.keeper = data.keeper ?? MERCHANT;
     this.mode = 'buy';
     this.selected = null;
     this.message = null;
@@ -72,7 +78,7 @@ export class ShopScene extends Phaser.Scene {
     this.page = 0;
     this.tiles = [];
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, COLORS.panel).setOrigin(0);
-    addTitle(this, BACKPACK_VIEW.titleY, TEXT.shop.title(MERCHANT.name));
+    addTitle(this, BACKPACK_VIEW.titleY, this.titleText());
     this.addDoneButton();
     this.addMerchant();
     this.addGrid();
@@ -97,7 +103,7 @@ export class ShopScene extends Phaser.Scene {
     const { coinX, coinY, coinScale, coinTextX, merchantX, merchantY, merchantScale } = SHOP_VIEW;
     this.add.image(coinX, coinY, 'coin').setScale(coinScale);
     this.coinText = addLabel(this, { x: coinTextX, y: coinY, text: '' }).setColor(COLORS.notice);
-    this.add.image(merchantX, merchantY, MERCHANT.sprite).setScale(merchantScale);
+    this.add.image(merchantX, merchantY, this.keeper.sprite).setScale(merchantScale);
     const { tabX, tabFirstY, tabGap, tabWidth } = SHOP_VIEW;
     const tab = (mode: ShopMode, index: number, label: string): TextButton =>
       new TextButton(this, {
@@ -137,7 +143,7 @@ export class ShopScene extends Phaser.Scene {
   }
 
   private entries(): ShopEntry[] {
-    return shopEntries(this.state, this.mode);
+    return shopEntries(this.state, this.mode, this.keeper);
   }
 
   private setMode(mode: ShopMode): void {
@@ -211,10 +217,7 @@ export class ShopScene extends Phaser.Scene {
     this.coinText.setText(String(this.state.coins));
     this.tabs.buy.setSelected(this.mode === 'buy');
     this.tabs.sell.setSelected(this.mode === 'sell');
-    const merchant = MERCHANT.name;
-    this.speech.setText(
-      this.mode === 'buy' ? TEXT.shop.greetBuy(merchant) : TEXT.shop.greetSell(merchant),
-    );
+    this.speech.setText(this.greeting());
     const all = this.entries();
     this.page = clampPage(this.page, all.length, this.pageSize);
     this.pager.update(this.page, pageCount(all.length, this.pageSize));
@@ -269,7 +272,7 @@ export class ShopScene extends Phaser.Scene {
       case 'level':
         return TEXT.shop.needLevel(item.minLevel ?? 1);
       case 'notBought':
-        return TEXT.shop.notBought(MERCHANT.name);
+        return TEXT.shop.notBought(this.keeper.name);
     }
   }
 
@@ -286,6 +289,24 @@ export class ShopScene extends Phaser.Scene {
       return TEXT.fishing.rodStats(rod.biteWindowMs, rod.rareMultiplier);
     }
     return item.kind === 'power' ? TEXT.shop.powerBonus(item.skillPoints) : '';
+  }
+
+  private isBoatShop(): boolean {
+    return this.keeper.id === BOAT_SHOP.id;
+  }
+
+  private titleText(): string {
+    const name = this.keeper.name;
+    return this.isBoatShop() ? TEXT.boat.shopTitle : TEXT.shop.title(name);
+  }
+
+  /** Kauppiaan puhe: venekauppias kertoo saarista ostopuolella. */
+  private greeting(): string {
+    const name = this.keeper.name;
+    if (this.mode === 'sell') {
+      return TEXT.shop.greetSell(name);
+    }
+    return this.isBoatShop() ? TEXT.boat.shopGreet(name) : TEXT.shop.greetBuy(name);
   }
 
   /** Kauppa sulkeutuu ja kartta jatkuu siitä, mihin se jäi. */

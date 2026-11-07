@@ -8,6 +8,7 @@ import {
   REGION_EDGE_WOBBLE,
   REGIONS,
 } from './island';
+import { ISLES } from './isles';
 import { MAP_ENEMIES } from './map-enemies';
 import { ROADS, START_TOWN, TOWNS } from './towns';
 import type { RockRule, TerrainDef, WorldDef } from './types';
@@ -33,6 +34,11 @@ export const TERRAINS: readonly TerrainDef[] = [
   { id: 'rock', sprite: 'tile-rock', walkable: false },
   // Kiviaskelmat laavan päällä: ilmestyvät lohikäärmeiden voitoista (data/volcano-stairs.ts).
   { id: 'stairs', sprite: 'tile-stairs', walkable: true },
+  // Pienten saarten maastot (data/isles.ts). Palmuviidakko hidastaa kuten metsä.
+  { id: 'jungle', sprite: 'tile-jungle', walkable: true, speedFactor: 0.7 },
+  { id: 'grave', sprite: 'tile-grave', walkable: true },
+  { id: 'ice', sprite: 'tile-ice', walkable: true },
+  { id: 'basalt', sprite: 'tile-basalt', walkable: true },
 ];
 
 /**
@@ -48,6 +54,7 @@ export const WORLD: WorldDef = {
   coast: ISLAND_COAST,
   beach: BEACH,
   lakes: LAKES,
+  isles: ISLES,
   regions: REGIONS,
   regionEdgeWobble: REGION_EDGE_WOBBLE,
   inland: INLAND,

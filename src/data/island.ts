@@ -1,11 +1,13 @@
 import type { LakeDef, MapPoint, TerrainMix, TerrainRegion } from './types';
 
 // Saaren muoto: rantaviiva, järvet ja alueet. Koordinaatit ovat karttaruutuja:
-// x kasvaa itään (oikealle) ja y etelään (alas). Kartta on 198 × 124 ruutua.
+// x kasvaa itään (oikealle) ja y etelään (alas). Kartta on 250 × 160 ruutua: pääsaari on
+// luoteiskulmassa (198 × 124), ja etelässä ja idässä on merta ja pienet saaret (data/isles.ts).
 // Lounaassa pellot ja aloituskylä, keskellä metsää ja järviä, idässä suo,
 // pohjoisessa lumiset tunturit ja koillisessa tulivuori. Meren reunalla on hiekkaranta.
 
-export const ISLAND_SIZE = { width: 198, height: 124 } as const;
+/** Koko kartan koko ruutuina (pääsaari, meri ja pienet saaret). */
+export const ISLAND_SIZE = { width: 250, height: 160 } as const;
 
 /** Saaren rantaviiva myötäpäivään idästä alkaen (itäniemi → etelälahti → länsi → pohjoinen). */
 export const ISLAND_COAST: readonly MapPoint[] = [

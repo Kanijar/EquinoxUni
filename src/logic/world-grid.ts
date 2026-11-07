@@ -1,6 +1,7 @@
 import { TERRAINS } from '../data/world';
 import type {
   CircleDef,
+  IsleDef,
   LakeDef,
   MapPoint,
   TerrainId,
@@ -58,9 +59,18 @@ export function isWalkable(grid: WorldGrid, tile: Vec2): boolean {
  * voi seistä kohdassa, johon on myöhemmin tullut kivi: hänet siirretään viereen.
  */
 export function nearestWalkable(grid: WorldGrid, tile: Vec2): Vec2 | undefined {
+  return nearestWhere(grid, tile, (t) => isWalkable(grid, t));
+}
+
+/** Lähin ruutu (sama ruutu ensin), joka täyttää ehdon, tai undefined. */
+export function nearestWhere(
+  grid: WorldGrid,
+  tile: Vec2,
+  test: (tile: Vec2) => boolean,
+): Vec2 | undefined {
   const maxRadius = Math.max(grid.width, grid.height);
   for (let r = 0; r <= maxRadius; r++) {
-    const found = ringTiles(tile, r).find((t) => isWalkable(grid, t));
+    const found = ringTiles(tile, r).find(test);
     if (found) {
       return found;
     }
@@ -101,7 +111,8 @@ export function townAt(world: WorldDef, tile: Vec2): TownDef | undefined {
 function baseTerrain(world: WorldDef, tile: Vec2): TerrainId {
   const center = { x: tile.x + 0.5, y: tile.y + 0.5 };
   if (!isInsidePolygon(center, world.coast)) {
-    return 'sea';
+    const isle = isleAt(world, tile);
+    return isle ? mixTerrain(isle.terrain, tile) : 'sea';
   }
   const lake = world.lakes.find((l) => isInLake(l, center));
   if (lake) {
@@ -110,6 +121,18 @@ function baseTerrain(world: WorldDef, tile: Vec2): TerrainId {
   const wobbled = wobble(center, world.regionEdgeWobble);
   const region = world.regions.find((r) => isInsidePolygon(wobbled, r.area));
   return mixTerrain(region ?? world.inland, tile);
+}
+
+/** Pienten saarten reuna kiemurtelee enintään näin monta ruutua (ei täydellisiä ympyröitä). */
+const ISLE_EDGE_WOBBLE = 1.5;
+
+/**
+ * Pieni saari (data/isles.ts), jonka alueella ruutu on, tai undefined. Saaren rannan
+ * merivesi ei kuulu saareen, mutta hiekkaranta kuuluu.
+ */
+export function isleAt(world: WorldDef, tile: Vec2): IsleDef | undefined {
+  const center = wobble({ x: tile.x + 0.5, y: tile.y + 0.5 }, ISLE_EDGE_WOBBLE);
+  return world.isles.find((isle) => isle.circles.some((c) => isInsideCircle(center, c)));
 }
 
 /** Onko piste järven ympyrässä mutta ei järven saarella. */

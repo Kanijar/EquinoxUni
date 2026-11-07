@@ -1,6 +1,7 @@
 import { GAME_INFO } from '../data/game-info';
 import type { GearStat, PlayerStats, SkillStat, StatBonus } from '../data/types';
 import { localDateParts, twoDigits, type DateParts } from './date-parts';
+import { EN_BOAT, EN_VEHICLE } from './en-boat';
 import { EN_CONTENT } from './en-content';
 import { EN_QUESTS } from './en-quests';
 import { EN_SHOP } from './en-shop';
@@ -157,11 +158,8 @@ export const EN: Texts = {
     revived: (town): string => `You fell... and woke up in ${town.name}. HP restored!`,
     skillPointsWaiting: (count: number): string => `You have ${points(count)}. Tap SKILLS.`,
   },
-  vehicle: {
-    button: 'BUGATTI',
-    on: 'Vroom! Speed +80%!',
-    off: 'Bugatti off. Walking again.',
-  },
+  /** Bugattin avaimet kartalla (logic/vehicle.ts): nappi ja ilmoitukset (i18n/en-boat.ts). */
+  vehicle: EN_VEHICLE,
   skills: {
     button: (count: number): string => `SKILLS ${count}`,
     title: 'Skill points',
@@ -269,6 +267,7 @@ export const EN: Texts = {
   shop: EN_SHOP,
   stairs: EN_STAIRS,
   fishing: EN_FISHING,
+  boat: EN_BOAT,
   spells: {
     fireball: 'Fireball',
   },

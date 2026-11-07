@@ -1,3 +1,4 @@
+import { ISLE_QUESTS } from './isle-quests';
 import type { QuestDef } from './types';
 
 // Jussi ja Ossi Ketolan tehtävät. Tehtävästä saa KP:tä ja esineitä (reward). Uusi tehtävä: lisää olio
@@ -198,4 +199,6 @@ export const QUESTS: readonly QuestDef[] = [
     goal: { kind: 'visit', town: 'tuhkala' },
     reward: { xp: 550, items: [{ id: 'potion', count: 5 }] },
   },
+  // --- Pienten saarten tehtävät (veneellä): data/isle-quests.ts ---
+  ...ISLE_QUESTS,
 ];
