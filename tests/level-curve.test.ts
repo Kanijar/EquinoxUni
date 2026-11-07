@@ -77,9 +77,8 @@ describe('tasokaava', () => {
     expect(lastGap).toBeLessThan(10 * getEnemy('dragon').xp);
   });
 
-  it('suden salaisuus vie tasolle 50, ei huipputasolle', () => {
-    expect(MENU_SECRET.wolfStartLevel).toBe(50);
-    expect(MENU_SECRET.wolfStartLevel).toBeLessThan(MAX_LEVEL);
+  it('suden salaisuus vie huipputasolle', () => {
+    expect(MENU_SECRET.wolfStartLevel).toBe(MAX_LEVEL);
   });
 });
 
