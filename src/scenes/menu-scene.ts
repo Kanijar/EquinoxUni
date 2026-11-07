@@ -8,6 +8,7 @@ import { makeHowlingWolf } from '../ui/howling-wolf';
 import { addInstallButton } from '../ui/install-button';
 import { drawMenuBackdrop, menuHeroTexture } from '../ui/menu-backdrop';
 import { addPlayerCountLabel } from '../ui/player-count-label';
+import { addSecretBurger } from '../ui/secret-burger';
 import { makeSquishySlime } from '../ui/squishy-slime';
 import { TextButton } from '../ui/text-button';
 import { addTitle } from '../ui/title-text';
@@ -23,6 +24,8 @@ import type { HeroSceneData } from './hero-scene';
 // lisäjuomilla (logic/menu-secret.ts). Alkuruudulla siitä ei kerrota: susi vain ulvahtaa
 // ja muuttuu hehkuvaksi henkisudeksi. Kartalla näkyy yllätysviesti.
 // Toinen salaisuus: liman napautus muuttaa sankarin silmät mustiksi heti ja uudessa pelissä.
+// Kolmas salaisuus: vasemmassa reunassa on todella pieni burgeri. Sen napautus antaa parhaat
+// varusteet ja Bugattin avaimet uuteen peliin tai LATAA-napista ladattuun peliin (logic/burger-secret.ts).
 
 interface MenuEntry {
   readonly label: string;
@@ -47,13 +50,16 @@ export class MenuScene extends Phaser.Scene {
       this.taps = { ...this.taps, slime: true };
       hero.setTexture(menuHeroTexture(this, MENU_SECRET.slimeEyeColor));
     });
+    addSecretBurger(this, () => {
+      this.taps = { ...this.taps, burger: true };
+    });
     addTitle(this, MENU_VIEW.titleY, TEXT.gameTitle);
     addVersionLabel(this);
     addPlayerCountLabel(this);
     addInstallButton(this);
     const entries: MenuEntry[] = [
       { label: TEXT.menu.play, onTap: () => this.play() },
-      { label: TEXT.menu.load, onTap: () => this.open(SCENES.saves, {} satisfies SavesSceneData) },
+      { label: TEXT.menu.load, onTap: () => this.openSaves() },
       { label: TEXT.menu.settings, onTap: () => this.open(SCENES.settings, {}) },
       { label: TEXT.menu.quit, onTap: () => this.scene.start(SCENES.exit) },
     ];
@@ -72,6 +78,10 @@ export class MenuScene extends Phaser.Scene {
   private play(): void {
     const start = startFromMenu(this.taps);
     this.open(SCENES.hero, start satisfies HeroSceneData);
+  }
+
+  private openSaves(): void {
+    this.open(SCENES.saves, { burger: this.taps.burger } satisfies SavesSceneData);
   }
 
   /** Koko näytön tila ja vaakasuunta pyydetään napautuksesta (selain vaatii kosketuksen). */

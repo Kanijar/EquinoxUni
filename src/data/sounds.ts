@@ -188,6 +188,15 @@ export const SOUNDS = {
       { freq: 1760, ms: 120 },
     ],
   },
+  /** Alkuruudun salainen burgeri: kaksi nopeaa haukkausta. */
+  chomp: {
+    wave: 'square',
+    gain: 0.2,
+    notes: [
+      { freq: 240, ms: 50, slideTo: 120 },
+      { freq: 200, ms: 70, slideTo: 90 },
+    ],
+  },
 } as const satisfies Record<string, SoundDef>;
 
 /** Äänen tunniste, esim. playSound('hit'). Kirjoitusvirhe huomataan jo käännöksessä. */

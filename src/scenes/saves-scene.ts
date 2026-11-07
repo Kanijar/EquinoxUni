@@ -10,6 +10,7 @@ import {
   WORLD_VIEW,
 } from '../config/game-config';
 import { TEXT } from '../i18n/text';
+import { burgerNews } from '../logic/burger-secret';
 import type { GameState } from '../logic/game-state';
 import { deleteSlot, listSlots, loadFromSlot, saveToSlot, slotNumbers } from '../logic/save-slots';
 import { browserStore } from '../systems/browser-storage';
@@ -27,10 +28,13 @@ import type { WorldSceneData } from './world-scene';
 export interface SavesSceneData {
   /** Käynnissä oleva peli, jos näkymä avattiin pelin aikana. */
   readonly game?: { readonly state: GameState; readonly place: string };
+  /** Alkuruudun salaista burgeria napautettiin: ladattu peli saa burgerin lahjat. */
+  readonly burger?: boolean;
 }
 
 export class SavesScene extends Phaser.Scene {
   private current: SavesSceneData['game'];
+  private burger = false;
   private rows: SaveSlotRow[] = [];
   private status!: Phaser.GameObjects.Text;
 
@@ -40,6 +44,7 @@ export class SavesScene extends Phaser.Scene {
 
   create(data: SavesSceneData): void {
     this.current = data.game;
+    this.burger = data.burger === true;
     addTitle(this, SAVES_VIEW.titleY, TEXT.saves.title);
     this.status = this.add
       .text(GAME_WIDTH / 2, SAVES_VIEW.statusY, '', {
@@ -103,10 +108,14 @@ export class SavesScene extends Phaser.Scene {
       return;
     }
     enterFullscreenLandscape(this);
+    const lines = [TEXT.saves.loaded];
+    if (this.burger) {
+      lines.push(burgerNews(state));
+    }
     const next: WorldSceneData = {
       state,
       graceMs: WORLD_VIEW.graceMs.start,
-      message: TEXT.saves.loaded,
+      message: lines.join('\n'),
     };
     this.scene.start(SCENES.world, next);
   }
