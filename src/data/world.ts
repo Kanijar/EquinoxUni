@@ -31,6 +31,8 @@ export const TERRAINS: readonly TerrainDef[] = [
   { id: 'ash', sprite: 'tile-ash', walkable: true },
   { id: 'lava', sprite: 'tile-lava', walkable: false },
   { id: 'rock', sprite: 'tile-rock', walkable: false },
+  // Kiviaskelmat laavan päällä: ilmestyvät lohikäärmeiden voitoista (data/volcano-stairs.ts).
+  { id: 'stairs', sprite: 'tile-stairs', walkable: true },
 ];
 
 /**

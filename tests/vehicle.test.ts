@@ -82,11 +82,12 @@ describe('Jussin viimeinen tehtävä: Lohikäärmeiden tuho', () => {
     return state;
   }
 
-  it('on taistelutehtävistä viimeinen ja vaatii kaksi lohikäärmettä', () => {
+  it('on Jussin taistelutehtävistä viimeinen ja vaatii kaksi lohikäärmettä', () => {
     const quest = getQuest('dragon-hunt');
     expect(quest.goal).toEqual({ kind: 'defeat', enemy: 'dragon', count: 2 });
     expect(quest.requires).toBe('lizard-watch');
-    const maxLevel = Math.max(...QUESTS.map((entry) => entry.minLevel));
+    const jussi = QUESTS.filter((entry) => entry.giver === 'jussi');
+    const maxLevel = Math.max(...jussi.map((entry) => entry.minLevel));
     expect(quest.minLevel).toBe(maxLevel);
   });
 

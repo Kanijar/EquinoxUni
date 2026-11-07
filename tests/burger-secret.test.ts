@@ -13,7 +13,7 @@ const BURGER = { ...NO_MENU_TAPS, burger: true };
 describe('alkuruudun salainen burgeri', () => {
   it('jokaiseen paikkaan valitaan pisteiltään paras varuste', () => {
     expect(bestGear('hand')?.id).toBe('dragon-sword');
-    expect(bestGear('body')?.id).toBe('lizard-armor');
+    expect(bestGear('body')?.id).toBe('lava-armor');
     expect(bestGear('neck')?.id).toBe('dragon-charm');
     for (const slot of GEAR_SLOTS) {
       const best = bestGear(slot);
@@ -32,11 +32,11 @@ describe('alkuruudun salainen burgeri', () => {
     const gained = eatBurger(state);
     expect(state.equipped).toEqual({
       hand: 'dragon-sword',
-      body: 'lizard-armor',
+      body: 'lava-armor',
       neck: 'dragon-charm',
     });
     expect(state.inventory['bugatti-keys']).toBe(1);
-    expect(gained.items).toEqual(['dragon-sword', 'lizard-armor', 'dragon-charm', 'bugatti-keys']);
+    expect(gained.items).toEqual(['dragon-sword', 'lava-armor', 'dragon-charm', 'bugatti-keys']);
     expect(gained.coins).toBe(1_000_000 - createNewGame().coins);
     expect(state.coins).toBe(1_000_000);
     expect(getItem('bugatti-keys').kind).toBe('vehicle');
@@ -67,12 +67,12 @@ describe('alkuruudun salainen burgeri', () => {
   it('aiemmat varusteet palaavat reppuun ja omistettu paras varuste otetaan käyttöön', () => {
     const state = createNewGame();
     state.equipped.hand = 'club';
-    state.inventory['lizard-armor'] = 1;
+    state.inventory['lava-armor'] = 1;
     state.inventory['bugatti-keys'] = 1;
     const gained = eatBurger(state);
     expect(state.inventory['club']).toBe(1);
-    expect(state.inventory['lizard-armor']).toBe(0);
-    expect(state.equipped.body).toBe('lizard-armor');
+    expect(state.inventory['lava-armor']).toBe(0);
+    expect(state.equipped.body).toBe('lava-armor');
     expect(state.inventory['bugatti-keys']).toBe(1);
     expect(gained.items).toEqual(['dragon-sword', 'dragon-charm']);
   });

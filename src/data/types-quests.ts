@@ -1,9 +1,12 @@
-import type { ItemStack } from './types';
+import type { ItemStack, MapPoint } from './types';
 
 // Tehtävien ja tehtävänantajien (NPC) tyypit. Tehtävät: data/quests.ts,
 // tehtävänantajat: data/npcs.ts, säännöt: logic/quest-log.ts ja logic/quests.ts.
 
-/** Hahmo, joka seisoo paikkakunnassa ja antaa tehtäviä (esim. Jussi Ketola). */
+/**
+ * Hahmo, joka antaa tehtäviä. Hahmo asuu joko paikkakunnassa (Jussi Ketola) tai seisoo
+ * omassa paikassaan kartalla (Ossi Ketola tulivuoren kraatterissa). Anna town tai tile.
+ */
 export interface NpcDef {
   readonly id: string;
   /** Nimi pelaajalle. Henkilön nimi on sama molemmilla kielillä. */
@@ -12,7 +15,12 @@ export interface NpcDef {
   readonly nameGenitive: string;
   readonly sprite: string;
   /** Paikkakunta, jossa hahmo asuu (data/towns.ts). Siellä hänen kanssaan voi puhua. */
-  readonly town: string;
+  readonly town?: string;
+  /**
+   * Paikka kartalla ruutuina, jos hahmo ei asu paikkakunnassa. Hänen kanssaan voi puhua,
+   * kun sankari on enintään NPC_TALK_TILES ruudun päässä (data/npcs.ts).
+   */
+  readonly tile?: MapPoint;
 }
 
 /**

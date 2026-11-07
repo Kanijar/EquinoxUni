@@ -7,7 +7,8 @@ import { cornerButton } from './corner-stack';
 import { TextButton } from './text-button';
 
 // Puhenappi kartan oikeassa alakulmassa TALLENNA-napin yläpuolella, esim. "JUSSI KETOLA !".
-// Näkyy vain paikkakunnassa, jossa tehtävänantaja asuu. Napista avautuu tehtävänäkymä.
+// Näkyy vain paikkakunnassa, jossa tehtävänantaja asuu, tai hänen vieressään (Ossi Ketola
+// kraatterissa). Napista avautuu tehtävänäkymä.
 
 export class TalkButton {
   private readonly button: TextButton;
@@ -20,7 +21,7 @@ export class TalkButton {
     this.button.setVisible(false);
   }
 
-  /** npc = paikkakunnan tehtävänantaja, tai null, kun pelaaja ei ole hänen paikkakunnassaan. */
+  /** npc = tehtävänantaja, jonka kanssa voi nyt puhua, tai null. */
   update(npc: NpcDef | null, marker: NpcMarker): void {
     this.npc = npc;
     this.button.setVisible(npc !== null);

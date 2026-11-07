@@ -1,4 +1,5 @@
 import { getQuest, NPCS, QUESTS } from '../data';
+import { NPC_TALK_TILES } from '../data/npcs';
 import type { ItemStack, NpcDef, QuestDef } from '../data/types';
 import { gainXp, playerLevel, type GameState, type XpGain } from './game-state';
 import {
@@ -10,6 +11,7 @@ import {
   type QuestProgress,
   type QuestStatus,
 } from './quest-log';
+import type { Vec2 } from './vector';
 
 // Tehtävät pelaajan kannalta: mitä tehtävänantaja (esim. Jussi Ketola) tarjoaa, tehtävän
 // ottaminen ja palauttaminen palkintoineen. Tehtäväkirjan säännöt: logic/quest-log.ts.
@@ -81,9 +83,16 @@ export function npcMarker(state: GameState, npcId: string): NpcMarker {
   return statuses.includes('available') ? 'available' : null;
 }
 
-/** Tehtävänantaja, joka asuu tässä paikkakunnassa, tai null. */
-export function npcInTown(townId: string | undefined): NpcDef | null {
-  return NPCS.find((npc) => npc.town === townId) ?? null;
+/**
+ * Tehtävänantaja, jonka kanssa voi puhua: hän asuu paikkakunnassa, jossa sankari on, tai
+ * hänen paikkansa kartalla on enintään NPC_TALK_TILES ruudun päässä sankarista. Muuten null.
+ */
+export function npcNearby(townId: string | undefined, tile: Vec2): NpcDef | null {
+  return NPCS.find((npc) => (npc.tile ? isNear(npc.tile, tile) : npc.town === townId)) ?? null;
+}
+
+function isNear(a: Vec2, b: Vec2): boolean {
+  return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)) <= NPC_TALK_TILES;
 }
 
 /** Ottaa tarjolla olevan tehtävän vastaan. Palauttaa false, jos tehtävä ei ole tarjolla. */

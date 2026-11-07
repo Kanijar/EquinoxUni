@@ -13,7 +13,7 @@ import {
   type GameState,
 } from '../logic/game-state';
 import { recordQuestVisit } from '../logic/quest-log';
-import { npcInTown, npcMarker } from '../logic/quests';
+import { npcNearby, npcMarker } from '../logic/quests';
 import { isSlowTerrain, speedFactorAt } from '../logic/terrain-speed';
 import { lastVisitedTown, visitTown } from '../logic/town-visits';
 import { length } from '../logic/vector';
@@ -30,6 +30,7 @@ import { playSound } from '../systems/sound-fx';
 import {
   buildWorldMap,
   getWorldGrid,
+  showStairs,
   tileToWorld,
   walkablePosition,
   worldToTile,
@@ -61,7 +62,8 @@ import type { VictorySceneData } from './victory-scene';
 // tuntureilla, ja ruudun reunan nuoli näyttää suunnan. REPPU-napista (aina näkyvissä) avautuu
 // reppu, jossa varusteita laitetaan käyttöön. Paikkakunnassa voi jakaa kykypisteet
 // KYKYPISTEET-napista ja tallentaa pelin TALLENNA-napista. Jussi Ketola seisoo kotipaikkakuntansa
-// vieressä: hänen kanssaan puhutaan puhenapista tai napauttamalla häntä (tehtävät).
+// vieressä: hänen kanssaan puhutaan puhenapista tai napauttamalla häntä (tehtävät). Hänen veljensä
+// Ossi odottaa tulivuoren kraatterissa: lohikäärmeiden voitot nostavat rappuset laavasta.
 // Kulkeva kauppias Kaapo kävelee teitä pitkin: hänen vieressään aukeaa kauppa KAUPPA-napista.
 // Tämä scene vain kokoaa osat.
 
@@ -109,7 +111,7 @@ export class WorldScene extends Phaser.Scene {
     // Taisteluun lähtiessä fysiikka pysäytettiin; se jatkuu, kun kartta avautuu uudelleen.
     this.physics.resume();
     const isNewGame = this.state.position === null && data.message === undefined;
-    const built = buildWorldMap(this, getWorldGrid());
+    const built = buildWorldMap(this, showStairs(this.state.stairSteps));
     placeTownMarkers(this);
     this.npcs = new NpcMarkers(this, (npc) => this.talkTo(npc));
     const saved = this.state.position;
@@ -223,12 +225,17 @@ export class WorldScene extends Phaser.Scene {
     if (this.leaving) {
       return;
     }
-    if (this.towns.town?.id !== npc.town) {
+    if (this.nearbyNpc()?.id !== npc.id) {
       this.toast.show(TEXT.quests.tooFar(npc));
       return;
     }
     const data: QuestSceneData = { state: this.state, npc: npc.id };
     this.sleepUnder(SCENES.quests, data);
+  }
+
+  /** Tehtävänantaja, jonka kanssa voi nyt puhua: paikkakunnassa tai vieressä. */
+  private nearbyNpc(): NpcDef | null {
+    return npcNearby(this.towns.town?.id, worldToTile(this.player.position));
   }
 
   private openSkills(): void {
@@ -294,7 +301,7 @@ export class WorldScene extends Phaser.Scene {
     const inTown = this.towns.town !== undefined;
     this.skillButton.update(inTown, unspentSkillPoints(this.state));
     this.saveButton.update(inTown);
-    const npc = npcInTown(this.towns.town?.id);
+    const npc = this.nearbyNpc();
     this.talkButton.update(npc, npc ? npcMarker(this.state, npc.id) : null);
     this.npcs.update(this.state);
     this.questTracker.update(this.state);

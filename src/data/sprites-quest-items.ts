@@ -1,6 +1,6 @@
 import type { SpriteDef } from './types';
 
-// Jussi Ketolan tehtävien palkintoesineiden ja tehtäväesineiden pikselispritet (16x16).
+// Jussi ja Ossi Ketolan tehtävien palkintoesineiden ja tehtäväesineiden pikselispritet (16x16).
 // Esineet: data/items.ts, tehtävät: data/quests.ts.
 
 export const QUEST_ITEM_SPRITES: readonly SpriteDef[] = [
@@ -157,6 +157,52 @@ export const QUEST_ITEM_SPRITES: readonly SpriteDef[] = [
       '......kssk......',
       '......kssk......',
       '.......kk.......',
+    ],
+  },
+  {
+    // Lohikäärmeen suomu: punainen suomu, jonka keskellä hehkuu tuli (Ossin tehtävä).
+    id: 'dragon-scale',
+    palette: { k: '#1a1a1a', r: '#e0303a', R: '#9a1a14', w: '#ffd0c0', o: '#ff8a3a', y: '#ffd23f' },
+    rows: [
+      '................',
+      '................',
+      '.......kk.......',
+      '......krrk......',
+      '.....kRrrrk.....',
+      '....kRrwrrrk....',
+      '....kRrrrrrk....',
+      '...kRrrrrrrrk...',
+      '...kRrrooorrk...',
+      '...kRrroyorrk...',
+      '...kRrrooorrk...',
+      '....kRrrrrrk....',
+      '....kkRrrrkk....',
+      '......kkkk......',
+      '................',
+      '................',
+    ],
+  },
+  {
+    // Laavahaarniska: musta laavakivi, jonka halkeamissa hehkuu tuli (Ossin palkinto).
+    id: 'lava-armor',
+    palette: { k: '#1a1a1a', b: '#3d3534', d: '#2a2322', o: '#e8641e', y: '#ffb347' },
+    rows: [
+      '................',
+      '................',
+      '..kkkk....kkkk..',
+      '.kbbbbk..kbbbbk.',
+      '.kbobbbkkbbbbbk.',
+      '.kbbbbbobbbbbdk.',
+      '..kbobbbobbbdk..',
+      '...kbbyyyybbk...',
+      '...kbbyooybbk...',
+      '...kbbyyyybbk...',
+      '...kbbbobbbdk...',
+      '...kbobbbobdk...',
+      '...kbbbobbbbk...',
+      '...kkkkkkkkkk...',
+      '................',
+      '................',
     ],
   },
 ];

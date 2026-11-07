@@ -25,7 +25,17 @@ export interface LakeDef {
   /** Mitä järvessä on: vettä (oletus) vai laavaa. Kumpikaan ei ole kävelykelpoinen. */
   readonly terrain?: 'lake' | 'lava';
   /** Ympyrät: keskipiste ja säde ruutuina. */
-  readonly circles: readonly (MapPoint & { readonly radius: number })[];
+  readonly circles: readonly CircleDef[];
+  /**
+   * Saaret järven keskellä (valinnainen): näissä ympyröissä on alueen tavallista maata.
+   * Esim. tulivuoren kraatterin keskellä on tuhkasaari, jolla Ossi Ketola odottaa.
+   */
+  readonly islands?: readonly CircleDef[];
+}
+
+/** Ympyrä kartalla: keskipiste ja säde ruutuina. */
+export interface CircleDef extends MapPoint {
+  readonly radius: number;
 }
 
 export type TerrainId =
@@ -39,7 +49,8 @@ export type TerrainId =
   | 'swamp'
   | 'ash'
   | 'lava'
-  | 'rock';
+  | 'rock'
+  | 'stairs';
 
 export interface TerrainDef {
   readonly id: TerrainId;
@@ -114,4 +125,19 @@ export interface RockRule {
 /** Kartalla kulkeva vihollinen. Sijainti ruutuina. */
 export interface MapEnemyDef extends MapPoint {
   readonly enemy: string;
+}
+
+/**
+ * Rappuset laavan yli (data/volcano-stairs.ts). Jokainen voitto vihollisesta (lohikäärme)
+ * nostaa laavasta yhden askelman lisää, kunnes rappuset vievät kraatterin saarelle.
+ */
+export interface StairsDef {
+  /** Vihollinen, jonka voittaminen tuo uuden askelman (data/enemies.ts). */
+  readonly enemy: string;
+  /** Askelmat ilmestymisjärjestyksessä ruutuina: ensimmäinen kraatterin reunalla. */
+  readonly steps: readonly MapPoint[];
+  /** Maasto, joksi askelman ruutu muuttuu (kävelykelpoinen). */
+  readonly terrain: TerrainId;
+  /** Rappusten päässä oleva ruutu (saari), jonne pääsee vasta valmiita rappusia pitkin. */
+  readonly goal: MapPoint;
 }

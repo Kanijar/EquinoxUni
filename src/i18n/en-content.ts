@@ -51,6 +51,8 @@ export const ITEM_TEXTS_EN: Readonly<
   },
   'dragon-charm': { name: 'Dragon Charm', description: "A dragon's eye. Toughness and fire!" },
   'jussi-sword': { name: "Jussi's Old Sword", description: 'A bit rusty, but sharp.' },
+  'dragon-scale': { name: 'Dragon Scale', description: 'A hot scale. Take it to Ossi Ketola.' },
+  'lava-armor': { name: 'Lava Armor', description: 'Forged by Ossi from lava. Fireproof!' },
   'leather-vest': { name: 'Leather Vest', description: 'A thick vest that softens blows.' },
   'lucky-charm': {
     name: 'Lucky Charm',
@@ -127,6 +129,16 @@ export const QUEST_TEXTS_EN: Readonly<Record<string, QuestTexts>> = {
     title: 'Dragon Slayer',
     story: 'Dragons live on the volcano! Destroy two dragons and you get my greatest treasure.',
     thanks: 'You did it! Take the keys to my Bugatti. Press E or BUGATTI to drive fast!',
+  },
+  'ossi-greetings': {
+    title: 'Greetings to Jussi',
+    story: 'You saved me from the dragons! Go and tell my brother Jussi that I am fine.',
+    thanks: 'Now Jussi knows! Take these potions. I have one more favour to ask...',
+  },
+  'dragon-scales': {
+    title: 'Dragon Scales',
+    story: 'I will forge you lava armor, but I need three dragon scales. Bring them to me!',
+    thanks: 'Great scales! Here is your lava armor. Fire cannot burn it!',
   },
   'letter-peltola': {
     title: 'A Letter to Peltola',

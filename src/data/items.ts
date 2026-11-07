@@ -225,6 +225,26 @@ export const ITEMS: readonly ItemDef[] = [
     speedMultiplier: 1.8,
     mapSprite: 'bugatti',
   },
+  // --- Ossi Ketolan tehtävät (data/quests.ts) ---
+  {
+    // Tehtäväesine: putoaa lohikäärmeiltä vain, kun Lohikäärmeen suomut -tehtävä on kesken.
+    id: 'dragon-scale',
+    name: 'Lohikäärmeen suomu',
+    description: 'Kuuma suomu. Vie se Ossi Ketolalle.',
+    kind: 'key',
+    sprite: 'dragon-scale',
+  },
+  {
+    // Ossin viimeisen tehtävän palkinto: saaren paras haarniska (parempi kuin Tulisuomupanssari).
+    id: 'lava-armor',
+    name: 'Laavahaarniska',
+    description: 'Ossin takoma laavasta. Kestää tulenkin!',
+    kind: 'gear',
+    sprite: 'lava-armor',
+    price: 2500,
+    slot: 'body',
+    bonus: { defense: 9, maxHp: 40, magic: 2 },
+  },
   // --- Kulkevan kauppiaan tavarat (data/merchant-items.ts) ---
   ...MERCHANT_ITEMS,
 ];

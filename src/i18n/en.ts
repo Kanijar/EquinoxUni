@@ -4,6 +4,7 @@ import { localDateParts, twoDigits, type DateParts } from './date-parts';
 import { EN_CONTENT } from './en-content';
 import { EN_QUESTS } from './en-quests';
 import { EN_SHOP } from './en-shop';
+import { EN_STAIRS } from './en-stairs';
 import { LANGUAGE_NAMES, type Texts } from './fi';
 
 // Kaikki pelaajalle näkyvät tekstit englanniksi. Avaimet ovat samat kuin i18n/fi.ts:ssä:
@@ -262,6 +263,7 @@ export const EN: Texts = {
   names: EN_CONTENT,
   quests: EN_QUESTS,
   shop: EN_SHOP,
+  stairs: EN_STAIRS,
   spells: {
     fireball: 'Fireball',
   },

@@ -135,7 +135,14 @@ export const LAKES: readonly LakeDef[] = [
       { x: 150, y: 88, radius: 2 },
     ],
   },
-  { name: 'Tulivuoren kraatteri', terrain: 'lava', circles: [{ x: 160, y: 42, radius: 4.5 }] },
+  {
+    // Kraatterin keskellä on tuhkasaari, jolla Ossi Ketola odottaa (data/npcs.ts). Saarelle
+    // pääsee vasta, kun lohikäärmeiden voitot ovat nostaneet rappuset laavasta (data/volcano-stairs.ts).
+    name: 'Tulivuoren kraatteri',
+    terrain: 'lava',
+    circles: [{ x: 160.5, y: 42.5, radius: 6.5 }],
+    islands: [{ x: 160.5, y: 42.5, radius: 1.6 }],
+  },
 ];
 
 /** Alueet. Ensimmäinen alue, jonka sisällä ruutu on, määrää maaston. */

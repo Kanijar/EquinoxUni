@@ -169,6 +169,8 @@ export const ENEMIES: readonly EnemyDef[] = [
       { item: 'dragon-sword', chance: 0.35 },
       { item: 'dragon-charm', chance: 0.35 },
       { item: 'potion', chance: 1 },
+      // Tehtäväesine: putoaa vain, kun Ossi Ketolan tehtävä Lohikäärmeen suomut on kesken.
+      { item: 'dragon-scale', chance: 0.5, quest: 'dragon-scales' },
     ],
     moves: { chargeChance: 0.25, chargeMultiplier: 2.5, specialChance: 0, specialPower: 0 },
     respawnMs: 300_000,
