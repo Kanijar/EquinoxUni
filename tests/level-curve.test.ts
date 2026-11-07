@@ -13,11 +13,13 @@ import {
 import { levelForXp, xpProgress, xpToNextLevel } from '../src/logic/progression';
 import { skillPointsEarned } from '../src/logic/skill-points';
 
-// Tasot 1–50: KP-rajat lasketaan kaavasta (data/level-curve.ts, data/rules.ts LEVEL_CURVE).
+// Tasot 1–100: KP-rajat lasketaan kaavasta (data/level-curve.ts, data/rules.ts LEVEL_CURVE).
 
 /** Rajat ennen tasojen laajennusta (taso 10 oli huipputaso). Vanhat tallennukset käyttävät näitä. */
 const OLD_XP_FOR_LEVEL = [0, 12, 30, 55, 90, 140, 200, 280, 380, 500];
-const MAX_LEVEL = 50;
+/** Rajat tasoilla 10, 20, 30, 40 ja 50, kun huipputaso oli 50. Nämä eivät saa muuttua. */
+const LEVELS_1_TO_50 = { 10: 474, 20: 2730, 30: 7966, 40: 17382, 50: 32178 };
+const MAX_LEVEL = 100;
 const TABLE = PROGRESSION.xpForLevel;
 const MAX_XP = TABLE.at(-1) ?? 0;
 
@@ -34,7 +36,7 @@ describe('tasokaava', () => {
     expect(buildXpTable(curve)).toEqual([0, 6, 22]);
   });
 
-  it('tasoja on 50 ja jokainen raja on edellistä suurempi', () => {
+  it('tasoja on 100 ja jokainen raja on edellistä suurempi', () => {
     expect(LEVEL_CURVE.maxLevel).toBe(MAX_LEVEL);
     expect(TABLE).toHaveLength(MAX_LEVEL);
     expect(TABLE[0]).toBe(0);
@@ -62,12 +64,26 @@ describe('tasokaava', () => {
     });
   });
 
-  it('suden salaisuus vie huipputasolle', () => {
-    expect(MENU_SECRET.wolfStartLevel).toBe(MAX_LEVEL);
+  it('tasojen 1–50 rajat ovat samat kuin ennen huipputason nostoa', () => {
+    Object.entries(LEVELS_1_TO_50).forEach(([level, xp]) => {
+      expect(TABLE[Number(level) - 1]).toBe(xp);
+    });
+  });
+
+  it('huipputaso 100 vaatii paljon mutta ei mahdottomasti', () => {
+    expect(MAX_XP).toBe(228858);
+    // Viimeinen taso vaatii alle 10 lohikäärmeen (700 KP) verran kokemusta.
+    const lastGap = MAX_XP - (TABLE[MAX_LEVEL - 2] ?? 0);
+    expect(lastGap).toBeLessThan(10 * getEnemy('dragon').xp);
+  });
+
+  it('suden salaisuus vie tasolle 50, ei huipputasolle', () => {
+    expect(MENU_SECRET.wolfStartLevel).toBe(50);
+    expect(MENU_SECRET.wolfStartLevel).toBeLessThan(MAX_LEVEL);
   });
 });
 
-describe('huipputaso 50', () => {
+describe('huipputaso 100', () => {
   it('huipputasolla seuraavaa rajaa ei ole ja KP-palkki on täynnä', () => {
     expect(levelForXp(MAX_XP)).toBe(MAX_LEVEL);
     expect(levelForXp(MAX_XP * 10)).toBe(MAX_LEVEL);
@@ -79,8 +95,8 @@ describe('huipputaso 50', () => {
       fraction: 1,
     });
     expect(TEXT.hud.xp(MAX_XP, null)).toContain('huipputaso');
-    expect(TEXT.hud.levelAndXp(MAX_LEVEL, MAX_XP, null)).toBe(`Huipputaso 50  KP ${MAX_XP}`);
-    expect(TEXT.hud.levelAndXp(49, 100, MAX_XP)).toBe(`Taso 49  KP 100/${MAX_XP}`);
+    expect(TEXT.hud.levelAndXp(MAX_LEVEL, MAX_XP, null)).toBe(`Huipputaso 100  KP ${MAX_XP}`);
+    expect(TEXT.hud.levelAndXp(99, 100, MAX_XP)).toBe(`Taso 99  KP 100/${MAX_XP}`);
   });
 
   it('juuri ennen huipputasoa KP-palkki näyttää rajan', () => {
@@ -88,9 +104,15 @@ describe('huipputaso 50', () => {
     expect(xpToNextLevel(MAX_XP - 1)).toBe(1);
   });
 
-  it('tasolla 50 on saatu 147 kykypistettä', () => {
+  it('tasolla 50 on saatu 147 ja tasolla 100 297 kykypistettä', () => {
+    expect(skillPointsEarned(50)).toBe(147);
     expect(skillPointsEarned(MAX_LEVEL)).toBe((MAX_LEVEL - 1) * PROGRESSION.skillPointsPerLevel);
-    expect(skillPointsEarned(MAX_LEVEL)).toBe(147);
+    expect(skillPointsEarned(MAX_LEVEL)).toBe(297);
+  });
+
+  it('vanha tallennus, jossa KP kertyi tason 50 yli, nousee ansaitsemalleen tasolle', () => {
+    expect(levelForXp(60_000)).toBe(62);
+    expect(levelForXp(LEVELS_1_TO_50[50])).toBe(50);
   });
 });
 
@@ -118,6 +140,6 @@ describe('usean tason nousu kerralla', () => {
     const reward = grantVictory(state, null, enemyWithXp(MAX_XP * 2));
     expect(reward.level).toBe(MAX_LEVEL);
     expect(reward.skillPoints).toBe(PROGRESSION.skillPointsPerLevel);
-    expect(unspentSkillPoints(state)).toBe(147);
+    expect(unspentSkillPoints(state)).toBe(297);
   });
 });

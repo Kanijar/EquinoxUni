@@ -1,6 +1,6 @@
 import type { LevelCurve } from './types';
 
-// Tasojen KP-rajat lasketaan kaavasta, jottei 50 rajaa tarvitse kirjoittaa käsin.
+// Tasojen KP-rajat lasketaan kaavasta, jottei 100 rajaa tarvitse kirjoittaa käsin.
 // Kaavan kertoimet ovat data/rules.ts:ssä (LEVEL_CURVE).
 
 /** KP-raja tasolle level (taso 1 = 0 KP). */

@@ -36,14 +36,17 @@ export const RESPAWN_RULES: RespawnRules = {
 };
 
 /**
- * Tasot 1–50. KP-raja = 0,2 × n³ + 3,5 × n² + 5 × n, kun n = taso − 1.
+ * Tasot 1–100. KP-raja = 0,2 × n³ + 3,5 × n² + 5 × n, kun n = taso − 1.
  * Esimerkkejä: taso 2 = 9 KP, taso 10 = 474 KP, taso 20 = 2730 KP, taso 30 = 7966 KP,
- * taso 50 = 32178 KP. Tasot 1–10 ovat lähellä vanhoja rajoja (0, 12, 30, 55, 90, 140, 200,
- * 280, 380, 500) eivätkä missään kohtaa vaadi niitä enempää, joten vanhan tallennuksen
- * taso ei laske. Helpompi huipputaso: pienennä cubic-arvoa (0,1 → taso 50 = noin 20 400 KP).
+ * taso 50 = 32178 KP, taso 75 = 100581 KP, taso 100 = 228858 KP.
+ * Tasot 1–50 ovat samat kuin ennen huipputason nostoa 100:aan, ja tasot 1–10 ovat lähellä
+ * vanhimpia rajoja (0, 12, 30, 55, 90, 140, 200, 280, 380, 500) eivätkä vaadi niitä enempää,
+ * joten vanhan tallennuksen taso ei laske. Tasolla 50 yksi taso vaatii noin 1800 KP
+ * (2–3 lohikäärmettä), tasolla 99 noin 6500 KP. Helpompi huipputaso: pienennä cubic-arvoa
+ * (huom. se muuttaa myös tasojen 1–50 rajoja).
  */
 export const LEVEL_CURVE: LevelCurve = {
-  maxLevel: 50,
+  maxLevel: 100,
   cubic: 0.2,
   quadratic: 3.5,
   linear: 5,
@@ -56,7 +59,7 @@ export const PROGRESSION: Progression = {
 
 /**
  * Salaisuus: napauta alkuruudun sutta ja sitten PELAA. Susi muuttuu henkisudeksi, ja uusi
- * peli alkaa huipputasolta 50 (KP tason rajassa, 147 kykypistettä) ja kolmella
+ * peli alkaa tasolta 50 (KP tason rajassa, 147 kykypistettä) ja kolmella
  * ylimääräisellä juomalla.
  * Alkuruudulla tästä ei kerrota, vasta kartalla näkyy "Susi siunasi sinut!".
  * Toinen salaisuus: alkuruudun liman napautus muuttaa sankarin silmät mustiksi (slimeEyeColor).
