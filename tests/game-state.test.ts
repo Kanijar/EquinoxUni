@@ -71,10 +71,12 @@ describe('pelin tila', () => {
     expect(playerLevel(state)).toBe(1);
   });
 
-  it('voitto antaa kokemusta, esineen ja merkitsee vihollisen voitetuksi', () => {
+  it('voitto antaa kokemusta, kolikoita, esineen ja merkitsee vihollisen voitetuksi', () => {
     const state = createNewGame();
-    const reward = grantVictory(state, 4, getEnemy('hiisi'));
+    // rng 0.5: kolikoissa ei satunnaisvaihtelua, hiisi 12 KP × 0,5 = 6 kolikkoa.
+    const reward = grantVictory(state, 4, getEnemy('hiisi'), () => 0.5);
     expect(state.xp).toBe(12);
+    expect(state.coins).toBe(PLAYER.startCoins + 6);
     expect(state.defeated).toEqual([4]);
     expect(state.inventory['potion']).toBe(4);
     expect(reward).toEqual({
@@ -83,6 +85,7 @@ describe('pelin tila', () => {
       leveledUp: true,
       level: 2,
       skillPoints: PROGRESSION.skillPointsPerLevel,
+      coins: 6,
       drops: ['potion'],
     });
   });

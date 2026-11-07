@@ -2,13 +2,8 @@ import type Phaser from 'phaser';
 import { BATTLE_VIEW, GAME_HEIGHT, GAME_WIDTH } from '../config/game-config';
 import { PLAYER } from '../data/player';
 import { TEXT } from '../i18n/text';
-import {
-  canChoose,
-  firstHealItem,
-  healItemCount,
-  type Battle,
-  type BattleAction,
-} from '../logic/battle';
+import { canChoose, healItemCount, type Battle, type BattleAction } from '../logic/battle';
+import { bestHealItem } from '../logic/heal-choice';
 import { ActionButton, type ActionKind } from './battle/action-button';
 
 // Taistelun napit ruudun alareunassa: kaksi vasemmalle ja kaksi oikealle peukalolle.
@@ -63,7 +58,8 @@ export class BattleMenu {
     this.battle = battle;
     this.enabled = enabled && battle.outcome === 'ongoing';
     this.attackMenuOpen = false;
-    this.itemId = firstHealItem(battle.inventory) ?? NO_ITEM;
+    const missingHp = battle.player.maxHp - battle.player.hp;
+    this.itemId = bestHealItem(battle.inventory, missingHp) ?? NO_ITEM;
     this.item.setLabel(TEXT.battle.item(healItemCount(battle.inventory)));
     this.update();
   }

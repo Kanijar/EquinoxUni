@@ -3,7 +3,7 @@ import { COLORS, FONT } from '../config/game-config';
 import { TEXT } from '../i18n/text';
 import { XpBar } from './xp-bar';
 
-// Karttanäkymän yläreunan tiedot: elämäpalkki, KP-palkki ja taso, juomat, paikkakunta
+// Karttanäkymän yläreunan tiedot: elämäpalkki, KP-palkki ja taso, kolikot, juomat, paikkakunta
 // ja loppubossin tilanne (peikkolaskuri).
 
 const BAR_WIDTH = 80;
@@ -17,6 +17,7 @@ export interface HudInfo {
   readonly maxHp: number;
   readonly xp: number;
   readonly potions: number;
+  readonly coins: number;
   readonly enemiesLeft: number;
   readonly townName: string;
   /** Loppubossin tilanne (esim. "Peikot 3/5"), tai tyhjä, kun boss on voitettu. */
@@ -63,8 +64,9 @@ export class Hud {
     this.bar.setScale(Math.max(0, info.hp / info.maxHp), 1);
     this.hpText.setText(TEXT.hud.hp(info.hp, info.maxHp));
     this.xpBar.set(info.xp);
+    const { coins, potions, enemiesLeft } = TEXT.hud;
     this.itemText.setText(
-      `${TEXT.hud.potions(info.potions)}  ${TEXT.hud.enemiesLeft(info.enemiesLeft)}`,
+      `${coins(info.coins)}  ${potions(info.potions)}  ${enemiesLeft(info.enemiesLeft)}`,
     );
     this.townText.setText(info.townName);
     this.bossText.setText(info.bossText);

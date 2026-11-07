@@ -15,6 +15,7 @@ import type {
 } from '../data/types';
 import { localDateParts, twoDigits, type DateParts } from './date-parts';
 import { FI_QUESTS } from './fi-quests';
+import { FI_SHOP } from './fi-shop';
 import type { Language } from './language';
 
 // Kaikki pelaajalle näkyvät tekstit suomeksi. Älä kirjoita tekstejä suoraan koodiin,
@@ -161,6 +162,7 @@ export const FI = {
         ? `Huipputaso ${level}  KP ${xp}`
         : `Taso ${level}  KP ${xp}/${nextLevelXp}`,
     potions: (count: number): string => `Juomat ${count}`,
+    coins: (count: number): string => `Kolikot ${count}`,
     /** Viholliset, joita ei ole vielä voitettu kertaakaan (voitetut palaavat kartalle). */
     enemiesLeft: (count: number): string => `Voittamatta ${count}`,
     /** Loppubossin peikkolaskuri (data/boss.ts). */
@@ -281,7 +283,8 @@ export const FI = {
     heal: (item: string, amount: number): string => `Joit: ${item}. Elämä +${amount}.`,
     fleeOk: 'Pääsit pakoon!',
     fleeFail: 'Pako epäonnistui!',
-    won: (enemy: string, xp: number): string => `Voitit: ${enemy}! Sait ${xp} KP.`,
+    won: (enemy: string, xp: number, coins: number): string =>
+      `Voitit: ${enemy}! Sait ${xp} KP ja ${coins} kolikkoa.`,
     drop: (item: string): string => `Löysit: ${item}!`,
     /** Vihollinen pudotti varusteen: kerrotaan, miten se laitetaan käyttöön. */
     gearHint: 'Avaa REPPU ja laita varuste käyttöön!',
@@ -316,6 +319,8 @@ export const FI = {
   },
   /** Jussi Ketolan tehtävät (i18n/fi-quests.ts). */
   quests: FI_QUESTS,
+  /** Kulkevan kauppiaan kauppa (i18n/fi-shop.ts). */
+  shop: FI_SHOP,
   /** Loitsujen nimet (data/spells.ts). */
   spells: {
     fireball: 'Tulipallo',

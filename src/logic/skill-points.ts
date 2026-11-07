@@ -31,9 +31,12 @@ export function skillPointsSpent(spent: SkillPoints): number {
   return Object.values(spent).reduce((sum, points) => sum + points, 0);
 }
 
-/** Käyttämättömät pisteet. Ei koskaan negatiivinen. */
-export function skillPointsLeft(level: number, spent: SkillPoints): number {
-  return Math.max(0, skillPointsEarned(level) - skillPointsSpent(spent));
+/**
+ * Käyttämättömät pisteet. bonus = muualta saadut pisteet (kauppiaan Voimakristalli).
+ * Ei koskaan negatiivinen.
+ */
+export function skillPointsLeft(level: number, spent: SkillPoints, bonus = 0): number {
+  return Math.max(0, skillPointsEarned(level) + bonus - skillPointsSpent(spent));
 }
 
 /** Onko kyvyn arvo ylärajallaan, jolloin siihen ei voi enää laittaa pisteitä. */

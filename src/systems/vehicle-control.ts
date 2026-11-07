@@ -30,9 +30,14 @@ export class VehicleControl {
     return vehicleSpeedFactor(this.state);
   }
 
+  /** Näkyykö BUGATTI-nappi: avaimet ovat repussa. */
+  get buttonShown(): boolean {
+    return ownedVehicle(this.state) !== null;
+  }
+
   /** Nappi näkyy vain, kun avaimet ovat repussa. */
   update(): void {
-    this.button.update(ownedVehicle(this.state) !== null, isDriving(this.state));
+    this.button.update(this.buttonShown, isDriving(this.state));
   }
 
   private toggle(): void {

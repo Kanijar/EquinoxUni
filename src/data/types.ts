@@ -50,6 +50,8 @@ export interface PlayerDef {
   readonly spell: SpellId;
   /** Esineet, jotka pelaajalla on pelin alussa. */
   readonly startItems: readonly ItemStack[];
+  /** Kolikot pelin alussa (kauppias, data/merchant.ts). */
+  readonly startCoins: number;
 }
 
 /** Sankarin värit, jotka pelaaja valitsee hahmonluonnissa (data/hero-looks.ts). */
@@ -159,9 +161,10 @@ export interface DropDef {
 /**
  * Esineen tyyppi: parannusjuoma (juodaan taistelussa tai repusta), varuste (laitetaan
  * käyttöön repussa, logic/equipment.ts), avain/tehtäväesine (tallessa repussa, esim. tuodaan
- * tehtävänantajalle, data/quests.ts) tai kulkuneuvo (kytketään päälle kartalla, logic/vehicle.ts).
+ * tehtävänantajalle, data/quests.ts), kulkuneuvo (kytketään päälle kartalla, logic/vehicle.ts)
+ * tai voima (ostetaan kauppiaalta ja otetaan heti käyttöön, esim. kykypiste, logic/shop.ts).
  */
-export type ItemKind = 'heal' | 'gear' | 'key' | 'vehicle';
+export type ItemKind = 'heal' | 'gear' | 'key' | 'vehicle' | 'power';
 
 /** Varustepaikka: jokaisessa paikassa voi olla yksi varuste kerrallaan. */
 export type GearSlot = 'hand' | 'body' | 'neck';
@@ -180,6 +183,11 @@ interface ItemBase {
   readonly name: string;
   readonly description: string;
   readonly sprite: string;
+  /**
+   * Hinta kolikkoina kulkevalla kauppiaalla (data/merchant.ts). Kauppias ostaa esineen
+   * pienemmällä hinnalla (SHOP_RULES.sellFactor). Puuttuu = esinettä ei voi myydä.
+   */
+  readonly price?: number;
 }
 
 export interface HealItemDef extends ItemBase {
@@ -207,7 +215,20 @@ export interface VehicleItemDef extends ItemBase {
   readonly mapSprite: string;
 }
 
-export type ItemDef = HealItemDef | GearItemDef | KeyItemDef | VehicleItemDef;
+/**
+ * Voima (esim. Voimakristalli): ostetaan kauppiaalta, ja se otetaan käyttöön heti
+ * ostaessa. Se ei mene reppuun, joten sitä ei voi myydä.
+ */
+export interface PowerItemDef extends ItemBase {
+  readonly kind: 'power';
+  readonly price: number;
+  /** Montako kykypistettä voima antaa (data/skills.ts). */
+  readonly skillPoints: number;
+  /** Paljonko hinta nousee jokaisesta jo ostetusta voimasta, ettei pisteitä saa loputtomasti. */
+  readonly priceStep: number;
+}
+
+export type ItemDef = HealItemDef | GearItemDef | KeyItemDef | VehicleItemDef | PowerItemDef;
 
 /** Väijytys: tietyssä maastossa kulkiessa vihollinen voi hyökätä yllättäen. */
 export interface AmbushRule {
@@ -390,3 +411,7 @@ export type {
 // --- Tehtävät (data/types-quests.ts) ---
 
 export type { NpcDef, QuestDef, QuestGoal, QuestRewardDef } from './types-quests';
+
+// --- Kulkeva kauppias ja kolikot (data/types-shop.ts) ---
+
+export type { CoinRules, MerchantDef, ShopRules } from './types-shop';

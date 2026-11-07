@@ -179,6 +179,15 @@ export const SOUNDS = {
   },
   /** Bugatti sammuu: moottori hiljenee. */
   'engine-off': { wave: 'sawtooth', gain: 0.15, notes: [{ freq: 160, ms: 220, slideTo: 50 }] },
+  /** Kolikot kilahtavat: ostos tai myynti kauppiaalla. */
+  coin: {
+    wave: 'square',
+    gain: 0.18,
+    notes: [
+      { freq: 1320, ms: 50 },
+      { freq: 1760, ms: 120 },
+    ],
+  },
   /** Alkuruudun salainen burgeri: kaksi nopeaa haukkausta. */
   chomp: {
     wave: 'square',

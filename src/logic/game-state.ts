@@ -6,8 +6,10 @@ import { recoverStolen, type Battle, type Rng } from './battle';
 import { recordBossVictory, type BossNews, type BossProgress } from './boss';
 import type { Fighter } from './combat';
 import { rollDrops } from './drops';
+import { victoryCoins } from './coins';
 import { applyGear, ownsItem, type Equipped } from './equipment';
 import { newAppearance, type HeroAppearance } from './hero-look';
+import type { MerchantProgress } from './merchant-route';
 import { levelForXp } from './progression';
 import {
   canQuestDrop,
@@ -30,11 +32,11 @@ import type { Vec2 } from './vector';
 
 // Pelin eteneminen, joka säilyy kartan ja taistelun välillä: sankarin nimi ja ulkonäkö,
 // elämä, kokemus, kykypisteet, esineet ja varusteet, sijainti, voitetut viholliset ja niiden paluu
-// sekä tehtävät.
+// sekä tehtävät, kolikot ja kulkevan kauppiaan paikka.
 // Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
 // tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
-export interface GameState extends BossProgress, HeroAppearance {
+export interface GameState extends BossProgress, HeroAppearance, MerchantProgress {
   hp: number;
   xp: number;
   /** Kuhunkin kykyyn käytetyt kykypisteet. Käyttämättömät: unspentSkillPoints(). */
@@ -66,6 +68,10 @@ export interface GameState extends BossProgress, HeroAppearance {
   readonly quests: QuestLog;
   /** Onko kulkuneuvo (Bugattin avaimet) päällä kartalla (logic/vehicle.ts). */
   driving: boolean;
+  /** Kolikot: saadaan voitoista ja myymällä, käytetään kauppiaalla (logic/shop.ts). */
+  coins: number;
+  /** Kauppiaalta ostetut kykypisteet (Voimakristalli). Lisätään tasoista saatuihin. */
+  bonusSkillPoints: number;
 }
 
 /**
@@ -93,6 +99,9 @@ export function createNewGame(startXp = 0): GameState {
     completed: false,
     quests: {},
     driving: false,
+    coins: PLAYER.startCoins,
+    bonusSkillPoints: 0,
+    merchantMs: 0,
   };
 }
 
@@ -135,9 +144,9 @@ export function playerStats(state: GameState): PlayerStats {
   return applyGear(skillStats(state), state.equipped);
 }
 
-/** Kykypisteet, joita pelaaja ei ole vielä käyttänyt. */
+/** Kykypisteet, joita pelaaja ei ole vielä käyttänyt (tasoista ja kauppiaalta ostetut). */
 export function unspentSkillPoints(state: GameState): number {
-  return skillPointsLeft(playerLevel(state), state.skills);
+  return skillPointsLeft(playerLevel(state), state.skills, state.bonusSkillPoints);
 }
 
 /** Voiko kykyyn laittaa pisteen: pisteitä on jäljellä eikä kyky ole ylärajallaan. */
@@ -196,6 +205,8 @@ export function gainXp(state: GameState, xp: number): XpGain {
 }
 
 export interface VictoryReward extends XpGain {
+  /** Voitosta saadut kolikot (logic/coins.ts). */
+  readonly coins: number;
   /** Esineet, jotka vihollinen pudotti (logic/drops.ts). Puuttuu, jos mitään ei pudonnut. */
   readonly drops?: readonly string[];
   /** Bossin eteneminen: peikkolaskuri kasvoi, boss heräsi tai boss voitettiin (logic/boss.ts). */
@@ -238,7 +249,7 @@ function collectDrops(state: GameState, enemy: EnemyDef, rng: Rng): string[] {
 }
 
 /**
- * Voitto vihollisesta: kokemus, mahdolliset pudotukset ja tason nousu (ja siitä kykypisteet).
+ * Voitto vihollisesta: kokemus, kolikot, mahdolliset pudotukset ja tason nousu (ja siitä kykypisteet).
  * mapEnemyIndex on null, kun vihollinen ei ollut kartalla (esim. väijytys).
  */
 export function grantVictory(
@@ -253,7 +264,9 @@ export function grantVictory(
   const drops = collectDrops(state, enemy, rng);
   const boss = recordBossVictory(state, enemy.id);
   const quests = questUpdates(state, enemy.id, drops);
-  const reward: VictoryReward = gainXp(state, enemy.xp);
+  const coins = victoryCoins(enemy.xp, rng);
+  state.coins += coins;
+  const reward: VictoryReward = { ...gainXp(state, enemy.xp), coins };
   const withDrops = drops.length > 0 ? { ...reward, drops } : reward;
   const withQuests = quests.length > 0 ? { ...withDrops, quests } : withDrops;
   return boss ? { ...withQuests, boss } : withQuests;

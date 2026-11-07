@@ -7,7 +7,8 @@ import type { BattleView } from '../ui/battle-view';
 import type { BattleStep } from './battle-steps';
 import { playSound } from './sound-fx';
 
-// Voiton jälkeiset viestit: KP, saadut esineet, tehtävien eteneminen, loppubossin eteneminen (peikkolaskuri),
+// Voiton jälkeiset viestit: KP ja kolikot, saadut esineet, tehtävien eteneminen,
+// loppubossin eteneminen (peikkolaskuri),
 // tason nousu ja kykypisteet. KP-palkki täyttyy samalla, kun voittoviesti näkyy.
 
 export function victorySteps(
@@ -16,7 +17,7 @@ export function victorySteps(
   view: BattleView,
 ): BattleStep[] {
   const won: BattleStep = {
-    text: TEXT.battle.won(enemyName, reward.xp),
+    text: TEXT.battle.won(enemyName, reward.xp, reward.coins),
     effect: () => {
       view.updateXp(reward.totalXp);
       view.playVictory();

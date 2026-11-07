@@ -12,4 +12,6 @@ export const PLAYER: PlayerDef = {
   stats: { maxHp: 30, attack: 4, defense: 2, speed: 75, critPercent: 8, magic: 0 },
   spell: 'fireball',
   startItems: [{ id: 'potion', count: 3 }],
+  // Alussa sen verran kolikoita, että kauppiaalta saa yhden juoman.
+  startCoins: 20,
 };

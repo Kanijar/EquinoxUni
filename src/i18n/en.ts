@@ -3,6 +3,7 @@ import type { GearStat, PlayerStats, SkillStat, StatBonus } from '../data/types'
 import { localDateParts, twoDigits, type DateParts } from './date-parts';
 import { EN_CONTENT } from './en-content';
 import { EN_QUESTS } from './en-quests';
+import { EN_SHOP } from './en-shop';
 import { LANGUAGE_NAMES, type Texts } from './fi';
 
 // Kaikki pelaajalle näkyvät tekstit englanniksi. Avaimet ovat samat kuin i18n/fi.ts:ssä:
@@ -138,6 +139,7 @@ export const EN: Texts = {
         ? `Max level ${level}  XP ${xp}`
         : `Level ${level}  XP ${xp}/${nextLevelXp}`,
     potions: (count: number): string => `Potions ${count}`,
+    coins: (count: number): string => `Coins ${count}`,
     enemiesLeft: (count: number): string => `Undefeated ${count}`,
     trolls: (count: number, needed: number): string => `Trolls ${count}/${needed}`,
     bossAwake: (boss: string): string => `${boss} is waiting!`,
@@ -240,7 +242,8 @@ export const EN: Texts = {
     heal: (item: string, amount: number): string => `You drank: ${item}. HP +${amount}.`,
     fleeOk: 'You got away!',
     fleeFail: 'You could not get away!',
-    won: (enemy: string, xp: number): string => `You beat ${enemy}! You got ${xp} XP.`,
+    won: (enemy: string, xp: number, coins: number): string =>
+      `You beat ${enemy}! You got ${xp} XP and ${coins} coins.`,
     drop: (item: string): string => `You found: ${item}!`,
     gearHint: 'Open the BAG and equip your new gear!',
     stole: (enemy: string, item: string): string => `${enemy} stole from you: ${item}!`,
@@ -257,6 +260,7 @@ export const EN: Texts = {
   },
   names: EN_CONTENT,
   quests: EN_QUESTS,
+  shop: EN_SHOP,
   spells: {
     fireball: 'Fireball',
   },
