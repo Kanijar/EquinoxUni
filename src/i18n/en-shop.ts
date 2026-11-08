@@ -23,6 +23,7 @@ export const EN_SHOP: typeof FI_SHOP = {
   confirm: 'SURE?',
   noMoney: 'Not enough coins.',
   owned: 'You already have this.',
+  slowerBoat: 'You already have a faster boat.',
   notBought: (merchant: string): string => `${merchant} does not buy this.`,
   powerBonus: (points: number): string => `+${points} skill point now`,
   pack: (count: number): string => `${count} per purchase`,

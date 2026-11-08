@@ -275,6 +275,8 @@ export class ShopScene extends Phaser.Scene {
         return TEXT.shop.noMoney;
       case 'owned':
         return TEXT.shop.owned;
+      case 'slowerBoat':
+        return TEXT.shop.slowerBoat;
       case 'level':
         return TEXT.shop.needLevel(item.minLevel ?? 1);
       case 'notBought':

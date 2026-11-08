@@ -1,6 +1,7 @@
 import { CAVE_ITEMS } from './cave-items';
 import { DEV_ITEMS } from './dev-items';
 import { FISHING_ITEMS } from './fishing-items';
+import { BOAT_ITEMS } from './boat-items';
 import { ISLE_ITEMS } from './isle-items';
 import { MERCHANT_ITEMS } from './merchant-items';
 import type { GearSlot, ItemDef } from './types';
@@ -254,7 +255,9 @@ export const ITEMS: readonly ItemDef[] = [
   ...MERCHANT_ITEMS,
   // --- Kalastus: onki, madot, kalat ja Kalan suomupanssari (data/fishing-items.ts) ---
   ...FISHING_ITEMS,
-  // --- Pienet saaret: vene, pudotukset ja tehtävien palkinnot (data/isle-items.ts) ---
+  // --- Venekaupan veneet (data/boat-items.ts) ---
+  ...BOAT_ITEMS,
+  // --- Pienet saaret: pudotukset ja tehtävien palkinnot (data/isle-items.ts) ---
   ...ISLE_ITEMS,
   // --- Peikkokuninkaan luola: Excalibur ja Noidan loitsukirjat (data/cave-items.ts) ---
   ...CAVE_ITEMS,

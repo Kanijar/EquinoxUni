@@ -308,14 +308,19 @@ scenes  →  systems / ui  →  entities  →  logic
   joten metsä hidastaa autoakin. Taisteluun auto ei vaikuta. Tila on `GameState.driving`
   (puuttuva = pois, joten `SAVE_VERSION`ia ei tarvinnut nostaa).
 - **Vene ja pienet saaret:** Venesatamassa (Kotirannan eteläpuolella rannalla) on
-  venekauppias Veikko (`data/boat-shop.ts`, `TownShopDef`), joka myy Purjeveneen
-  (`kind: 'boat'`, `data/isle-items.ts`) ja juomia. Kauppa on sama `ShopScene` kuin Kaapolla
+  venekauppias Veikko (`data/boat-shop.ts`, `TownShopDef`), joka myy neljää venettä
+  (`kind: 'boat'`, `data/boat-items.ts`, kuvat `data/sprites-boats.ts`) ja juomia: Soutuvene
+  (×0,8, 300 kolikkoa), Purjevene (×1,1, taso 30), Moottorivene (×2, taso 55) ja Luksusvene
+  (×2,8, taso 70, `canFish`: merellä voi kalastaa). Jos veneitä on monta, käytössä on nopein
+  (`ownedBoat`), eikä hitaampaa venettä kuin oma voi ostaa (`BuyBlock` `'slowerBoat'`).
+  Laiturissa keinuu seuraava myytävä vene (`nextBoat`). Vanhojen tallennusten entinen Purjevene
+  (`sailboat`, ×1,6) on nyt uusi Purjevene samalla tunnisteella, joten muunnosta ei tarvita. Kauppa on sama `ShopScene` kuin Kaapolla
   (`keeper`-parametri), ja kartalla laituri, Veikko ja kauppanappi piirretään
   `systems/boat-dock.ts`:ssä. Kun vene on repussa ja sankari seisoo meren vieressä, REPPU-napin
   vasemmalla oleva kulkuneuvonappi näyttää VENEESEEN (V-näppäin tekee saman): sankari siirtyy
-  viereiseen meriruutuun ja kulkee veneellä 1,6 kertaa nopeammin. Merellä rannan vieressä nappi
+  viereiseen meriruutuun ja kulkee veneen nopeuskertoimella (`speedMultiplier`). Merellä rannan vieressä nappi
   näyttää MAIHIN. Muualla nappi on BUGATTI, jos avaimet ovat repussa (`systems/vehicle-control.ts`,
-  `systems/boat-control.ts`). Merellä ei taistella eikä kalasteta, ja Bugatti sammuu. Kartalla
+  `systems/boat-control.ts`). Merellä ei taistella, kalastaa voi vain Luksusveneestä, ja Bugatti sammuu. Kartalla
   on toinen, näkymätön tilemap-kerros (`seaLayer`), jossa kaikki paitsi meri on estettä; veneessä
   käytetään sitä. Säännöt `logic/sailing.ts` + testi `tests/sailing.test.ts`.
   Pienet saaret ovat `data/isles.ts`:ssä (ympyröiden yhdiste, oma maasto ja suositustaso):
@@ -406,6 +411,22 @@ scenes  →  systems / ui  →  entities  →  logic
   avoimet yhteydet. Ei tunnisteita, evästeitä eikä tallennettua tietoa. Toteutus on
   `net/presence.ts`-rajapinnan takana, joten palvelun voi vaihtaa. Ilman osoitetta
   (`VITE_PRESENCE_URL`) laskuri on piilossa. Pystytysohje: `docs/PELAAJALASKURI.md`.
+- **Sankarin talo ja 10 parhaan lista:** Kotirannan laidalla (ruutu 83, 95, `data/house.ts`)
+  on sankarin oma talo, sininen katto ja nimi "Talosi". Talon ovella oikean alakulman pinoon tulee
+  TALO-nappi (`systems/house-door.ts`, paikka 1, koska KYKYPISTEET näkyy vain paikkakunnan
+  ruudussa). Talo (`scenes/house-scene.ts`) avautuu kartan päälle kuten luola: vasemmalla
+  sankari pokaalin alla ja oma sija, oikealla koko pelin 10 parhaan lista (`ui/leaderboard-list.ts`).
+  Paremmuus ratkeaa KP:stä (taso lasketaan niistä), tasatilanteessa ensin perille ehtinyt.
+  Talo hakee listan avautuessaan. LISÄÄ TULOKSENI -nappi (jonka yllä kerrotaan, että nimimerkki
+  näkyy kaikille) lähettää palvelimelle sankarin satunnaisen tunnisteen
+  (`GameState.heroId`, puuttuva = uusi tunniste, joten `SAVE_VERSION`ia ei tarvinnut nostaa),
+  nimimerkin ja KP:t, ja saa takaisin listan ja oman sijan. Palvelin on sama Cloudflare Worker
+  kuin pelaajalaskurilla (`worker/presence`, `LeaderboardRoom`, osoite `/leaderboard`), ja osoite
+  johdetaan `VITE_PRESENCE_URL`ista, joten uutta asetusta ei tarvita. Nimimerkki siistitään kuten
+  hahmonluonnissa, ja kirosanat (`data/blocked-names.ts`) korvataan oletusnimellä sekä
+  palvelimella että pelissä. Säännöt `logic/leaderboard.ts` ja `logic/leaderboard-name.ts`,
+  yhteys `net/leaderboard.ts`. Ilman palvelinta talossa lukee "Lista ei ole vielä käytössä".
+  Pystytys ja rajoitukset: `docs/PELAAJALASKURI.md`.
 - **Äänet:** ääniefektit tehdään koodilla Web Audiolla (`data/sounds.ts` + `systems/sound-fx.ts`),
   joten tiedostoja ei tarvita. Ne kulkevat Phaserin äänijärjestelmän läpi, jolloin asetusten
   voimakkuus koskee niitä. Nappien painallus, osumat, voitto, tason nousu ja tallennus soivat.

@@ -3,14 +3,14 @@ import { BOAT_DOCK_VIEW } from '../config/shop-config';
 import { getTown } from '../data';
 import { BOAT_SHOP } from '../data/boat-shop';
 import type { GameState } from '../logic/game-state';
-import { isSailable, ownedBoat } from '../logic/sailing';
+import { isSailable, nextBoat } from '../logic/sailing';
 import { nearestWhere, townTile } from '../logic/world-grid';
 import { ShopButton } from '../ui/shop-button';
 import { getWorldGrid, tileToWorld } from './world-map';
 
 // Venesataman venekauppa kartalla (data/boat-shop.ts). Veneveistäjä Veikko seisoo
-// Venesataman talon vieressä, ja lähimmässä meriruudussa keinuu myytävä purjevene (kunnes
-// sankari ostaa sen). Kun sankari on
+// Venesataman talon vieressä, ja lähimmässä meriruudussa keinuu seuraava myytävä vene (oma vene
+// nopeampi; kun sankarilla on jo Luksusvene, laituri on tyhjä). Kun sankari on
 // Venesatamassa, alariviin tulee KAUPPA-nappi (kuten kulkevalla kauppiaalla), ja Veikkoa
 // voi myös napauttaa. Kauppa on sama näkymä kuin kauppiaalla (scenes/shop-scene.ts).
 
@@ -52,10 +52,14 @@ export class BoatDock {
   update(townId: string | undefined, driveShown: boolean): void {
     this.near = townId === BOAT_SHOP.town;
     this.button.update(this.near, driveShown);
-    this.boat?.setVisible(ownedBoat(this.state) === null);
+    const forSale = nextBoat(this.state);
+    this.boat?.setVisible(forSale !== null);
+    if (forSale && this.boat?.texture.key !== forSale.sprite) {
+      this.boat?.setTexture(forSale.sprite);
+    }
   }
 
-  /** Purjevene keinuu Venesatamaa lähimmässä meriruudussa. */
+  /** Myytävä vene keinuu Venesatamaa lähimmässä meriruudussa. */
   private addMooredBoat(
     scene: Phaser.Scene,
     town: { x: number; y: number },
@@ -67,7 +71,8 @@ export class BoatDock {
     }
     const pos = tileToWorld(sea);
     const { depth, boatBobPx, boatBobMs } = BOAT_DOCK_VIEW;
-    const boat = scene.add.image(pos.x, pos.y, 'boat').setDepth(depth);
+    const boat = scene.add.image(pos.x, pos.y, nextBoat(this.state)?.sprite ?? 'rowboat');
+    boat.setDepth(depth);
     scene.tweens.add({
       targets: boat,
       y: pos.y + boatBobPx,

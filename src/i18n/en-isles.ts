@@ -27,7 +27,11 @@ export const ISLE_ENEMY_NAMES_EN: Readonly<Record<string, string>> = {
 export const ISLE_ITEM_TEXTS_EN: Readonly<
   Record<string, { readonly name: string; readonly description: string }>
 > = {
-  sailboat: { name: 'Sailboat', description: 'Sail to the isles! On a beach: SET SAIL or V.' },
+  // Venekaupan veneet (data/boat-items.ts).
+  rowboat: { name: 'Rowboat', description: 'Really slow, but cheap. Off to the isles!' },
+  sailboat: { name: 'Sailboat', description: 'The wind makes it a bit faster than rowing.' },
+  motorboat: { name: 'Motorboat', description: 'Vroom! The second fastest boat.' },
+  'luxury-boat': { name: 'Luxury Yacht', description: 'Really fast. You can fish at sea!' },
   'pirate-saber': {
     name: 'Pirate Saber',
     description: 'Curved and sharp. You hit more accurately!',
