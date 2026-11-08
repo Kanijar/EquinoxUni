@@ -28,8 +28,8 @@ describe('pelin nimi', () => {
 });
 
 describe('pelin versio', () => {
-  it('peli on alfaversio', () => {
-    expect(GAME_INFO.version).toBe('alfa');
+  it('peli on betaversio', () => {
+    expect(GAME_INFO.version).toBe('beta');
   });
 
   it('versionumeron alkuosa on 0, koska peli on vielä kesken', () => {

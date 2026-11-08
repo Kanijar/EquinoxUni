@@ -9,6 +9,7 @@ import { EN_SHOP } from './en-shop';
 import { EN_STAIRS } from './en-stairs';
 import { EN_FISHING } from './en-fishing';
 import { EN_HOUSE } from './en-house';
+import { EN_MAP } from './en-map';
 import { LANGUAGE_NAMES, type Texts } from './fi';
 
 // Kaikki pelaajalle näkyvät tekstit englanniksi. Avaimet ovat samat kuin i18n/fi.ts:ssä:
@@ -275,6 +276,7 @@ export const EN: Texts = {
   magic: EN_MAGIC,
   cave: EN_CAVE,
   house: EN_HOUSE,
+  map: EN_MAP,
   boss: {
     progress: (count: number, needed: number): string =>
       `Mountain trolls defeated ${count}/${needed}.`,

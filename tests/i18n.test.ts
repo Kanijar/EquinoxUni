@@ -92,11 +92,11 @@ describe('kielet', () => {
     setLanguage('en');
     const builtAt = '2026-11-01T08:05:00.000Z';
     expect(releaseLines({ prNumber: '25', builtAt, dev: false })).toEqual([
-      'Version: 0.25 (alpha)',
+      'Version: 0.25 (beta)',
       'Released 1 Nov 2026 at 10:05',
     ]);
     expect(releaseLines({ prNumber: '25', dev: true })).toEqual([
-      'Version: 0.25 (alpha)',
+      'Version: 0.25 (beta)',
       'Development build',
     ]);
   });

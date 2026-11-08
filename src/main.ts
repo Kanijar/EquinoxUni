@@ -7,6 +7,7 @@ import { CaveScene } from './scenes/cave-scene';
 import { ExitScene } from './scenes/exit-scene';
 import { HeroScene } from './scenes/hero-scene';
 import { HouseScene } from './scenes/house-scene';
+import { MapScene } from './scenes/map-scene';
 import { MenuScene } from './scenes/menu-scene';
 import { QuestScene } from './scenes/quest-scene';
 import { SavesScene } from './scenes/saves-scene';
@@ -53,6 +54,7 @@ new Phaser.Game({
     ShopScene,
     CaveScene,
     HouseScene,
+    MapScene,
     ExitScene,
   ],
 });

@@ -12,10 +12,10 @@ export const GAME_INFO = {
   /** Lyhyt kuvaus, jonka puhelin voi näyttää asennuksen yhteydessä. */
   description: 'Pikseliseikkailu isolla saarella: tutki kyliä ja taistele hirviöitä vastaan.',
   /**
-   * Pelin kehitysvaihe, joka näkyy versionumeron perässä ("Versio: 0.25 (alfa)").
-   * Kun peli etenee, vaihda tähän esim. 'beta'.
+   * Pelin kehitysvaihe, joka näkyy versionumeron perässä ("Versio: 0.50 (beta)").
+   * Vaihtoehdot: 'alfa' tai 'beta' (englanniksi alpha/beta, i18n/en.ts).
    */
-  version: 'alfa',
+  version: 'beta',
   /**
    * Versionumeron alkuosa. Loppuosa on uusimman PR:n numero, jonka buildi lukee gitistä:
    * PR #25 → versio 0.25 (logic/release-number.ts). Kun peli on valmis, vaihda tähän 1.
