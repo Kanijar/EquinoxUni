@@ -83,7 +83,7 @@ export const FI = {
     load: 'LATAA',
     settings: 'ASETUKSET',
     quit: 'LÄHDE',
-    /** Alakulman versioteksti, esim. "Versio: 0.25 (alfa)". Vaihe: data/game-info.ts. */
+    /** Alakulman versioteksti, esim. "Versio: 0.50 (beta)". Vaihe: data/game-info.ts. */
     version: (number: string): string => `Versio: ${number} (${GAME_INFO.version})`,
     /** Versioteksti, kun numeroa ei saatu buildissa (esim. peli ladattu zip-tiedostona). */
     versionStageOnly: `Versio: ${GAME_INFO.version}`,

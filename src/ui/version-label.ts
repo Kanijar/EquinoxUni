@@ -3,7 +3,7 @@ import { COLORS, FONT, GAME_HEIGHT, GAME_WIDTH, MENU_VIEW } from '../config/game
 import { releaseLines } from '../logic/release-info';
 
 // Pelin versio ja julkaisuaika pienellä ja himmeällä tekstillä alkuruudun oikeassa alakulmassa:
-//   Versio: 0.25 (alfa)
+//   Versio: 0.50 (beta)
 //   Julkaistu 1.11.2026 klo 10.05
 // Kulma on vapaa napeista, joten teksti ei peitä mitään pienelläkään näytöllä.
 
