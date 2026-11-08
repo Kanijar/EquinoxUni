@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getItem, getSprite, ITEMS } from '../src/data';
+import { DEV_GEAR_IDS } from '../src/data/dev-items';
 import { MERCHANT, SHOP_RULES } from '../src/data/merchant';
 import { PLAYER } from '../src/data/player';
 import { equipFromBag } from '../src/logic/backpack';
@@ -152,8 +153,9 @@ describe('kaupan sisältö', () => {
     }
   });
 
-  it('jokaisen varusteen voi myydä, ja myyntihinta on pienempi kuin ostohinta', () => {
-    for (const item of ITEMS.filter((entry) => entry.kind === 'gear')) {
+  it('jokaisen varusteen (paitsi burgerin dev-varusteiden) voi myydä halvemmalla kuin ostaa', () => {
+    const gear = ITEMS.filter((entry) => entry.kind === 'gear');
+    for (const item of gear.filter((entry) => !DEV_GEAR_IDS.includes(entry.id))) {
       const sell = sellPrice(item);
       expect(sell, item.id).not.toBeNull();
       expect(sell ?? 0, item.id).toBeLessThan(item.price ?? 0);

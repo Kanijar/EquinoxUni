@@ -9,7 +9,7 @@ import { minXpForLevel } from './progression';
 // PELAA-napista, eivät tallennuksen latausta. Kaikki voivat olla päällä yhtä aikaa.
 // - Susi: uusi peli alkaa korkeammalta tasolta ja ylimääräisillä esineillä.
 // - Lima: sankarin silmät vaihtavat väriä.
-// - Burgeri: parhaat varusteet ja Bugattin avaimet, tasot ennallaan (logic/burger-secret.ts).
+// - Burgeri: dev-varusteet ja Bugattin avaimet, tasot ennallaan (logic/burger-secret.ts).
 //   Burgeri koskee myös LATAA-napista ladattua tallennusta (scenes/saves-scene.ts).
 
 /** Mitä alkuruudulla napautettiin tällä käynnillä. */

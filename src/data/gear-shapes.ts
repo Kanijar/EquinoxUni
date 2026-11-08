@@ -78,6 +78,18 @@ export const WEAPON_SHAPES: Readonly<Record<WeaponShape, GearShape>> = {
     top: 0,
     rows: ['...........W.W.W', '...........W.W.W', '...........GWWWG', ...HANDLE_TO_12],
   },
+  greatsword: {
+    // Dev-miekka: leveä hehkuva terä (W ydin, G hehku), leveä väistin ja kahva (R), nuppi G.
+    top: 0,
+    rows: [
+      '.............W..',
+      ...Array.from({ length: 7 }, () => '............GWG.'),
+      '...........RRRRR',
+      '.............R..',
+      '.............R..',
+      '.............G..',
+    ],
+  },
 };
 
 /** Vartalon varusteet. Peittävät paidan; kädet (sarakkeet 3 ja 12) jäävät näkyviin. */
@@ -111,6 +123,11 @@ export const ARMOR_SHAPES: Readonly<Record<ArmorShape, GearShape>> = {
       '...A........A...',
     ],
   },
+  pauldrons: {
+    // Dev-haarniska: isot olkasuojat yli olkapäiden, hehkuvat reunat ja vyö (reunuksen värillä).
+    top: 7,
+    rows: ['..TTTAAAAAATTT..', '..TTAAAAAAAATT..', '....TAAAAAAT....', '....TTTTTTTT....'],
+  },
 };
 
 /** Korut kaulassa. */
@@ -118,5 +135,10 @@ export const CHARM_SHAPES: Readonly<Record<CharmShape, GearShape>> = {
   pendant: {
     top: 7,
     rows: ['.....N....N.....', '......NPPN......', '.......PP.......'],
+  },
+  star: {
+    // Dev-amuletti: iso tähti, jossa on kärki, leveät sakarat ja kaksi jalkaa.
+    top: 7,
+    rows: ['.....N....N.....', '......NPPN......', '.....PPPPPP.....', '......P..P......'],
   },
 };

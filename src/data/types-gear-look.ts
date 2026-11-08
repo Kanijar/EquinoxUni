@@ -4,13 +4,25 @@
 
 /** Aseen muoto kädessä. Uusi muoto: lisää tähän ja kuvio WEAPON_SHAPES-listaan (data/gear-shapes.ts). */
 export type WeaponShape =
-  'sword' | 'saber' | 'knife' | 'axe' | 'club' | 'hammer' | 'staff' | 'spear' | 'trident';
+  | 'sword'
+  | 'saber'
+  | 'knife'
+  | 'axe'
+  | 'club'
+  | 'hammer'
+  | 'staff'
+  | 'spear'
+  | 'trident'
+  | 'greatsword';
 
-/** Vartalon varusteen muoto: vaatteet, liivi, haarniska, suomupanssari tai viitta. */
-export type ArmorShape = 'clothes' | 'vest' | 'plate' | 'scale' | 'cloak';
+/**
+ * Vartalon varusteen muoto: vaatteet, liivi, haarniska, suomupanssari, viitta tai
+ * olkasuojallinen haarniska (pauldrons, Dev-haarniska).
+ */
+export type ArmorShape = 'clothes' | 'vest' | 'plate' | 'scale' | 'cloak' | 'pauldrons';
 
-/** Korun muoto kaulassa. */
-export type CharmShape = 'pendant';
+/** Korun muoto kaulassa: pieni riipus tai iso tähti (Dev-amuletti). */
+export type CharmShape = 'pendant' | 'star';
 
 /** Ase kädessä: terä (tai nuijan pää), koriste (kahva-suojus, liekki) ja varsi. */
 export interface WeaponLook {

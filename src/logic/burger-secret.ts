@@ -8,6 +8,7 @@ import { playerStats, type GameState } from './game-state';
 
 // Alkuruudun salainen burgeri (data/rules.ts BURGER_SECRET). Burgeri antaa sankarille
 // jokaiseen varustepaikkaan parhaan varusteen käyttöön, Bugattin avaimet ja miljoona kultakolikkoa.
+// Parhaat varusteet ovat dev-varusteet (data/dev-items.ts), joita ei saa mistään muualta.
 // Kokemus ja taso eivät muutu. Esinettä, joka sankarilla jo on (repussa tai käytössä),
 // ei anneta toista kertaa, ja kolikot nostetaan miljoonaan vain, jos niitä on vähemmän.
 // Siksi burgerin voi syödä monta kertaa ilman että reppu tai kukkaro kasvaa loputtomiin.
