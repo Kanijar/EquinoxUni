@@ -8,7 +8,10 @@ export const FI_BOAT = {
   board: 'VENEESEEN',
   /** Alarivin nappi merellä, kun ranta on vieressä. */
   land: 'MAIHIN',
-  boarded: 'Vesille! Purjehdi saarille. Rannan vieressä MAIHIN.',
+  /** Veneeseen noustessa (boat = veneen nimi). */
+  boarded: (boat: string): string => `${boat} vesille! Rannan vieressä MAIHIN.`,
+  /** Lisärivi, kun veneestä voi kalastaa (Luksusvene). */
+  fishAtSea: 'Täältä voit kalastaa: KALASTA tai F.',
   landed: 'Nousit maihin.',
   /** Ensimmäinen rantautuminen saarelle. */
   isleFound: (isle: IsleDef, found: number, total: number): string =>
@@ -19,7 +22,10 @@ export const FI_BOAT = {
   /** Venekaupan otsikko ja tervehdys (data/boat-shop.ts). */
   shopTitle: 'Venekauppa',
   shopGreet: (name: string): string =>
-    `${name}: Ahoi! Veneellä pääset neljälle saarelle. Ne ovat vaarallisia: tule tasolla 50!`,
+    `${name}: Ahoi! Mitä nopeampi vene, sitä nopeammin saarille. Ne ovat vaarallisia: tule tasolla 50!`,
+  /** Veneen nopeus kaupassa (×1 = kävelyvauhti) ja voiko siitä kalastaa. */
+  speedInfo: (multiplier: number, canFish: boolean): string =>
+    `Nopeus merellä ×${String(multiplier).replace('.', ',')}${canFish ? ', voit kalastaa' : ''}`,
 };
 
 /** Bugattin avaimet kartalla (logic/vehicle.ts): nappi ja ilmoitukset. */

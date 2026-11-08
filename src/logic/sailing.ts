@@ -1,13 +1,15 @@
 import { ITEMS } from '../data';
+import { BOAT_ITEMS } from '../data/boat-items';
 import type { BoatItemDef, IsleDef, ItemDef, WorldDef } from '../data/types';
 import type { Vec2 } from './vector';
 import { isleAt, isWalkable, terrainAt, type WorldGrid } from './world-grid';
 
-// Vene (esim. Purjevene, Venesataman venekaupasta) ja pienet saaret (data/isles.ts).
+// Veneet (data/boat-items.ts, Venesataman venekaupasta) ja pienet saaret (data/isles.ts).
 // Kun vene on repussa ja sankari seisoo meren vieressä, hän voi nousta veneeseen: sankari
 // siirtyy viereiseen meriruutuun ja kulkee sen jälkeen vain merellä. Merellä rannan vieressä
-// hän voi nousta maihin viereiseen kävelyruutuun. Merellä ei taistella eikä kalasteta,
-// eikä Bugatti ole käytössä. Ensimmäinen rantautuminen saarelle tallentuu (isles).
+// hän voi nousta maihin viereiseen kävelyruutuun. Jos veneitä on monta, käytössä on nopein.
+// Merellä ei taistella eikä Bugatti ole käytössä, ja kalastaa voi vain Luksusveneestä
+// (canFish). Ensimmäinen rantautuminen saarelle tallentuu (isles).
 
 /** Tämän verran tilaa vene tarvitsee: reppu, onko sankari veneessä ja löydetyt saaret. */
 export interface SailorState {
@@ -47,9 +49,29 @@ export function isBoat(item: ItemDef): item is BoatItemDef {
   return item.kind === 'boat';
 }
 
-/** Repussa oleva vene, tai null. */
+/** Repussa olevista veneistä nopein, tai null, jos venettä ei ole. */
 export function ownedBoat(state: Pick<SailorState, 'inventory'>): BoatItemDef | null {
-  return ITEMS.filter(isBoat).find((item) => (state.inventory[item.id] ?? 0) > 0) ?? null;
+  const owned = ITEMS.filter(isBoat).filter((item) => (state.inventory[item.id] ?? 0) > 0);
+  return owned.reduce<BoatItemDef | null>(
+    (best, boat) => (best && best.speedMultiplier >= boat.speedMultiplier ? best : boat),
+    null,
+  );
+}
+
+/** Onko repussa jo yhtä nopea tai nopeampi vene (silloin tätä ei kannata ostaa). */
+export function hasFasterBoat(state: Pick<SailorState, 'inventory'>, boat: BoatItemDef): boolean {
+  const best = ownedBoat(state);
+  return best !== null && best.speedMultiplier >= boat.speedMultiplier;
+}
+
+/** Venekaupan seuraava vene: halvin, joka on nopeampi kuin oma, tai null (paras on jo). */
+export function nextBoat(state: Pick<SailorState, 'inventory'>): BoatItemDef | null {
+  return BOAT_ITEMS.find((boat) => !hasFasterBoat(state, boat)) ?? null;
+}
+
+/** Voiko nyt kalastaa: maalla aina, merellä vain veneestä, josta voi kalastaa (Luksusvene). */
+export function canFishHere(state: Pick<SailorState, 'inventory' | 'sailing'>): boolean {
+  return !isSailing(state) || ownedBoat(state)?.canFish === true;
 }
 
 /** Onko sankari veneessä (ja vene on yhä repussa). */
@@ -107,7 +129,7 @@ export function toggleSailing(state: SailorState, grid: WorldGrid, tile: Vec2): 
   return null;
 }
 
-/** Nopeuskerroin veneestä: merellä esim. 1,6, muuten 1. */
+/** Nopeuskerroin veneestä: merellä esim. 2 (Moottorivene), muuten 1. */
 export function boatSpeedFactor(state: SailorState): number {
   const boat = ownedBoat(state);
   return boat && state.sailing ? boat.speedMultiplier : 1;

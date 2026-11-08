@@ -17,7 +17,7 @@ import {
   type ReelResult,
 } from '../logic/fishing';
 import type { GameState } from '../logic/game-state';
-import { isSailing } from '../logic/sailing';
+import { canFishHere } from '../logic/sailing';
 import type { Vec2 } from '../logic/vector';
 import { FishButton, type BottomRow } from '../ui/fish-button';
 import { playSound } from './sound-fx';
@@ -84,8 +84,8 @@ export class FishingControl {
       this.stop();
       this.callbacks.message(TEXT.fishing.cancelled);
     }
-    // Veneessä ei kalasteta (logic/sailing.ts).
-    const canFish = hasRod(this.state) && !isSailing(this.state);
+    // Veneestä voi kalastaa vain, jos vene sallii sen (Luksusvene, logic/sailing.ts).
+    const canFish = hasRod(this.state) && canFishHere(this.state);
     this.spot = canFish ? fishingSpot(getWorldGrid(), worldToTile(position)) : null;
     if (this.active) {
       this.advance(this.active, deltaMs);

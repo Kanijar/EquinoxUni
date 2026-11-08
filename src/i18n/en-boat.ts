@@ -7,7 +7,8 @@ import type { FI_BOAT, FI_VEHICLE } from './fi-boat';
 export const EN_BOAT: typeof FI_BOAT = {
   board: 'SET SAIL',
   land: 'GO ASHORE',
-  boarded: 'Off you go! Sail to the isles. Next to a shore: GO ASHORE.',
+  boarded: (boat: string): string => `${boat} afloat! Next to a shore: GO ASHORE.`,
+  fishAtSea: 'You can fish from here: FISH or F.',
   landed: 'You went ashore.',
   isleFound: (isle: IsleDef, found: number, total: number): string =>
     `You found an isle: ${EN_CONTENT.isle(isle)} (${found}/${total})!\nRecommended level ${isle.level}+.`,
@@ -15,7 +16,9 @@ export const EN_BOAT: typeof FI_BOAT = {
     `You landed on ${EN_CONTENT.isle(isle)}. Recommended level ${isle.level}+.`,
   shopTitle: 'Boat Shop',
   shopGreet: (name: string): string =>
-    `${name}: Ahoy! A boat takes you to four isles. They are dangerous: come at level 50!`,
+    `${name}: Ahoy! The faster the boat, the sooner you reach the isles. They are dangerous: come at level 50!`,
+  speedInfo: (multiplier: number, canFish: boolean): string =>
+    `Speed at sea x${multiplier}${canFish ? ', fishing allowed' : ''}`,
 };
 
 export const EN_VEHICLE: typeof FI_VEHICLE = {

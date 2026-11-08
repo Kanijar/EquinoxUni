@@ -51,24 +51,24 @@ function gameWithBoat(): GameState {
 }
 
 describe('venekauppa', () => {
-  it('Veikko myy Purjeveneen Venesatamassa', () => {
-    const boat = getItem('sailboat');
+  it('Veikko myy Venesatamassa neljää venettä, ensin Soutuveneen', () => {
+    const boat = getItem('rowboat');
     expect(isBoat(boat)).toBe(true);
-    expect(isBoat(boat) && getSprite(boat.mapSprite).id).toBe('sailboat');
+    expect(isBoat(boat) && getSprite(boat.mapSprite).id).toBe('rowboat-hero');
     expect(BOAT_SHOP.town).toBe('venesatama');
     const stock = shopEntries(createNewGame(), 'buy', BOAT_SHOP).map((entry) => entry.item.id);
-    expect(stock[0]).toBe('sailboat');
+    expect(stock.slice(0, 4)).toEqual(['rowboat', 'sailboat', 'motorboat', 'luxury-boat']);
   });
 
   it('veneen voi ostaa kolikoilla, mutta vain yhden', () => {
     const state = createNewGame();
-    expect(buyBlock(state, 'sailboat')).toBe('noMoney');
+    expect(buyBlock(state, 'rowboat')).toBe('noMoney');
     state.coins = 5000;
-    expect(buyItem(state, 'sailboat')).toBe(true);
-    expect(state.coins).toBe(5000 - (getItem('sailboat').price ?? 0));
-    expect(ownedBoat(state)?.id).toBe('sailboat');
-    expect(buyBlock(state, 'sailboat')).toBe('owned');
-    expect(buyItem(state, 'sailboat')).toBe(false);
+    expect(buyItem(state, 'rowboat')).toBe(true);
+    expect(state.coins).toBe(5000 - (getItem('rowboat').price ?? 0));
+    expect(ownedBoat(state)?.id).toBe('rowboat');
+    expect(buyBlock(state, 'rowboat')).toBe('owned');
+    expect(buyItem(state, 'rowboat')).toBe(false);
   });
 
   it('Venesatama on rannalla, ja sinne pääsee Kotirannasta tietä pitkin', () => {
@@ -96,7 +96,7 @@ describe('vene', () => {
     expect(sea && Math.max(Math.abs(sea.x - shore.x), Math.abs(sea.y - shore.y))).toBe(1);
     expect(isSailing(state)).toBe(true);
     expect(state.driving).toBe(false);
-    expect(boatSpeedFactor(state)).toBe(1.6);
+    expect(boatSpeedFactor(state)).toBe(1.1);
   });
 
   it('kaukana rannasta ei voi nousta veneeseen', () => {

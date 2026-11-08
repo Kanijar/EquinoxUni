@@ -61,7 +61,8 @@ export function hasRod(state: GameState, rules: FishingRules = FISHING): boolean
 
 /**
  * Lähin vesiruutu, johon koho heitetään, tai null, kun vettä ei ole tarpeeksi lähellä.
- * Lähin = pienin etäisyys; tasapelissä ensin löytynyt (ylhäältä vasemmalta).
+ * Lähin = pienin etäisyys; tasapelissä ensin löytynyt (ylhäältä vasemmalta). Sankarin omaa
+ * ruutua ei lasketa, koska veneessä (Luksusvene) sankari on itse vedessä.
  */
 export function fishingSpot(
   grid: WorldGrid,
@@ -76,7 +77,12 @@ export function fishingSpot(
       const spot = { x: tile.x + dx, y: tile.y + dy };
       const inside = spot.x >= 0 && spot.y >= 0 && spot.x < grid.width && spot.y < grid.height;
       const d = dx * dx + dy * dy;
-      if (inside && d < bestDistance && rules.waterTerrains.includes(terrainAt(grid, spot))) {
+      if (
+        inside &&
+        d > 0 &&
+        d < bestDistance &&
+        rules.waterTerrains.includes(terrainAt(grid, spot))
+      ) {
         best = spot;
         bestDistance = d;
       }

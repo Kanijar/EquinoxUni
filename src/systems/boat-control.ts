@@ -75,12 +75,19 @@ export class BoatControl {
     this.applyColliders();
     playSound('splash');
     if (this.state.sailing) {
-      this.events.message(TEXT.boat.boarded);
+      this.announceBoarding();
     } else {
       this.announceLanding(tile);
       this.events.landed();
     }
     return true;
+  }
+
+  private announceBoarding(): void {
+    const boat = ownedBoat(this.state);
+    const name = boat ? TEXT.names.item(boat) : '';
+    const fish = boat?.canFish ? `\n${TEXT.boat.fishAtSea}` : '';
+    this.events.message(`${TEXT.boat.boarded(name)}${fish}`);
   }
 
   private announceLanding(tile: { x: number; y: number }): void {

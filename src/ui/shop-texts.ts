@@ -41,8 +41,8 @@ export function spellInfo(spellId: SpellId, magic: number): string {
 }
 
 /**
- * Keltainen lisätieto: varusteen lisäykset, loitsun teho, erän koko (madot), ongen tiedot tai
- * voiman kykypisteet.
+ * Keltainen lisätieto: varusteen lisäykset, loitsun teho, veneen nopeus, erän koko (madot),
+ * ongen tiedot tai voiman kykypisteet.
  */
 export function itemDetail(item: ItemDef, mode: ShopMode, magic: number): string {
   if (item.kind === 'gear') {
@@ -50,6 +50,9 @@ export function itemDetail(item: ItemDef, mode: ShopMode, magic: number): string
   }
   if (item.kind === 'spell') {
     return spellInfo(item.spell, magic);
+  }
+  if (item.kind === 'boat') {
+    return TEXT.boat.speedInfo(item.speedMultiplier, item.canFish === true);
   }
   if (mode === 'buy' && buyCount(item) > 1) {
     return TEXT.shop.pack(buyCount(item));

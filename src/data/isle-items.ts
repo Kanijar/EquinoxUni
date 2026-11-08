@@ -1,22 +1,12 @@
 import type { ItemDef } from './types';
 
-// Pienten saarten esineet (data/isles.ts): vene, saarten vihollisten pudotukset,
+// Pienten saarten esineet (data/isles.ts): saarten vihollisten pudotukset,
 // tehtäväesineet ja tehtävien palkinnot (data/isle-quests.ts). Jokaisen saaren varusteet
 // ovat edellisen saaren varusteita parempia, ja ensimmäisen saaren varusteet ovat vähän
 // parempia kuin lohikäärmeen ja Ossi Ketolan varusteet. Spritet: data/sprites-isle-items.ts.
+// Veneet: data/boat-items.ts.
 
 export const ISLE_ITEMS: readonly ItemDef[] = [
-  {
-    // Venesataman venekaupasta (data/boat-shop.ts). Merellä kuljet 60 % nopeammin.
-    id: 'sailboat',
-    name: 'Purjevene',
-    description: 'Vie saarille! Rannalla VENEESEEN tai V.',
-    kind: 'boat',
-    sprite: 'boat',
-    price: 1500,
-    speedMultiplier: 1.6,
-    mapSprite: 'sailboat',
-  },
   // --- Palmusaari ---
   {
     id: 'pirate-saber',

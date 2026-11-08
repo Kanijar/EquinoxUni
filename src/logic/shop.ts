@@ -3,18 +3,23 @@ import { MERCHANT, SHOP_RULES } from '../data/merchant';
 import type { ItemDef, ShopKeeperDef } from '../data/types';
 import { bagItems, findGear, ownsItem } from './equipment';
 import { playerLevel, type GameState } from './game-state';
+import { hasFasterBoat } from './sailing';
 
 // Kulkevan kauppiaan kauppa: tavaroita ostetaan kolikoilla ja repun tavaroita myydään
 // kauppiaalle. Hinta on esineen price (data/items.ts), ja kauppias ostaa esineen
 // pienemmällä hinnalla (SHOP_RULES.sellFactor). Voima (esim. Voimakristalli) otetaan käyttöön
 // heti ostaessa, eikä se mene reppuun. Varustetta tai työkalua (onki), joka pelaajalla jo on,
-// ei osteta toista kertaa (eikä toista venettä tai samaa loitsukirjaa). Loitsukirjoja (Noita,
-// data/cave.ts) ei voi myydä takaisin, ettei opittu loitsu katoa vahingossa. Osa tavaroista
-// myydään vasta tietyltä tasolta (minLevel). Osa tavaroista myydään monen kappaleen erissä (buyCount, esim. madot).
+// ei osteta toista kertaa (eikä samaa venettä tai loitsukirjaa, eikä hitaampaa venettä kuin
+// oma). Loitsukirjoja (Noita, data/cave.ts) ei voi myydä takaisin, ettei opittu loitsu katoa
+// vahingossa. Osa tavaroista myydään vasta tietyltä tasolta (minLevel). Osa tavaroista
+// myydään monen kappaleen erissä (buyCount, esim. madot).
 // Käytössä olevaa varustetta ei voi myydä: se pitää ensin ottaa pois repussa.
 
-/** Miksi esinettä ei voi ostaa: kolikot eivät riitä, varuste on jo pelaajalla tai taso ei riitä. */
-export type BuyBlock = 'noMoney' | 'owned' | 'level';
+/**
+ * Miksi esinettä ei voi ostaa: kolikot eivät riitä, varuste on jo pelaajalla, taso ei riitä tai
+ * pelaajalla on jo nopeampi vene.
+ */
+export type BuyBlock = 'noMoney' | 'owned' | 'level' | 'slowerBoat';
 
 /** Kauppiaan tavarat järjestyksessä (oletuksena kulkeva kauppias, MERCHANT.stock). */
 export function shopStock(keeper: ShopKeeperDef = MERCHANT): ItemDef[] {
@@ -52,6 +57,9 @@ export function buyBlock(state: GameState, itemId: string): BuyBlock | null {
   const onlyOne = findGear(itemId) !== null || ['tool', 'boat', 'spell'].includes(item.kind);
   if (onlyOne && ownsItem(state.inventory, state.equipped, itemId)) {
     return 'owned';
+  }
+  if (item.kind === 'boat' && hasFasterBoat(state, item)) {
+    return 'slowerBoat';
   }
   if (playerLevel(state) < (item.minLevel ?? 1)) {
     return 'level';
