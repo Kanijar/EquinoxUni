@@ -2,6 +2,7 @@ import type {
   ArmorLook,
   ArmorShape,
   CharmLook,
+  CharmShape,
   GearLook,
   WeaponLook,
   WeaponShape,
@@ -27,9 +28,9 @@ const armor = (shape: ArmorShape, main: string, trim: string): ArmorLook => ({
   trim,
 });
 
-const charm = (chain: string, gem: string): CharmLook => ({
+const charm = (chain: string, gem: string, shape: CharmShape = 'pendant'): CharmLook => ({
   slot: 'neck',
-  shape: 'pendant',
+  shape,
   chain,
   gem,
 });
@@ -50,6 +51,8 @@ export const GEAR_LOOKS: Readonly<Record<string, GearLook>> = {
   'serpent-spear': weapon('trident', '#9fffe0', '#3fb0a0', '#1a6a6a'),
   // Peikkokuninkaan luolan kivestä (data/cave-items.ts): kirkas terä ja kultainen kahva.
   excalibur: weapon('sword', '#e8f4ff', '#3a7aff', '#ffd23f'),
+  // Dev-varusteet (data/dev-items.ts, vain burgerista): musta, neonsyaani, neonpinkki ja kulta.
+  'dev-sword': weapon('greatsword', '#e8ffff', '#ff3fd8', '#ffd23f'),
   // Ideaviestien palkinto (data/idea-items.ts): vaaleanpunainen terä ja punainen sydän.
   'like-sword': weapon('sword', '#ff7ab8', '#e0303a', '#ffd23f'),
   // Vartalolla
@@ -67,6 +70,7 @@ export const GEAR_LOOKS: Readonly<Record<string, GearLook>> = {
   'ghost-cloak': armor('cloak', '#c8d8ec', '#9fffe0'),
   'crystal-armor': armor('plate', '#c8a0ff', '#8a4ad0'),
   'storm-cloak': armor('cloak', '#2a3a8a', '#ffe066'),
+  'dev-armor': armor('pauldrons', '#1a1030', '#3fffe0'),
   // Kaulassa
   'tooth-necklace': charm('#8a5a2a', '#f4f0e0'),
   'bog-stone': charm('#5a4a2a', '#4f9a4a'),
@@ -80,6 +84,7 @@ export const GEAR_LOOKS: Readonly<Record<string, GearLook>> = {
   'shadow-amulet': charm('#5a5a6a', '#8a4ad0'),
   'snowflake-charm': charm('#c8d0dc', '#bfe6ff'),
   'storm-heart': charm('#c8d0dc', '#ffe066'),
+  'dev-amulet': charm('#ffd23f', '#ff3fd8', 'star'),
 };
 
 /** Arvatun ulkonäön oletukset, kun varusteella ei ole riviä GEAR_LOOKSissa. */

@@ -31,8 +31,8 @@ export function atCaveMouth(tile: Vec2, cave: CaveDef = CAVE): boolean {
 }
 
 /**
- * Miekan tila. Jos sankarilla on jo Excalibur muualta (esim. alkuruudun salainen burgeri),
- * kivi on tyhjä.
+ * Miekan tila. Jos sankarilla on jo Excalibur muualta (esim. vanha tallennus, jossa salainen
+ * burgeri antoi sen ennen dev-varusteita), kivi on tyhjä.
  */
 export function swordStatus(state: GameState, cave: CaveDef = CAVE): SwordStatus {
   if (state.swordTaken || ownsItem(state.inventory, state.equipped, cave.sword)) {

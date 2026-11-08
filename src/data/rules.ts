@@ -75,6 +75,7 @@ export const MENU_SECRET: MenuSecretRules = {
  * Salaisuus: alkuruudun vasemmassa reunassa on pieni burgeri. Kun sitä napauttaa ja sitten
  * aloittaa uuden pelin tai lataa tallennuksen, sankari saa parhaat varusteet käyttöön
  * (jokaiseen paikkaan pisteiltään paras, gearWeights), Bugattin avaimet ja miljoona kultakolikkoa.
+ * Parhaat varusteet ovat dev-varusteet (data/dev-items.ts), joita saa vain burgerista.
  * Tasot eivät nouse. Omistettua esinettä ei anneta toista kertaa, ja kolikot nostetaan
  * miljoonaan vain, jos niitä on vähemmän (logic/burger-secret.ts).
  */

@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { getItem, getSprite, WORLD } from '../src/data';
+import { getItem, getSprite, ITEMS, WORLD } from '../src/data';
 import { BACKPACK_VIEW } from '../src/config/game-config';
 import { CAVE, WITCH } from '../src/data/cave';
-import { bestGear, eatBurger } from '../src/logic/burger-secret';
+import { DEV_GEAR_IDS } from '../src/data/dev-items';
+import type { GearItemDef } from '../src/data/types';
+import { bestGear, eatBurger, gearScore } from '../src/logic/burger-secret';
 import { atCaveMouth, isCaveOpen, pullSword, swordStatus } from '../src/logic/cave';
+import { isGear } from '../src/logic/equipment';
 import { createNewGame, playerStats } from '../src/logic/game-state';
 import { minXpForLevel } from '../src/logic/progression';
 import { decodeSave, encodeSave } from '../src/logic/save-format';
@@ -78,16 +81,26 @@ describe('Excalibur kivessä', () => {
     expect(loaded?.swordTaken).toBe(true);
   });
 
-  it('salainen burgeri antaa Excaliburin, jolloin kivi on tyhjä', () => {
+  it('salainen burgeri antaa Dev-miekan, ja Excalibur jää kiveen odottamaan', () => {
     const state = bossBeaten(CAVE.swordMinLevel);
     eatBurger(state);
-    expect(state.equipped.hand).toBe('excalibur');
+    expect(state.equipped.hand).toBe('dev-sword');
+    expect(swordStatus(state)).toBe('ready');
+  });
+
+  it('vanhassa tallennuksessa burgerista saatu Excalibur tyhjentää kiven', () => {
+    const state = bossBeaten(CAVE.swordMinLevel);
+    state.inventory[CAVE.sword] = 1;
     expect(swordStatus(state)).toBe('taken');
   });
 
-  it('Excalibur on pelin paras ase', () => {
+  it('Excalibur on paras ase, jonka voi löytää (vain burgerin Dev-miekka on parempi)', () => {
     expect(getItem(CAVE.sword).kind).toBe('gear');
-    expect(bestGear('hand')?.id).toBe(CAVE.sword);
+    expect(bestGear('hand')?.id).toBe('dev-sword');
+    const found = ITEMS.filter(isGear).filter((item) => !DEV_GEAR_IDS.includes(item.id));
+    const hand = found.filter((item) => item.slot === 'hand');
+    const best = Math.max(...hand.map((item) => gearScore(item)));
+    expect(gearScore(getItem(CAVE.sword) as GearItemDef)).toBe(best);
   });
 });
 

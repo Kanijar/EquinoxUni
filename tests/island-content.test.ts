@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ENEMIES, ITEMS, QUESTS } from '../src/data';
 import { FINAL_BOSS } from '../src/data/boss';
 import { CAVE } from '../src/data/cave';
+import { DEV_GEAR_IDS } from '../src/data/dev-items';
 import { FISHING } from '../src/data/fishing';
 import { LIKE_SWORD_ID } from '../src/data/idea-items';
 import { MERCHANT } from '../src/data/merchant';
@@ -32,18 +33,31 @@ const fromCave = new Set([CAVE.sword]);
 /** Ideaviestien palkinto parhaan idean tekijälle (logic/like-reward.ts). */
 const fromIdeas = new Set([LIKE_SWORD_ID]);
 
+/** Dev-varusteet saa vain alkuruudun salaisesta burgerista (data/dev-items.ts). */
+const fromBurger = new Set(DEV_GEAR_IDS);
+
 describe('saaren hirviöt ja varusteet', () => {
   it.each(ISLAND_MONSTERS)('%s pudottaa varusteen', (id) => {
     const enemy = ENEMIES.find((e) => e.id === id);
     expect(enemy?.drops?.some((drop) => gearIds.has(drop.item))).toBe(true);
   });
 
-  it('jokaisen varusteen voi saada viholliselta, palkintona, kauppiaalta, kalastamalla, luolasta tai ideoista', () => {
+  it('jokaisen varusteen voi saada viholliselta, palkintona, kauppiaalta, kalastamalla, luolasta, burgerista tai ideoista', () => {
+    const sources = [dropped, rewarded, sold, fished, fromCave, fromBurger, fromIdeas];
     for (const id of gearIds) {
-      const found = [dropped, rewarded, sold, fished, fromCave, fromIdeas].some((source) =>
+      expect(
+        sources.some((source) => source.has(id)),
+        id,
+      ).toBe(true);
+    }
+  });
+
+  it('dev-varusteita saa vain burgerista', () => {
+    for (const id of fromBurger) {
+      const elsewhere = [dropped, rewarded, sold, fished, fromCave, fromIdeas].some((source) =>
         source.has(id),
       );
-      expect(found, id).toBe(true);
+      expect(elsewhere, id).toBe(false);
     }
   });
 

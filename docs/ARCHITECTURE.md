@@ -158,8 +158,17 @@ scenes  →  systems / ui  →  entities  →  logic
   vasemmalla Excalibur kivessä, oikealla Noita Nokkonen. VEDÄ MIEKKA vetää Excaliburin kivestä
   ja laittaa sen käteen, kun taso on vähintään `CAVE.swordMinLevel` (50). Miekan saa vain kerran
   (`GameState.swordTaken`, puuttuva = false, joten `SAVE_VERSION`ia ei tarvinnut nostaa), ja jos
-  Excalibur on jo saatu salaisesta burgerista, kivi on tyhjä. Säännöt `logic/cave.ts`.
-  Excalibur (`data/cave-items.ts`) on pelin paras ase, joten burgerin "parhaat varusteet" antaa sen.
+  Excalibur on jo saatu salaisesta burgerista (vanha tallennus), kivi on tyhjä. Säännöt `logic/cave.ts`.
+  Excalibur (`data/cave-items.ts`) on paras ase, jonka voi löytää pelistä. Vain dev-varusteet ovat
+  parempia.
+- **Dev-varusteet:** pelin voimakkaimmat varusteet (`data/dev-items.ts`): Dev-miekka, Dev-haarniska
+  ja Dev-amuletti. Jokainen arvo on suurempi kuin millään muulla saman paikan varusteella. Niitä saa
+  vain alkuruudun salaisesta burgerista: `logic/burger-secret.ts` antaa jokaiseen paikkaan
+  pisteiltään parhaan varusteen, ja dev-varusteet ovat parhaat. Niillä ei ole hintaa (ei voi
+  myydä) eikä tasovaatimusta, eikä niitä saa lisätä kauppoihin, pudotuksiin, kalastukseen tai
+  tehtäviin (testi `tests/dev-gear.test.ts` tarkistaa). Burgeri ei anna omistettua esinettä
+  toista kertaa. Ulkonäkö: omat muodot `greatsword`, `pauldrons` ja `star`
+  (`data/gear-shapes.ts`) ja neonvärit (`data/gear-looks.ts`).
   NOIDAN KAUPPA on sama `ShopScene` kuin Kaapolla (`keeper: WITCH`, `returnTo`: kauppa palaa
   luolaan). Noita myy loitsukirjoja (`kind: 'spell'`) ja voimakristalleja. Loitsukirjaa ei
   osteta toista kertaa eikä sitä voi myydä.

@@ -1,4 +1,5 @@
 import { CAVE_ITEMS } from './cave-items';
+import { DEV_ITEMS } from './dev-items';
 import { FISHING_ITEMS } from './fishing-items';
 import { IDEA_ITEMS } from './idea-items';
 import { BOAT_ITEMS } from './boat-items';
@@ -261,6 +262,8 @@ export const ITEMS: readonly ItemDef[] = [
   ...ISLE_ITEMS,
   // --- Peikkokuninkaan luola: Excalibur ja Noidan loitsukirjat (data/cave-items.ts) ---
   ...CAVE_ITEMS,
+  // --- Dev-varusteet: voimakkaimmat, vain salaisesta burgerista (data/dev-items.ts) ---
+  ...DEV_ITEMS,
   // --- Ideaviestien palkinto: Tykkäysmiekka (data/idea-items.ts) ---
   ...IDEA_ITEMS,
 ];

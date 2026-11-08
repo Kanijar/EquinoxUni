@@ -109,6 +109,10 @@ export const ITEM_TEXTS_EN: Readonly<
   ...ISLE_ITEM_TEXTS_EN,
   // Peikkokuninkaan luola (i18n/en-cave.ts)
   ...CAVE_ITEM_TEXTS_EN,
+  // Dev-varusteet, vain salaisesta burgerista (data/dev-items.ts)
+  'dev-sword': { name: 'Dev Sword', description: 'The game makers’ sword. The mightiest weapon!' },
+  'dev-armor': { name: 'Dev Armor', description: 'The game makers’ armor. Nothing gets through!' },
+  'dev-amulet': { name: 'Dev Amulet', description: 'The game makers’ star. The mightiest charm!' },
   ...IDEA_ITEM_TEXTS_EN,
 };
 
