@@ -9,6 +9,7 @@ import { EN_SHOP } from './en-shop';
 import { EN_STAIRS } from './en-stairs';
 import { EN_FISHING } from './en-fishing';
 import { EN_HOUSE } from './en-house';
+import { EN_IDEAS } from './en-ideas';
 import { EN_MAP } from './en-map';
 import { LANGUAGE_NAMES, type Texts } from './fi';
 
@@ -276,6 +277,7 @@ export const EN: Texts = {
   magic: EN_MAGIC,
   cave: EN_CAVE,
   house: EN_HOUSE,
+  ideas: EN_IDEAS,
   map: EN_MAP,
   boss: {
     progress: (count: number, needed: number): string =>

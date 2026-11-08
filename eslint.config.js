@@ -11,7 +11,7 @@ const noPhaser = {
 };
 
 export default tseslint.config(
-  { ignores: ['dist/', 'coverage/', 'node_modules/'] },
+  { ignores: ['dist/', 'coverage/', 'node_modules/', '**/.wrangler/'] },
   js.configs.recommended,
   ...tseslint.configs.strict,
   {

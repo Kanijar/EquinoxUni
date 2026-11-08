@@ -26,3 +26,12 @@ class_name = "LeaderboardRoom"
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["LeaderboardRoom"]
+
+# Ideaviestit (alkuruudun IDEAT-nappi). Muistaa ideat, kommentit ja tykkäykset SQLite-tauluissa.
+[[durable_objects.bindings]]
+name = "IDEAS"
+class_name = "IdeasRoom"
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["IdeasRoom"]

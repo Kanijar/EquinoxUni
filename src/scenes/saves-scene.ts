@@ -11,6 +11,7 @@ import {
 } from '../config/game-config';
 import { TEXT } from '../i18n/text';
 import { burgerNews } from '../logic/burger-secret';
+import { deliverLikeReward } from '../logic/like-reward';
 import type { GameState } from '../logic/game-state';
 import { deleteSlot, listSlots, loadFromSlot, saveToSlot, slotNumbers } from '../logic/save-slots';
 import { browserStore } from '../systems/browser-storage';
@@ -111,6 +112,9 @@ export class SavesScene extends Phaser.Scene {
     const lines = [TEXT.saves.loaded];
     if (this.burger) {
       lines.push(burgerNews(state));
+    }
+    if (deliverLikeReward(browserStore(), state)) {
+      lines.push(TEXT.ideas.delivered);
     }
     const next: WorldSceneData = {
       state,

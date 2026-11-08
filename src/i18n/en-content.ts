@@ -1,5 +1,6 @@
 import type { EnemyDef, IsleDef, ItemDef, NpcDef, QuestDef, TownDef } from '../data/types';
 import { CAVE_ITEM_TEXTS_EN } from './en-cave';
+import { IDEA_ITEM_TEXTS_EN } from './en-ideas';
 import {
   ISLE_ENEMY_NAMES_EN,
   ISLE_ITEM_TEXTS_EN,
@@ -112,6 +113,7 @@ export const ITEM_TEXTS_EN: Readonly<
   'dev-sword': { name: 'Dev Sword', description: 'The game makers’ sword. The mightiest weapon!' },
   'dev-armor': { name: 'Dev Armor', description: 'The game makers’ armor. Nothing gets through!' },
   'dev-amulet': { name: 'Dev Amulet', description: 'The game makers’ star. The mightiest charm!' },
+  ...IDEA_ITEM_TEXTS_EN,
 };
 
 /** Tehtävän tekstit: nimi, tarjous (story) ja kiitos palautettaessa. */

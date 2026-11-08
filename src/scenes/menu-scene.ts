@@ -20,6 +20,8 @@ import type { HeroSceneData } from './hero-scene';
 // ASETUKSET avaa valon ja äänten säädöt ja LÄHDE lopettaa pelin.
 // Oikeassa alakulmassa näkyy pelin versio (data/game-info.ts), vasemmassa pelaajamäärä.
 // Oikeassa yläkulmassa on ASENNA-nappi, kun Chrome tarjoaa pelin asennusta (ui/install-button.ts).
+// Vasemmassa yläkulmassa IDEAT avaa ideaviestit (scenes/ideas-scene.ts): nimettömät ideat,
+// kommentit ja tykkäykset.
 // Salaisuus: jos sutta napauttaa ennen PELAA-nappia, uusi peli alkaa kokemuspisteillä ja
 // lisäjuomilla (logic/menu-secret.ts). Alkuruudulla siitä ei kerrota: susi vain ulvahtaa
 // ja muuttuu hehkuvaksi henkisudeksi. Kartalla näkyy yllätysviesti.
@@ -57,6 +59,14 @@ export class MenuScene extends Phaser.Scene {
     addVersionLabel(this);
     addPlayerCountLabel(this);
     addInstallButton(this);
+    new TextButton(this, {
+      x: MENU_VIEW.ideasLeft + MENU_VIEW.ideasWidth / 2,
+      y: BUTTON.margin + BUTTON.height / 2,
+      width: MENU_VIEW.ideasWidth,
+      height: BUTTON.height,
+      label: TEXT.ideas.menuButton,
+      onTap: () => this.open(SCENES.ideas, {}),
+    });
     const entries: MenuEntry[] = [
       { label: TEXT.menu.play, onTap: () => this.play() },
       { label: TEXT.menu.load, onTap: () => this.openSaves() },

@@ -17,7 +17,7 @@ const LOOKALIKES: Readonly<Record<string, string>> = {
 const NOT_LETTERS = /[^\p{L}]/gu;
 
 /** Nimi vertailua varten: pienet kirjaimet, numerot kirjaimiksi, ei välejä eikä viivoja. */
-function comparable(name: string): string {
+export function comparableText(name: string): string {
   const lower = name.toLowerCase();
   const letters = [...lower].map((char) => LOOKALIKES[char] ?? char).join('');
   return letters.replace(NOT_LETTERS, '');
@@ -28,7 +28,7 @@ export function hasBlockedWord(
   name: string,
   words: readonly string[] = BLOCKED_NAME_WORDS,
 ): boolean {
-  const plain = comparable(name);
+  const plain = comparableText(name);
   return words.some((word) => plain.includes(word));
 }
 

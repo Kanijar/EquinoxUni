@@ -53,6 +53,8 @@ export const GEAR_LOOKS: Readonly<Record<string, GearLook>> = {
   excalibur: weapon('sword', '#e8f4ff', '#3a7aff', '#ffd23f'),
   // Dev-varusteet (data/dev-items.ts, vain burgerista): musta, neonsyaani, neonpinkki ja kulta.
   'dev-sword': weapon('greatsword', '#e8ffff', '#ff3fd8', '#ffd23f'),
+  // Ideaviestien palkinto (data/idea-items.ts): vaaleanpunainen terä ja punainen sydän.
+  'like-sword': weapon('sword', '#ff7ab8', '#e0303a', '#ffd23f'),
   // Vartalolla
   'robber-clothes': armor('clothes', '#3a3f4a', '#5a3a1a'),
   'king-cloak': armor('cloak', '#6a3a86', '#ffd23f'),

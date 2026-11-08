@@ -1,6 +1,7 @@
 import { CAVE_ITEMS } from './cave-items';
 import { DEV_ITEMS } from './dev-items';
 import { FISHING_ITEMS } from './fishing-items';
+import { IDEA_ITEMS } from './idea-items';
 import { BOAT_ITEMS } from './boat-items';
 import { ISLE_ITEMS } from './isle-items';
 import { MERCHANT_ITEMS } from './merchant-items';
@@ -263,6 +264,8 @@ export const ITEMS: readonly ItemDef[] = [
   ...CAVE_ITEMS,
   // --- Dev-varusteet: voimakkaimmat, vain salaisesta burgerista (data/dev-items.ts) ---
   ...DEV_ITEMS,
+  // --- Ideaviestien palkinto: Tykkäysmiekka (data/idea-items.ts) ---
+  ...IDEA_ITEMS,
 ];
 
 /** Varustepaikat repussa tässä järjestyksessä: käsi (ase), vartalo (vaatteet), kaula (koru). */

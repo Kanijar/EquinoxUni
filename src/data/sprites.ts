@@ -5,6 +5,7 @@ import { CHARACTER_SPRITES } from './sprites-characters';
 import { DEV_ITEM_SPRITES } from './sprites-dev-items';
 import { FISHING_SPRITES } from './sprites-fishing';
 import { HOUSE_SPRITES } from './sprites-house';
+import { IDEA_SPRITES } from './sprites-ideas';
 import { ITEM_SPRITES } from './sprites-items';
 import { ISLE_ITEM_SPRITES } from './sprites-isle-items';
 import { ISLE_MONSTER_SPRITES } from './sprites-isle-monsters';
@@ -24,6 +25,7 @@ import type { SpriteDef } from './types';
 // esineet): sprites-isles.ts, sprites-isle-monsters.ts ja sprites-isle-items.ts. Luola (Noita,
 // Excalibur ja loitsukirjat): sprites-cave.ts. Sankarin talo ja pokaali: sprites-house.ts.
 // Dev-varusteet: sprites-dev-items.ts.
+// Ideaviestit (Tykkäysmiekka, sydän ja puhekupla): sprites-ideas.ts.
 export const SPRITES: readonly SpriteDef[] = [
   ...CHARACTER_SPRITES,
   ...BOSS_SPRITES,
@@ -41,4 +43,5 @@ export const SPRITES: readonly SpriteDef[] = [
   ...CAVE_SPRITES,
   ...HOUSE_SPRITES,
   ...DEV_ITEM_SPRITES,
+  ...IDEA_SPRITES,
 ];

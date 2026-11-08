@@ -1,4 +1,4 @@
-# Pelaajalaskuri ja 10 parhaan lista
+# Pelaajalaskuri, 10 parhaan lista ja ideaviestit
 
 Alkuruudun ja kartan vasemmassa alakulmassa näkyy, montako ihmistä pelaa juuri nyt:
 **Pelaajia nyt: 3**. Luvussa on mukana myös pelaaja itse.
@@ -108,6 +108,9 @@ cd worker/presence && npx wrangler dev --port 8787
 VITE_PRESENCE_URL=ws://127.0.0.1:8787 npm run dev
 ```
 
+Samalla tavalla toimivat 10 parhaan lista ja ideaviestit. Paikallisen palvelimen ylläpitoavaimen
+voi antaa käynnistäessä: `npx wrangler dev --port 8787 --var ADMIN_KEY:testi`.
+
 Windowsissa osoitteen voi laittaa tiedostoon `.env.local` (ei mene GitHubiin):
 `VITE_PRESENCE_URL=ws://127.0.0.1:8787`. Avaa `http://localhost:5173` kahteen välilehteen.
 Puhelimella paikallinen laskuri ei näy, koska puhelimen sivun osoite ei ole sallittujen listalla.
@@ -166,6 +169,89 @@ curl -X DELETE -H "Authorization: Bearer <avain>" \
 Vastaus kertoo, montako riviä poistettiin: `{"removed":1}`. Uuden estetyn sanan voi lisätä
 tiedostoon `src/data/blocked-names.ts`.
 
+## Ideaviestit (alkuruudun IDEAT-nappi)
+
+Alkuruudun vasemmassa yläkulmassa on **IDEAT**-nappi. Siellä pelaajat voivat kirjoittaa
+**nimettömästi** ideoita pelin kehittämiseksi, kommentoida toisten ideoita ja tykätä niistä.
+Ideat käyttävät **samaa palvelinta** kuin laskuri ja lista: osoite
+`https://equinox-presence.<aliverkkotunnus>.workers.dev/ideas` johdetaan laskurin osoitteesta.
+Ennen palvelimen pystytystä näkymässä lukee _Ideat eivät ole vielä käytössä_.
+
+Jos laskuri on jo pystytetty, palvelin päivittyy itsestään, kun tämä muutos yhdistetään
+`main`-haaraan (tai aja `npx wrangler deploy` kansiossa `worker/presence`).
+
+### Miten se toimii
+
+1. Lista näyttää ideat uusimmat tai suosituimmat ensin, kolme kerrallaan. Kortin napautus avaa
+   idean kommentteineen. Sydännapista tykätään (toinen napautus perii tykkäyksen pois).
+2. Idea on enintään 200 ja kommentti 150 merkkiä. Yhteen ideaan mahtuu 40 kommenttia, ja
+   palvelin muistaa 1000 uusinta ideaa (vanhimmat poistuvat kommentteineen).
+3. Jokaisella idealla ja kommentilla on numero (#12). Numero ei kerro kirjoittajasta mitään,
+   mutta sillä ylläpitäjä voi poistaa sopimattoman viestin (alla).
+
+### Nimettömyys ja turvallisuus (pelaajat ovat 12–15-vuotiaita)
+
+- **Kenenkään nimeä tai tunnistetta ei näytetä.** Laite arpoo kerran salaisen satunnaisen
+  tunnisteen (20 merkkiä, selaimen muistissa, ei tallennuksissa). Vain palvelin näkee sen, ja
+  sitä käytetään kolmeen asiaan: yksi tykkäys per laite, nopeusraja ja oman idean tunnistus
+  (näet omassa ideassasi merkinnän _SINUN_, muut eivät näe sitä).
+- Listassa ja kirjoittaessa muistutetaan aina, ettei saa kirjoittaa nimeä, osoitetta,
+  puhelinnumeroa, koulua tai muita henkilötietoja.
+- **Viesti hylätään**, jos siinä on kirosana (`src/data/blocked-names.ts`, myös v1ttu ja
+  v i t t u) tai jotain yhteystiedon näköistä: puhelinnumero, sähköposti (@), linkki tai
+  sovelluksen tunnus (Discord, Snapchat, Insta ...: `src/data/blocked-contacts.ts`).
+  Tarkistus tehdään sekä pelissä että palvelimella.
+- **Nopeusraja:** samalta laitteelta enintään yksi viesti 30 sekunnissa ja 8 tunnissa, samasta
+  verkosta 60 tunnissa ja tykkäyksiä 30 minuutissa (`src/config/ideas.ts`). Verkon osoitetta
+  (IP) pidetään vain palvelimen muistissa rajaa varten: sitä ei tallenneta eikä liitetä viesteihin.
+- Omasta ideasta ei voi tykätä.
+- Tämä ei ole chat: yksityisviestejä ei ole, eikä kukaan näe, kuka kirjoitti mitä.
+
+### Tykkäysmiekka (palkinto parhaasta ideasta)
+
+- **Paras idea** = eniten tykkäyksiä, vähintään **5 tykkäystä muilta** (omasta ei voi tykätä).
+  Tasatilanteessa paras on se, joka kirjoitettiin ensin. Paras idea näkyy listassa tähdellä
+  ja kultaisella reunuksella.
+- Kun oma idea on paras, listaan tulee **LUNASTA MIEKKA** -nappi. Palvelin tarkistaa, että
+  idea on yhä paras, ja muistaa laitteen, joten **samalle tekijälle miekkaa ei anneta toiste**.
+  Kun paras idea vaihtuu, uusi tekijä voi lunastaa oman miekkansa.
+- Miekka ilmestyy reppuun, kun pelaaja seuraavan kerran aloittaa tai lataa pelin (alkuruudulla
+  ei ole peliä auki). Tykkäysmiekka: hyökkäys +50 (`src/data/idea-items.ts`). Se on heikompi kuin
+  Excalibur kokonaisuutena ja dev-varusteet joka arvoltaan, joten salainen burgeri ei anna sitä.
+
+### Rajoitukset
+
+- Suodatin ei ole täydellinen: kirjoittaja voi keksiä kiertotien. Siksi ylläpitäjän kannattaa
+  vilkaista ideoita silloin tällöin ja poistaa sopimattomat.
+- Laitteen tunniste on selaimen muistissa. Jos muistin tyhjentää, laite saa uuden tunnisteen,
+  jolla voi tykätä uudelleen. Siksi miekka vaatii viisi tykkäystä.
+
+### Sopimattoman idean tai kommentin poisto (aikuinen)
+
+Avain on sama `ADMIN_KEY` kuin 10 parhaan listassa (ohje yllä, kohta 1).
+
+1. Katso viestin numero pelistä (#12) tai hae ideat komentoriviltä:
+
+```bash
+curl -H "Authorization: Bearer <avain>" \
+  "https://equinox-presence.<aliverkkotunnus>.workers.dev/ideas?sort=new"
+# idean 12 kommentit numeroineen:
+curl -H "Authorization: Bearer <avain>" \
+  "https://equinox-presence.<aliverkkotunnus>.workers.dev/ideas?comments=12"
+```
+
+2. Poista idea (kommentteineen ja tykkäyksineen) tai yksi kommentti:
+
+```bash
+curl -X DELETE -H "Authorization: Bearer <avain>" \
+  "https://equinox-presence.<aliverkkotunnus>.workers.dev/ideas?idea=12"
+curl -X DELETE -H "Authorization: Bearer <avain>" \
+  "https://equinox-presence.<aliverkkotunnus>.workers.dev/ideas?comment=34"
+```
+
+Vastaus kertoo, montako poistettiin: `{"removed":1}`. Uuden estetyn sanan voi lisätä tiedostoon
+`src/data/blocked-names.ts` (kirosanat) tai `src/data/blocked-contacts.ts` (sovellusten nimet).
+
 ## Koodin rakenne
 
 | Tiedosto                                                     | Mitä tekee                                                        |
@@ -180,6 +266,9 @@ tiedostoon `src/data/blocked-names.ts`.
 | `worker/presence/`                                           | Palvelin: Cloudflare Worker + `PresenceRoom`-Durable Object       |
 | `worker/presence/src/leaderboard-room.ts`                    | 10 parhaan lista (`LeaderboardRoom`-Durable Object, SQLite)       |
 | `src/net/leaderboard.ts`, `src/logic/leaderboard*.ts`        | Listan yhteys, viestit, nimimerkit ja sankaritunniste             |
+| `worker/presence/src/ideas-room.ts`, `ideas-store.ts`        | Ideaviestit (`IdeasRoom`-Durable Object, SQLite)                  |
+| `src/net/ideas.ts`, `src/logic/idea*.ts`, `rate-limit.ts`    | Ideoiden yhteys, viestit, tekstin tarkistus ja nopeusraja         |
+| `src/logic/like-reward.ts`, `src/data/idea-items.ts`         | Tykkäysmiekka parhaan idean tekijälle                             |
 | `tests/presence.test.ts`, `tests/websocket-presence.test.ts` | Testit valeyhteydellä, ilman oikeaa palvelinta                    |
 
 **Palvelun vaihtaminen:** tee uusi luokka, joka toteuttaa `PresenceService`-rajapinnan

@@ -1,4 +1,4 @@
-// 10 parhaan listan HTTP-vastausten CORS-otsakkeet: selain antaa pelin lukea vastauksen
+// 10 parhaan listan ja ideaviestien HTTP-vastausten CORS-otsakkeet: selain antaa pelin lukea vastauksen
 // vain, jos palvelin kertoo pelin sivun osoitteen (Origin) sallituksi.
 
 export function corsHeaders(origin: string): Record<string, string> {

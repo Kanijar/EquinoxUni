@@ -23,6 +23,7 @@ import { FI_SHOP } from './fi-shop';
 import { FI_STAIRS } from './fi-stairs';
 import { FI_FISHING } from './fi-fishing';
 import { FI_HOUSE } from './fi-house';
+import { FI_IDEAS } from './fi-ideas';
 import { FI_MAP } from './fi-map';
 import type { Language } from './language';
 
@@ -347,6 +348,8 @@ export const FI = {
   cave: FI_CAVE,
   /** Sankarin talo ja 10 parhaan lista (data/house.ts, i18n/fi-house.ts). */
   house: FI_HOUSE,
+  /** Ideaviestit alkuruudun IDEAT-napista (i18n/fi-ideas.ts). */
+  ideas: FI_IDEAS,
   /** Minikartta ja iso kartta (i18n/fi-map.ts). */
   map: FI_MAP,
   /** Loppuboss (data/boss.ts): peikkolaskuri, herääminen ja voitto (i18n/fi-boss.ts). */
