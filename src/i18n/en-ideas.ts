@@ -51,7 +51,8 @@ export const EN_IDEAS: typeof FI_IDEAS = {
   empty: 'No ideas yet.\nWrite the first one!',
   noComments: 'No comments yet.',
   offline: 'Could not load the ideas.\nTry again later.',
-  disabled: 'Ideas are not available yet.',
+  /** Palvelinta ei ole vielä pystytetty (docs/PELAAJALASKURI.md). */
+  disabled: 'Ideas are not available yet.\nThe game makers will turn them on soon!',
   sending: 'Sending...',
   results: RESULTS,
   claim: 'CLAIM SWORD',
