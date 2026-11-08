@@ -24,10 +24,15 @@ const WOLF = { ...NO_MENU_TAPS, wolf: true };
 const SLIME = { ...NO_MENU_TAPS, slime: true };
 const BOTH = { ...NO_MENU_TAPS, wolf: true, slime: true };
 
+/** Tavallinen uusi peli samalla satunnaisella sankaritunnisteella (10 parhaan lista). */
+function newGameAs(state: { readonly heroId: string }): ReturnType<typeof createNewGame> {
+  return { ...createNewGame(), heroId: state.heroId };
+}
+
 describe('alkuruudun suden salaisuus', () => {
   it('ilman suden napautusta peli alkaa nollasta ilman viestiä', () => {
     const start = startFromMenu(NO_MENU_TAPS);
-    expect(start.state).toEqual(createNewGame());
+    expect(start.state).toEqual(newGameAs(start.state));
     expect(playerLevel(start.state)).toBe(1);
     expect(start.message).toBeUndefined();
   });
@@ -54,7 +59,7 @@ describe('alkuruudun suden salaisuus', () => {
 
   it('elämä on täynnä ja muu aloitustila on sama kuin tavallisessa pelissä', () => {
     const secret = createMenuGame(WOLF, { ...rules, bonusItems: [] });
-    expect({ ...secret, xp: 0 }).toEqual(createNewGame());
+    expect({ ...secret, xp: 0 }).toEqual(newGameAs(secret));
     expect(secret.hp).toBe(playerStats(secret).maxHp);
     expect(secret.hp).toBe(PLAYER.stats.maxHp);
   });
@@ -106,7 +111,7 @@ describe('alkuruudun suden salaisuus', () => {
   it('liman salaisuus ei tuo viestiä eikä muuta muuta aloitustilaa', () => {
     const start = startFromMenu(SLIME);
     expect(start.message).toBeUndefined();
-    expect({ ...start.state, eyeColor: PLAYER.eyeColor }).toEqual(createNewGame());
+    expect({ ...start.state, eyeColor: PLAYER.eyeColor }).toEqual(newGameAs(start.state));
   });
 
   it('suden ja liman salaisuudet toimivat yhtä aikaa', () => {

@@ -1,4 +1,4 @@
-# Pelaajalaskuri
+# Pelaajalaskuri ja 10 parhaan lista
 
 Alkuruudun ja kartan vasemmassa alakulmassa näkyy, montako ihmistä pelaa juuri nyt:
 **Pelaajia nyt: 3**. Luvussa on mukana myös pelaaja itse.
@@ -112,6 +112,60 @@ Windowsissa osoitteen voi laittaa tiedostoon `.env.local` (ei mene GitHubiin):
 `VITE_PRESENCE_URL=ws://127.0.0.1:8787`. Avaa `http://localhost:5173` kahteen välilehteen.
 Puhelimella paikallinen laskuri ei näy, koska puhelimen sivun osoite ei ole sallittujen listalla.
 
+## 10 parhaan lista (sankarin talo)
+
+Kotirannan laidalla on sankarin talo, jonka seinällä on **koko pelin 10 parhaan pelaajan lista**
+(nimimerkki, taso ja KP). Lista käyttää **samaa palvelinta** kuin laskuri: osoite
+`https://equinox-presence.<aliverkkotunnus>.workers.dev/leaderboard` johdetaan laskurin
+`wss://`-osoitteesta. Kun laskuri on pystytetty yllä olevalla ohjeella, myös lista toimii.
+Ennen sitä talossa lukee _Lista ei ole vielä käytössä_.
+
+Jos laskuri on jo pystytetty: kun tämä muutos yhdistetään `main`-haaraan, palvelin päivittyy
+itsestään (työ **Julkaise pelaajalaskuri Cloudflareen**). Jos julkaisit palvelimen omalta
+koneelta, aja `npx wrangler deploy` uudelleen kansiossa `worker/presence`.
+
+### Miten se toimii
+
+1. Kun pelaaja menee taloonsa, peli hakee listan. Vasta kun hän painaa **LISÄÄ TULOKSENI**,
+   peli lähettää palvelimelle kolme asiaa: sankarin satunnaisen
+   tunnisteen (20 merkkiä, arvotaan uutta peliä aloitettaessa), nimimerkin ja KP:t.
+2. Palvelin muistaa jokaisen sankarin parhaat KP:t (`LeaderboardRoom`, SQLite-taulu) ja
+   vastaa 10 parhaalla ja pelaajan omalla sijalla.
+3. Paremmuus: eniten KP:tä. Tasatilanteessa ensin perille ehtinyt on edellä.
+
+### Yksityisyys ja turvallisuus
+
+- Talossa kerrotaan aina, että nimimerkki näkyy kaikille, ja kehotetaan olemaan käyttämättä
+  oikeaa nimeä. Tulos lähtee vain, kun pelaaja itse painaa talossa LISÄÄ TULOKSENI.
+- Palvelin ei tallenna IP-osoitteita, evästeitä eikä muuta tietoa. Tunnistetta ei näytetä muille.
+- Nimimerkki siistitään (enintään 12 merkkiä, vain kirjaimia, numeroita, välilyöntejä ja
+  viivoja), ja kirosanat (`src/data/blocked-names.ts`) korvataan nimellä _Sankari_.
+- Palvelin muistaa enintään 5000 sankaria (`src/config/leaderboard.ts`); huonoimmat poistetaan.
+
+### Rajoitukset
+
+- **Huijaaminen on mahdollista.** Peli toimii selaimessa, joten taitava käyttäjä voi lähettää
+  palvelimelle keksityt KP:t (tai muokata tallennustaan). Palvelin hylkää vain järjettömät luvut.
+  Alkuruudun suden salaisuus (taso 100 heti) näkyy listalla tavallisena tuloksena.
+- **Kirosanasuodatin ei ole täydellinen.** Jos listalle ilmestyy sopimaton nimimerkki, sen voi
+  poistaa (alla).
+- Sama pelaaja voi olla listalla monella sankarilla (jokaisella uudella pelillä on oma tunniste).
+  Vanhan tallennuksen sankari saa tunnisteen latauksessa: tallenna peli, niin tunniste pysyy.
+
+### Sopimattoman nimimerkin poisto (aikuinen, kerran)
+
+1. Keksi pitkä salainen avain ja tallenna se palvelimelle kansiossa `worker/presence`:
+   `npx wrangler secret put ADMIN_KEY` (kysyy avaimen).
+2. Poista nimimerkki (kaikki sen nimiset sankarit):
+
+```bash
+curl -X DELETE -H "Authorization: Bearer <avain>" \
+  "https://equinox-presence.<aliverkkotunnus>.workers.dev/leaderboard?name=Nimimerkki"
+```
+
+Vastaus kertoo, montako riviä poistettiin: `{"removed":1}`. Uuden estetyn sanan voi lisätä
+tiedostoon `src/data/blocked-names.ts`.
+
 ## Koodin rakenne
 
 | Tiedosto                                                     | Mitä tekee                                                        |
@@ -124,6 +178,8 @@ Puhelimella paikallinen laskuri ei näy, koska puhelimen sivun osoite ei ole sal
 | `src/systems/player-count.ts`                                | Yksi yhteinen laskuri koko pelille, seuraa onko peli näkyvissä    |
 | `src/ui/player-count-label.ts`                               | Teksti vasempaan alakulmaan (alkuruutu ja kartta)                 |
 | `worker/presence/`                                           | Palvelin: Cloudflare Worker + `PresenceRoom`-Durable Object       |
+| `worker/presence/src/leaderboard-room.ts`                    | 10 parhaan lista (`LeaderboardRoom`-Durable Object, SQLite)       |
+| `src/net/leaderboard.ts`, `src/logic/leaderboard*.ts`        | Listan yhteys, viestit, nimimerkit ja sankaritunniste             |
 | `tests/presence.test.ts`, `tests/websocket-presence.test.ts` | Testit valeyhteydellä, ilman oikeaa palvelinta                    |
 
 **Palvelun vaihtaminen:** tee uusi luokka, joka toteuttaa `PresenceService`-rajapinnan

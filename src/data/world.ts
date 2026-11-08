@@ -9,6 +9,7 @@ import {
   REGION_EDGE_WOBBLE,
   REGIONS,
 } from './island';
+import { HOUSE } from './house';
 import { ISLES } from './isles';
 import { MAP_ENEMIES } from './map-enemies';
 import { ROADS, START_TOWN, TOWNS } from './towns';
@@ -63,5 +64,5 @@ export const WORLD: WorldDef = {
   roads: ROADS,
   startTown: START_TOWN,
   rocks: ROCKS,
-  keepClear: [...MAP_ENEMIES, FINAL_BOSS, CAVE],
+  keepClear: [...MAP_ENEMIES, FINAL_BOSS, CAVE, HOUSE],
 };

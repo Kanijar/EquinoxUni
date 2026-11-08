@@ -84,23 +84,23 @@ describe('alkuruudun versioteksti', () => {
 
   it('julkaistussa pelissä näkyy versio ja julkaisuaika', () => {
     expect(releaseLines({ prNumber: '25', builtAt, dev: false })).toEqual([
-      'Versio: 0.25 (alfa)',
+      'Versio: 0.25 (beta)',
       'Julkaistu 1.11.2026 klo 10.05',
     ]);
   });
 
   it('omalla koneella näkyy kehitysversio eikä julkaisuaikaa', () => {
     expect(releaseLines({ prNumber: '24', builtAt, dev: true })).toEqual([
-      'Versio: 0.24 (alfa)',
+      'Versio: 0.24 (beta)',
       'Kehitysversio',
     ]);
   });
 
   it('ilman PR:n numeroa näkyy pelkkä kehitysvaihe', () => {
     expect(releaseLines({ builtAt, dev: false })).toEqual([
-      'Versio: alfa',
+      'Versio: beta',
       'Julkaistu 1.11.2026 klo 10.05',
     ]);
-    expect(releaseLines({ prNumber: 'x', dev: false })).toEqual(['Versio: alfa']);
+    expect(releaseLines({ prNumber: 'x', dev: false })).toEqual(['Versio: beta']);
   });
 });

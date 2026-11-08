@@ -23,6 +23,7 @@ import type { BoatColliders } from '../systems/boat-control';
 import { BoatDock } from '../systems/boat-dock';
 import { CaveEntrance } from '../systems/cave-entrance';
 import { heroTexture } from '../systems/hero-texture';
+import { HouseDoor } from '../systems/house-door';
 import { Controls } from '../systems/controls';
 import { FishingControl } from '../systems/fishing-control';
 import { MapEncounters } from '../systems/map-encounters';
@@ -39,6 +40,7 @@ import type { NpcDef, ShopKeeperDef, TownDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import { Hud } from '../ui/hud';
 import { LeafRustle } from '../ui/leaf-rustle';
+import { Minimap } from '../ui/minimap';
 import { addBackpackButton } from '../ui/backpack-button';
 import { coverScreen, revealScreen } from '../ui/screen-wipe';
 import { addPlayerCountLabel } from '../ui/player-count-label';
@@ -50,7 +52,6 @@ import { TalkButton } from '../ui/talk-button';
 import { Toast } from '../ui/toast';
 import type { BackpackSceneData } from './backpack-scene';
 import type { BattleSceneData } from './battle-scene';
-import type { CaveSceneData } from './cave-scene';
 import type { QuestSceneData } from './quest-scene';
 import type { SavesSceneData } from './saves-scene';
 import type { ShopSceneData } from './shop-scene';
@@ -68,7 +69,9 @@ import type { VictorySceneData } from './victory-scene';
 // Ongen kanssa rannalla voi kalastaa KALASTA-napista (systems/fishing-control.ts).
 // Venesatamassa myydään venettä, jolla purjehditaan pienille saarille (systems/boat-dock.ts,
 // systems/boat-control.ts). Merellä ei taistella. Peikkokuninkaan voiton jälkeen tuntureilla
-// aukeaa luola (systems/cave-entrance.ts), jossa on Excalibur ja Noidan kauppa.
+// aukeaa luola (systems/cave-entrance.ts), jossa on Excalibur ja Noidan kauppa. Kotirannan
+// laidalla on sankarin oma talo ja koko pelin 10 parhaan lista (systems/house-door.ts).
+// Vasemmassa yläkulmassa on minikartta (ui/minimap.ts): napautus avaa ison kartan.
 // Tämä scene vain kokoaa osat.
 
 export interface WorldSceneData {
@@ -84,7 +87,7 @@ export interface WorldSceneData {
 }
 
 /** Näkymät, jotka avautuvat kartan päälle kartan nukkuessa. */
-type OverlayData = BackpackSceneData | QuestSceneData | ShopSceneData | CaveSceneData;
+type OverlayData = { readonly state: GameState };
 
 export class WorldScene extends Phaser.Scene {
   private state!: GameState;
@@ -100,10 +103,12 @@ export class WorldScene extends Phaser.Scene {
   private talkButton!: TalkButton;
   private npcs!: NpcMarkers;
   private questTracker!: QuestTracker;
+  private minimap!: Minimap;
   private vehicle!: VehicleControl;
   private merchant!: MerchantWalker;
   private dock!: BoatDock;
   private cave!: CaveEntrance;
+  private house!: HouseDoor;
   private fishing!: FishingControl;
   private toast!: Toast;
   private bossPointer: BossPointer | null = null;
@@ -142,6 +147,9 @@ export class WorldScene extends Phaser.Scene {
     this.saveButton = new SaveButton(this, () => this.openSaves());
     this.talkButton = new TalkButton(this, (npc) => this.talkTo(npc));
     this.questTracker = new QuestTracker(this);
+    this.minimap = new Minimap(this, this.state, () =>
+      this.sleepUnder(SCENES.map, { state: this.state }),
+    );
     addBackpackButton(this, () => this.openBackpack());
     this.toast = new Toast(this);
     this.addVehicles({ walk, sail });
@@ -149,10 +157,7 @@ export class WorldScene extends Phaser.Scene {
       onOpen: () => this.openShop(),
       onTooFar: () => this.toast.show(TEXT.shop.tooFar(MERCHANT.name)),
     });
-    this.cave = new CaveEntrance(this, this.state, {
-      onOpen: () => this.sleepUnder(SCENES.cave, { state: this.state }),
-      message: (text) => this.toast.show(text),
-    });
+    this.addLandmarks();
     this.fishing = new FishingControl(this, this.state, {
       message: (text) => this.toast.show(text),
       onEnemy: (enemyId) => this.startBattle(enemyId, null),
@@ -189,6 +194,7 @@ export class WorldScene extends Phaser.Scene {
     this.merchant.update(position, delta, driveShown);
     this.dock.update(this.towns.town?.id, driveShown);
     this.cave.update(worldToTile(position));
+    this.house.update(worldToTile(position));
     this.fishing.update(position, moving, delta, {
       driveShown,
       shopShown: this.merchant.shopShown || this.dock.shopShown,
@@ -225,6 +231,15 @@ export class WorldScene extends Phaser.Scene {
     const moving = length(move) > 0;
     this.leaves.update(isSlowTerrain(speedFactor) && moving);
     return moving;
+  }
+
+  /** Peikkokuninkaan luolan suu ja sankarin talo: kumpikin avautuu kartan päälle. */
+  private addLandmarks(): void {
+    this.cave = new CaveEntrance(this, this.state, {
+      onOpen: () => this.sleepUnder(SCENES.cave, { state: this.state }),
+      message: (text) => this.toast.show(text),
+    });
+    this.house = new HouseDoor(this, () => this.sleepUnder(SCENES.house, { state: this.state }));
   }
 
   /** Bugatti ja vene (systems/vehicle-control.ts) sekä Venesataman venekauppa. */
@@ -348,6 +363,7 @@ export class WorldScene extends Phaser.Scene {
     this.talkButton.update(npc, npc ? npcMarker(this.state, npc.id) : null);
     this.npcs.update(this.state);
     this.questTracker.update(this.state);
+    this.minimap.update();
     this.vehicle.update();
   }
 }

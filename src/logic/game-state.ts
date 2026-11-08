@@ -10,6 +10,7 @@ import { rollDrops } from './drops';
 import { victoryCoins } from './coins';
 import { applyGear, ownsItem, type Equipped } from './equipment';
 import { newAppearance, type HeroAppearance } from './hero-look';
+import { newHeroId, type LeaderboardProgress } from './leaderboard';
 import type { FishingProgress } from './fishing-gear';
 import type { MerchantProgress } from './merchant-route';
 import { levelForXp } from './progression';
@@ -37,7 +38,7 @@ import { recordStairsVictory, type StairsNews, type StairsProgress } from './vol
 // Pelin eteneminen, joka säilyy kartan ja taistelun välillä: sankarin nimi ja ulkonäkö,
 // elämä, kokemus, kykypisteet, esineet ja varusteet, sijainti, voitetut viholliset ja niiden paluu
 // sekä tehtävät, kolikot, kulkevan kauppiaan paikka, tulivuoren rappuset, vene (saaret) ja
-// luolan miekka (logic/cave.ts).
+// luolan miekka (logic/cave.ts) sekä 10 parhaan listan sankaritunniste (logic/leaderboard.ts).
 // Tila tallennetaan selaimeen (logic/save-format.ts). Kun lisäät kentän, lisää se myös
 // tallennuksen tarkistukseen (logic/save-validate.ts), jotta vanhat tallennukset latautuvat.
 
@@ -46,6 +47,7 @@ export interface GameState
     BossProgress,
     CaveProgress,
     HeroAppearance,
+    LeaderboardProgress,
     MerchantProgress,
     StairsProgress,
     FishingProgress,
@@ -107,6 +109,7 @@ export function createNewGame(startXp = 0): GameState {
     defeated: [],
     respawning: [],
     ...newAppearance(),
+    heroId: newHeroId(),
     bossProgress: 0,
     bossDefeated: false,
     swordTaken: false,

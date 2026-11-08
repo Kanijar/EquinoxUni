@@ -2,7 +2,8 @@ import { PLAYER } from '../data/player';
 
 // Pelaajan oma nimi sankarille (hahmonluonti uuden pelin alussa).
 // Nimessä saa olla kirjaimia (myös å, ä, ö), numeroita, välilyöntejä ja yhdysmerkkejä.
-// Nimi näkyy vain pelaajan omassa pelissä: sitä ei lähetetä minnekään.
+// Nimi lähetetään palvelimelle vain, kun pelaaja menee taloonsa (10 parhaan lista,
+// logic/leaderboard.ts). Muuten se näkyy vain pelaajan omassa pelissä.
 
 const NOT_ALLOWED = /[^\p{L}\p{N} -]/gu;
 const SPACES = /\s+/g;
