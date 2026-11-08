@@ -20,7 +20,7 @@ export interface CaveProgress {
 export type SwordStatus = 'ready' | 'level' | 'taken';
 
 /** Onko luola auki (Peikkokuningas voitettu). */
-export function isCaveOpen(state: GameState): boolean {
+export function isCaveOpen(state: Pick<GameState, 'bossDefeated'>): boolean {
   return state.bossDefeated;
 }
 

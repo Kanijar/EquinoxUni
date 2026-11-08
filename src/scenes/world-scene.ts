@@ -39,6 +39,7 @@ import type { NpcDef, ShopKeeperDef, TownDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import { Hud } from '../ui/hud';
 import { LeafRustle } from '../ui/leaf-rustle';
+import { Minimap } from '../ui/minimap';
 import { addBackpackButton } from '../ui/backpack-button';
 import { coverScreen, revealScreen } from '../ui/screen-wipe';
 import { addPlayerCountLabel } from '../ui/player-count-label';
@@ -51,6 +52,7 @@ import { Toast } from '../ui/toast';
 import type { BackpackSceneData } from './backpack-scene';
 import type { BattleSceneData } from './battle-scene';
 import type { CaveSceneData } from './cave-scene';
+import type { MapSceneData } from './map-scene';
 import type { QuestSceneData } from './quest-scene';
 import type { SavesSceneData } from './saves-scene';
 import type { ShopSceneData } from './shop-scene';
@@ -69,6 +71,7 @@ import type { VictorySceneData } from './victory-scene';
 // Venesatamassa myydään venettä, jolla purjehditaan pienille saarille (systems/boat-dock.ts,
 // systems/boat-control.ts). Merellä ei taistella. Peikkokuninkaan voiton jälkeen tuntureilla
 // aukeaa luola (systems/cave-entrance.ts), jossa on Excalibur ja Noidan kauppa.
+// Vasemmassa yläkulmassa on minikartta (ui/minimap.ts): napautus avaa ison kartan.
 // Tämä scene vain kokoaa osat.
 
 export interface WorldSceneData {
@@ -84,7 +87,8 @@ export interface WorldSceneData {
 }
 
 /** Näkymät, jotka avautuvat kartan päälle kartan nukkuessa. */
-type OverlayData = BackpackSceneData | QuestSceneData | ShopSceneData | CaveSceneData;
+type OverlayData =
+  BackpackSceneData | QuestSceneData | ShopSceneData | CaveSceneData | MapSceneData;
 
 export class WorldScene extends Phaser.Scene {
   private state!: GameState;
@@ -100,6 +104,7 @@ export class WorldScene extends Phaser.Scene {
   private talkButton!: TalkButton;
   private npcs!: NpcMarkers;
   private questTracker!: QuestTracker;
+  private minimap!: Minimap;
   private vehicle!: VehicleControl;
   private merchant!: MerchantWalker;
   private dock!: BoatDock;
@@ -142,6 +147,9 @@ export class WorldScene extends Phaser.Scene {
     this.saveButton = new SaveButton(this, () => this.openSaves());
     this.talkButton = new TalkButton(this, (npc) => this.talkTo(npc));
     this.questTracker = new QuestTracker(this);
+    this.minimap = new Minimap(this, this.state, () =>
+      this.sleepUnder(SCENES.map, { state: this.state }),
+    );
     addBackpackButton(this, () => this.openBackpack());
     this.toast = new Toast(this);
     this.addVehicles({ walk, sail });
@@ -348,6 +356,7 @@ export class WorldScene extends Phaser.Scene {
     this.talkButton.update(npc, npc ? npcMarker(this.state, npc.id) : null);
     this.npcs.update(this.state);
     this.questTracker.update(this.state);
+    this.minimap.update();
     this.vehicle.update();
   }
 }
