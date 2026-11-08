@@ -24,6 +24,7 @@ import {
 } from '../logic/shop';
 import { playSound } from '../systems/sound-fx';
 import { BagPager } from '../ui/bag-pager';
+import { ComingSoonButton } from '../ui/coming-soon-button';
 import { ItemInfo, type ItemInfoContent } from '../ui/item-info';
 import { ItemTile } from '../ui/item-tile';
 import { boughtText, itemDetail, keeperGreeting, keeperTitle } from '../ui/shop-texts';
@@ -65,6 +66,8 @@ export class ShopScene extends Phaser.Scene {
   private speech!: Phaser.GameObjects.Text;
   private emptyText!: Phaser.GameObjects.Text;
   private info!: ItemInfo;
+  /** Noidan kaupan "???"-nappi (vain kauppiaalla, jolla on comingSoon). */
+  private comingSoon: ComingSoonButton | null = null;
 
   constructor() {
     super(SCENES.shop);
@@ -85,6 +88,7 @@ export class ShopScene extends Phaser.Scene {
     this.addDoneButton();
     this.addMerchant();
     this.addGrid();
+    this.comingSoon = this.keeper.comingSoon ? new ComingSoonButton(this) : null;
     this.info = new ItemInfo(this, () => this.act());
     this.refresh();
   }
@@ -224,6 +228,8 @@ export class ShopScene extends Phaser.Scene {
     this.emptyText.setVisible(all.length === 0);
     const shown = pageItems(all, this.page, this.pageSize);
     this.tiles.forEach((tile, index) => this.showTile(tile, shown[index]));
+    // "???" näkyy ostopuolella, kun ruudukon alempi rivi on tyhjä.
+    this.comingSoon?.setVisible(this.mode === 'buy' && shown.length <= BACKPACK_VIEW.bagColumns);
     this.info.update(this.infoContent());
   }
 

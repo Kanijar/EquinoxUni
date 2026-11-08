@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getItem, getSprite, WORLD } from '../src/data';
+import { BACKPACK_VIEW } from '../src/config/game-config';
 import { CAVE, WITCH } from '../src/data/cave';
 import { bestGear, eatBurger } from '../src/logic/burger-secret';
 import { atCaveMouth, isCaveOpen, pullSword, swordStatus } from '../src/logic/cave';
@@ -98,6 +99,11 @@ describe('Noidan kauppa', () => {
       expect(item.price ?? 0, item.id).toBeGreaterThan(0);
       expect(getSprite(item.sprite).id).toBe(item.sprite);
     }
+  });
+
+  it('Noidan kaupassa on "???"-nappi, ja tavarat mahtuvat yhdelle riville sen yläpuolelle', () => {
+    expect(WITCH.comingSoon).toBe(true);
+    expect(shopStock(WITCH).length).toBeLessThanOrEqual(BACKPACK_VIEW.bagColumns);
   });
 
   it('loitsukirjan ostaminen opettaa loitsun, eikä samaa kirjaa osteta toista kertaa', () => {

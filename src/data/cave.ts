@@ -14,6 +14,8 @@ export const WITCH: ShopKeeperDef = {
   name: 'Nokkonen',
   sprite: 'witch',
   stock: ['spell-lightning', 'spell-ice', 'spell-healing', 'power-crystal'],
+  // Jarin toive: "???"-nappi, joka lupaa lisää loitsuja myöhemmin. Nappi ei vielä tee mitään.
+  comingSoon: true,
 };
 
 export const CAVE: CaveDef = {

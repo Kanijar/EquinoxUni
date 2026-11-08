@@ -47,6 +47,8 @@ export const EN_CAVE = {
     `${name}: Hee hee! You beat the Troll King. Want to learn some spells?`,
   shopTitle: (name: string): string => `${name} the Witch`,
   shopGreet: (name: string): string => `${name}: Spells and powers, my dear! What will it be?`,
+  mystery: '???',
+  comingSoon: 'Coming soon to the game!',
 };
 
 /** Luolan esineiden nimet englanniksi (data/cave-items.ts). */
