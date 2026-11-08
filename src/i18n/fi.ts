@@ -21,6 +21,7 @@ import { FI_QUESTS } from './fi-quests';
 import { FI_SHOP } from './fi-shop';
 import { FI_STAIRS } from './fi-stairs';
 import { FI_FISHING } from './fi-fishing';
+import { FI_MAP } from './fi-map';
 import type { Language } from './language';
 
 // Kaikki pelaajalle näkyvät tekstit suomeksi. Älä kirjoita tekstejä suoraan koodiin,
@@ -342,6 +343,8 @@ export const FI = {
   magic: FI_MAGIC,
   /** Peikkokuninkaan luola (data/cave.ts). */
   cave: FI_CAVE,
+  /** Minikartta ja iso kartta (i18n/fi-map.ts). */
+  map: FI_MAP,
   /** Loppuboss (data/boss.ts): peikkolaskuri, herääminen ja voitto. */
   boss: {
     progress: (count: number, needed: number): string =>
