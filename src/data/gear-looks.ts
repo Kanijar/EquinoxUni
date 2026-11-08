@@ -50,6 +50,8 @@ export const GEAR_LOOKS: Readonly<Record<string, GearLook>> = {
   'serpent-spear': weapon('trident', '#9fffe0', '#3fb0a0', '#1a6a6a'),
   // Peikkokuninkaan luolan kivestä (data/cave-items.ts): kirkas terä ja kultainen kahva.
   excalibur: weapon('sword', '#e8f4ff', '#3a7aff', '#ffd23f'),
+  // Ideaviestien palkinto (data/idea-items.ts): vaaleanpunainen terä ja punainen sydän.
+  'like-sword': weapon('sword', '#ff7ab8', '#e0303a', '#ffd23f'),
   // Vartalolla
   'robber-clothes': armor('clothes', '#3a3f4a', '#5a3a1a'),
   'king-cloak': armor('cloak', '#6a3a86', '#ffd23f'),

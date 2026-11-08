@@ -14,6 +14,8 @@ export interface BagPagerOptions {
   readonly right: number;
   /** step on -1 (edellinen sivu) tai 1 (seuraava sivu). */
   readonly onTurn: (step: number) => void;
+  /** Rivin korkeus. Oletus: repun sivunuolten paikka (ideanäkymä käyttää omaansa). */
+  readonly y?: number;
 }
 
 /** Ikonit ovat napin päällä (TextButton on syvyydellä 1000–1001). */
@@ -30,11 +32,15 @@ export class BagPager {
   private readonly label: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene, options: BagPagerOptions) {
-    const { pagerButtonWidth, pagerY } = BACKPACK_VIEW;
-    const half = pagerButtonWidth / 2;
+    const pagerY = options.y ?? BACKPACK_VIEW.pagerY;
+    const half = BACKPACK_VIEW.pagerButtonWidth / 2;
     this.arrows = [
-      addArrow(scene, options.left + half, 'icon-arrow-left', () => options.onTurn(-1)),
-      addArrow(scene, options.right - half, 'icon-arrow-right', () => options.onTurn(1)),
+      addArrow(scene, { x: options.left + half, y: pagerY }, 'icon-arrow-left', () =>
+        options.onTurn(-1),
+      ),
+      addArrow(scene, { x: options.right - half, y: pagerY }, 'icon-arrow-right', () =>
+        options.onTurn(1),
+      ),
     ];
     this.label = addLabel(scene, {
       x: (options.left + options.right) / 2,
@@ -56,16 +62,22 @@ export class BagPager {
   }
 }
 
-function addArrow(scene: Phaser.Scene, x: number, sprite: string, onTap: () => void): Arrow {
-  const { pagerButtonWidth, pagerY, tileSize, pagerIconScale } = BACKPACK_VIEW;
+function addArrow(
+  scene: Phaser.Scene,
+  at: { readonly x: number; readonly y: number },
+  sprite: string,
+  onTap: () => void,
+): Arrow {
+  const { pagerButtonWidth, tileSize, pagerIconScale } = BACKPACK_VIEW;
+  const { x, y } = at;
   const button = new TextButton(scene, {
     x,
-    y: pagerY,
+    y,
     width: pagerButtonWidth,
     height: tileSize,
     label: '',
     onTap,
   });
-  const icon = scene.add.image(x, pagerY, sprite).setScale(pagerIconScale).setDepth(ICON_DEPTH);
+  const icon = scene.add.image(x, y, sprite).setScale(pagerIconScale).setDepth(ICON_DEPTH);
   return { button, icon };
 }

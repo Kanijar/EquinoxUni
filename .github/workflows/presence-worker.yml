@@ -1,6 +1,6 @@
 name: Julkaise pelaajalaskuri Cloudflareen
 
-# Julkaisee pelaajalaskurin ja 10 parhaan listan palvelimen (worker/presence) Cloudflare Workersiin.
+# Julkaisee pelaajalaskurin, 10 parhaan listan ja ideaviestien palvelimen (worker/presence) Cloudflare Workersiin.
 # Vaatii kerran repon salaisuudet CLOUDFLARE_API_TOKEN ja CLOUDFLARE_ACCOUNT_ID
 # (ohje: docs/PELAAJALASKURI.md). Ilman niitä työ ohitetaan, eikä mikään mene rikki.
 
@@ -16,6 +16,11 @@ on:
       - 'src/logic/hero-name.ts'
       - 'src/data/blocked-names.ts'
       - 'src/data/player.ts'
+      - 'src/config/ideas.ts'
+      - 'src/logic/idea*.ts'
+      - 'src/logic/rate-limit.ts'
+      - 'src/logic/server-url.ts'
+      - 'src/data/blocked-contacts.ts'
       - '.github/workflows/presence-worker.yml'
   workflow_dispatch:
 

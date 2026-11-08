@@ -7,6 +7,7 @@ import {
   type ScoreSubmission,
 } from '../../../src/logic/leaderboard';
 import { leaderboardName } from '../../../src/logic/leaderboard-name';
+import { json, parseJson } from './json';
 
 // Koko pelin 10 parhaan lista (ks. docs/PELAAJALASKURI.md). Yksi yhteinen huone, joka
 // muistaa sankarit SQLite-taulussa: satunnainen tunniste, nimimerkki ja KP. Tunnistetta ei
@@ -107,18 +108,4 @@ export class LeaderboardRoom extends DurableObject<unknown> {
     }
     return this.ctx.storage.sql.exec('DELETE FROM scores WHERE name = ?', name).rowsWritten;
   }
-}
-
-function parseJson(text: string): unknown {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return null;
-  }
-}
-
-function json(value: unknown): Response {
-  return new Response(JSON.stringify(value), {
-    headers: { 'Content-Type': 'application/json' },
-  });
 }

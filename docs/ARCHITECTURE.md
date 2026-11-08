@@ -418,6 +418,18 @@ scenes  →  systems / ui  →  entities  →  logic
   palvelimella että pelissä. Säännöt `logic/leaderboard.ts` ja `logic/leaderboard-name.ts`,
   yhteys `net/leaderboard.ts`. Ilman palvelinta talossa lukee "Lista ei ole vielä käytössä".
   Pystytys ja rajoitukset: `docs/PELAAJALASKURI.md`.
+- **Ideaviestit:** alkuruudun vasemman yläkulman IDEAT-nappi avaa `scenes/ideas-scene.ts`:n, jossa
+  pelaajat kirjoittavat nimettömästi ideoita, kommentoivat ja tykkäävät. Näkymällä on kolme osaa
+  (`ui/ideas/`: lista, avattu idea, kirjoitus), ja osa vaihtuu käynnistämällä scene uudelleen.
+  Tekstikenttä on HTML `<textarea>` pelin päällä (`ui/message-input.ts`, sijoittelu
+  `ui/dom-overlay.ts`, jota myös hahmonluonnin nimikenttä käyttää). Palvelin on sama Worker
+  (`IdeasRoom`, osoite `/ideas`, SQLite). Laitteella on salainen satunnainen tunniste
+  (localStorage, ei tallennuksissa), jota ei näytetä kenellekään: yksi tykkäys per laite,
+  nopeusraja ja oman idean tunnistus. Teksti tarkistetaan pelissä ja palvelimella
+  (`logic/idea-text.ts`: kirosanat ja yhteystiedot), nopeusraja `logic/rate-limit.ts`.
+  Parhaan idean (eniten tykkäyksiä, vähintään 5, tasatilanteessa vanhin) tekijä voi lunastaa
+  kerran Tykkäysmiekan (`data/idea-items.ts`, `logic/like-reward.ts`), joka odottaa selaimen
+  muistissa ja siirtyy reppuun seuraavassa uudessa tai ladatussa pelissä.
 - **Äänet:** ääniefektit tehdään koodilla Web Audiolla (`data/sounds.ts` + `systems/sound-fx.ts`),
   joten tiedostoja ei tarvita. Ne kulkevat Phaserin äänijärjestelmän läpi, jolloin asetusten
   voimakkuus koskee niitä. Nappien painallus, osumat, voitto, tason nousu ja tallennus soivat.
@@ -490,3 +502,6 @@ kokemustasot, parannusjuomat ja lepo paikkakunnissa.
 - Väkivalta on piirrettyä ja fantasiaa (limat, hirviöt): ei verta.
 - Peli on staattinen sivusto. Ainoa palvelin on valinnainen, anonyymi pelaajalaskuri, joka
   laskee vain avoimet yhteydet eikä tallenna mitään (`docs/PELAAJALASKURI.md`).
+  Samalla palvelimella ovat 10 parhaan lista (nimimerkki vain pelaajan luvalla) ja nimettömät
+  ideaviestit. Ideaviestit eivät ole chat: ei nimiä, ei yksityisviestejä, kirosanat ja
+  yhteystiedot hylätään, ja ylläpitäjä voi poistaa viestin numerolla.

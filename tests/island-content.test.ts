@@ -3,6 +3,7 @@ import { ENEMIES, ITEMS, QUESTS } from '../src/data';
 import { FINAL_BOSS } from '../src/data/boss';
 import { CAVE } from '../src/data/cave';
 import { FISHING } from '../src/data/fishing';
+import { LIKE_SWORD_ID } from '../src/data/idea-items';
 import { MERCHANT } from '../src/data/merchant';
 
 // Saaren hirviöiden ja varusteiden sisältötestit.
@@ -28,6 +29,8 @@ const fished = new Set(
 
 /** Peikkokuninkaan luolan kivestä vedettävä miekka (data/cave.ts). */
 const fromCave = new Set([CAVE.sword]);
+/** Ideaviestien palkinto parhaan idean tekijälle (logic/like-reward.ts). */
+const fromIdeas = new Set([LIKE_SWORD_ID]);
 
 describe('saaren hirviöt ja varusteet', () => {
   it.each(ISLAND_MONSTERS)('%s pudottaa varusteen', (id) => {
@@ -35,9 +38,11 @@ describe('saaren hirviöt ja varusteet', () => {
     expect(enemy?.drops?.some((drop) => gearIds.has(drop.item))).toBe(true);
   });
 
-  it('jokaisen varusteen voi saada viholliselta, palkintona, kauppiaalta, kalastamalla tai luolasta', () => {
+  it('jokaisen varusteen voi saada viholliselta, palkintona, kauppiaalta, kalastamalla, luolasta tai ideoista', () => {
     for (const id of gearIds) {
-      const found = [dropped, rewarded, sold, fished, fromCave].some((source) => source.has(id));
+      const found = [dropped, rewarded, sold, fished, fromCave, fromIdeas].some((source) =>
+        source.has(id),
+      );
       expect(found, id).toBe(true);
     }
   });

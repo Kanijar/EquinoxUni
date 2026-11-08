@@ -64,6 +64,7 @@ export const SCENES = {
   shop: 'shop',
   cave: 'cave',
   house: 'house',
+  ideas: 'ideas',
   map: 'map',
   exit: 'exit',
 } as const;
@@ -98,6 +99,9 @@ export const MENU_VIEW = {
   versionAlpha: 0.7,
   /** ASENNA-napin leveys oikeassa yläkulmassa (näkyy vain, kun Chrome tarjoaa asennusta). */
   installWidth: 96,
+  /** IDEAT-nappi vasemmassa yläkulmassa: vasen reuna jättää salaisen burgerin napautettavaksi. */
+  ideasLeft: 26,
+  ideasWidth: 88,
 } as const;
 
 /** Alkuruudun suden salaisuuden taikaefektit (ui/wolf-magic.ts). */

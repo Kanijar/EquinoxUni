@@ -1,6 +1,7 @@
 import { LEADERBOARD } from '../config/leaderboard';
 import type { Rng } from './battle';
 import { leaderboardName } from './leaderboard-name';
+import { serverUrl } from './server-url';
 
 // Koko pelin 10 parhaan lista (sankarin talo, data/house.ts). Paremmuus ratkeaa
 // kokemuspisteistä (KP), joista myös taso lasketaan. Pelaaja lähettää palvelimelle vain
@@ -103,12 +104,7 @@ export function readReply(value: unknown): LeaderboardReply | null {
  * null = laskuria ei ole määritetty, joten listaakaan ei ole.
  */
 export function leaderboardUrl(presenceUrl: string | undefined): string | null {
-  const match = /^(wss?):\/\/([^\s/]+)/.exec(presenceUrl?.trim() ?? '');
-  if (!match) {
-    return null;
-  }
-  const scheme = match[1] === 'wss' ? 'https' : 'http';
-  return `${scheme}://${match[2] ?? ''}${LEADERBOARD.path}`;
+  return serverUrl(presenceUrl, LEADERBOARD.path);
 }
 
 /** Sankarin tulos lähetettäväksi: tunniste, nimimerkki (siistitty) ja KP. */

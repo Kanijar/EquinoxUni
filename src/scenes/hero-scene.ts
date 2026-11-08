@@ -8,6 +8,8 @@ import { TEXT } from '../i18n/text';
 import type { GameState } from '../logic/game-state';
 import { lookChoices, lookColor, randomLook, stepLook } from '../logic/hero-look';
 import { cleanHeroName } from '../logic/hero-name';
+import { deliverLikeReward } from '../logic/like-reward';
+import { browserStore } from '../systems/browser-storage';
 import { heroTexture } from '../systems/hero-texture';
 import { LookRow } from '../ui/look-row';
 import { NameInput } from '../ui/name-input';
@@ -135,7 +137,11 @@ export class HeroScene extends Phaser.Scene {
     }
   }
 
+  /** Peli alkaa. Lunastettu Tykkäysmiekka (ideaviestit) ilmestyy reppuun. */
   private start(): void {
-    this.scene.start(SCENES.world, this.setup satisfies WorldSceneData);
+    const gift = deliverLikeReward(browserStore(), this.setup.state);
+    const message = [this.setup.message ?? TEXT.world.intro, TEXT.ideas.delivered].join('\n');
+    const next: WorldSceneData = gift ? { ...this.setup, message } : this.setup;
+    this.scene.start(SCENES.world, next);
   }
 }

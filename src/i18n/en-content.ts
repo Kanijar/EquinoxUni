@@ -1,5 +1,6 @@
 import type { EnemyDef, IsleDef, ItemDef, NpcDef, QuestDef, TownDef } from '../data/types';
 import { CAVE_ITEM_TEXTS_EN } from './en-cave';
+import { IDEA_ITEM_TEXTS_EN } from './en-ideas';
 import {
   ISLE_ENEMY_NAMES_EN,
   ISLE_ITEM_TEXTS_EN,
@@ -108,6 +109,7 @@ export const ITEM_TEXTS_EN: Readonly<
   ...ISLE_ITEM_TEXTS_EN,
   // Peikkokuninkaan luola (i18n/en-cave.ts)
   ...CAVE_ITEM_TEXTS_EN,
+  ...IDEA_ITEM_TEXTS_EN,
 };
 
 /** Tehtävän tekstit: nimi, tarjous (story) ja kiitos palautettaessa. */
