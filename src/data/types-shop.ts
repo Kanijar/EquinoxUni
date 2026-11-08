@@ -12,6 +12,8 @@ export interface ShopKeeperDef {
   readonly sprite: string;
   /** Mitä kauppias myy (esineiden tunnisteet, data/items.ts). Hinta on esineen price. */
   readonly stock: readonly string[];
+  /** Kaupassa näkyy "???"-nappi ja teksti "Tulee pian peliin!" (vihje tulevasta). */
+  readonly comingSoon?: boolean;
 }
 
 /**

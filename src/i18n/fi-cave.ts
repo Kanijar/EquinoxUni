@@ -58,4 +58,7 @@ export const FI_CAVE = {
     `${name}: Hihhii! Kukistit Peikkokuninkaan. Haluatko oppia loitsuja?`,
   shopTitle: (name: string): string => `Noita ${name}`,
   shopGreet: (name: string): string => `${name}: Loitsuja ja voimia, kultaseni! Mitä otat?`,
+  /** Noidan kaupan salainen nappi ja teksti sen yläpuolella (ui/coming-soon-button.ts). */
+  mystery: '???',
+  comingSoon: 'Tulee pian peliin!',
 };

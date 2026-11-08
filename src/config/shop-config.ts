@@ -50,6 +50,19 @@ export const SHOP_VIEW = {
 } as const;
 
 /**
+ * "???"-nappi kauppanäkymässä (ui/coming-soon-button.ts), jos kauppiaalla on comingSoon:
+ * tavararuudukon alemmalla rivillä, jonka teksti "Tulee pian peliin!" on napin päällä.
+ * x on ruudukon keskikohta (BACKPACK_VIEW: bagX − 20 … bagX − 20 + 4 × 48 + 40).
+ */
+export const COMING_SOON_VIEW = {
+  x: 340,
+  labelY: 115,
+  buttonY: 140,
+  width: 136,
+  height: 38,
+} as const;
+
+/**
  * Venesataman venekauppa kartalla (systems/boat-dock.ts): Veikko seisoo talon vieressä, ja
  * laiturin vieressä meressä keinuu purjevene.
  */
