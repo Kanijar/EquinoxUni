@@ -56,7 +56,8 @@ export const FI_IDEAS = {
   empty: 'Ei vielä ideoita.\nKirjoita ensimmäinen!',
   noComments: 'Ei vielä kommentteja.',
   offline: 'Ideoita ei saatu.\nKokeile myöhemmin uudelleen.',
-  disabled: 'Ideat eivät ole vielä käytössä.',
+  /** Palvelinta ei ole vielä pystytetty (docs/PELAAJALASKURI.md). */
+  disabled: 'Ideat eivät ole vielä käytössä.\nPelin tekijä ottaa ne pian käyttöön!',
   sending: 'Lähetetään...',
   results: RESULTS,
   /** Tykkäysmiekan lunastus, kun oma idea on paras. */

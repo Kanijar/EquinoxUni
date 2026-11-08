@@ -19,7 +19,6 @@ export class IdeaListView {
   private readonly cards: IdeaCard[] = [];
   private readonly pager: BagPager;
   private readonly message: Phaser.GameObjects.Text;
-  private readonly newButton: TextButton;
   private readonly claimButton: TextButton;
   private list: IdeaList | null = null;
   private page: number;
@@ -63,13 +62,13 @@ export class IdeaListView {
       label: TEXT.ideas.claim,
       onTap: () => this.claim(),
     });
-    this.newButton = new TextButton(scene, {
+    new TextButton(scene, {
       x: GAME_WIDTH - margin - IDEAS_VIEW.newWidth / 2,
       y: bottomY,
       width: IDEAS_VIEW.newWidth,
       height: buttonHeight,
       label: TEXT.ideas.newIdea,
-      onTap: () => nav.go({ view: 'write', sort: nav.sort, page: this.page }),
+      onTap: () => this.write(),
     });
     const listMiddle = IDEAS_VIEW.firstCardY + IDEAS_VIEW.cardHeight * 1.5;
     this.message = scene.add
@@ -87,7 +86,6 @@ export class IdeaListView {
   private load(): void {
     const service = ideasService();
     this.claimButton.setVisible(false);
-    this.newButton.setEnabled(service.enabled);
     this.render();
     if (!service.enabled) {
       this.message.setText(TEXT.ideas.disabled);
@@ -113,6 +111,18 @@ export class IdeaListView {
     this.pager.update(this.page, count);
     if (this.list && ideas.length === 0) this.message.setText(TEXT.ideas.empty);
     this.claimButton.setVisible(this.list?.reward === 'claimable');
+  }
+
+  /**
+   * UUSI IDEA on aina painettava: jos palvelinta ei ole vielä pystytetty, nappi kertoo sen
+   * (harmaa nappi ilman selitystä näyttäisi rikkinäiseltä).
+   */
+  private write(): void {
+    if (!ideasService().enabled) {
+      this.nav.toast(TEXT.ideas.disabled);
+      return;
+    }
+    this.nav.go({ view: 'write', sort: this.nav.sort, page: this.page });
   }
 
   private turn(step: number): void {
