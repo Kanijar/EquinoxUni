@@ -17,3 +17,12 @@ class_name = "PresenceRoom"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["PresenceRoom"]
+
+# 10 parhaan lista (sankarin talo). Muistaa nimimerkit ja KP:t SQLite-taulussa.
+[[durable_objects.bindings]]
+name = "BOARD"
+class_name = "LeaderboardRoom"
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["LeaderboardRoom"]

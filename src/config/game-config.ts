@@ -63,6 +63,7 @@ export const SCENES = {
   quests: 'quests',
   shop: 'shop',
   cave: 'cave',
+  house: 'house',
   exit: 'exit',
 } as const;
 

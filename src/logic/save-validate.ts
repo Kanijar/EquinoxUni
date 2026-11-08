@@ -9,6 +9,7 @@ import { readCount } from './coins';
 import { findGear, type Equipped } from './equipment';
 import { readLook } from './hero-look';
 import { cleanHeroName } from './hero-name';
+import { isHeroId, newHeroId } from './leaderboard';
 import { playerStats, type GameState } from './game-state';
 import { readMerchantMs } from './merchant-route';
 import { mapEnemyRespawnMs, type RespawnTimer } from './respawn';
@@ -194,6 +195,7 @@ export function readGameState(value: unknown): GameState | null {
     defeated,
     respawning,
     name: typeof value['name'] === 'string' ? cleanHeroName(value['name']) : '',
+    heroId: isHeroId(value['heroId']) ? value['heroId'] : newHeroId(),
     look: readLook(value['look']),
     eyeColor: readEyeColor(value['eyeColor']),
     ...readBoss(value),
