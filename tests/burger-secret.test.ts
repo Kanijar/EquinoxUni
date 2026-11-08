@@ -12,7 +12,7 @@ const BURGER = { ...NO_MENU_TAPS, burger: true };
 
 describe('alkuruudun salainen burgeri', () => {
   it('jokaiseen paikkaan valitaan pisteiltään paras varuste', () => {
-    expect(bestGear('hand')?.id).toBe('serpent-spear');
+    expect(bestGear('hand')?.id).toBe('excalibur');
     expect(bestGear('body')?.id).toBe('storm-cloak');
     expect(bestGear('neck')?.id).toBe('storm-heart');
     for (const slot of GEAR_SLOTS) {
@@ -31,12 +31,12 @@ describe('alkuruudun salainen burgeri', () => {
     const state = createNewGame();
     const gained = eatBurger(state);
     expect(state.equipped).toEqual({
-      hand: 'serpent-spear',
+      hand: 'excalibur',
       body: 'storm-cloak',
       neck: 'storm-heart',
     });
     expect(state.inventory['bugatti-keys']).toBe(1);
-    expect(gained.items).toEqual(['serpent-spear', 'storm-cloak', 'storm-heart', 'bugatti-keys']);
+    expect(gained.items).toEqual(['excalibur', 'storm-cloak', 'storm-heart', 'bugatti-keys']);
     expect(gained.coins).toBe(1_000_000 - createNewGame().coins);
     expect(state.coins).toBe(1_000_000);
     expect(getItem('bugatti-keys').kind).toBe('vehicle');
@@ -74,7 +74,7 @@ describe('alkuruudun salainen burgeri', () => {
     expect(state.inventory['storm-cloak']).toBe(0);
     expect(state.equipped.body).toBe('storm-cloak');
     expect(state.inventory['bugatti-keys']).toBe(1);
-    expect(gained.items).toEqual(['serpent-spear', 'storm-heart']);
+    expect(gained.items).toEqual(['excalibur', 'storm-heart']);
   });
 
   it('ladatun pelin elämä kasvaa yhtä paljon kuin maksimielämä, ei yli', () => {
@@ -93,7 +93,7 @@ describe('alkuruudun salainen burgeri', () => {
     const both = startFromMenu({ ...BURGER, wolf: true });
     expect(both.message).toContain('Susi siunasi sinut!');
     expect(both.message).toContain('salainen burgeri');
-    expect(both.state.equipped.hand).toBe('serpent-spear');
+    expect(both.state.equipped.hand).toBe('excalibur');
     expect(startFromMenu(NO_MENU_TAPS).state.equipped).toEqual({});
   });
 

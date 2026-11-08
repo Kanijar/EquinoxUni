@@ -1,4 +1,5 @@
 import { FINAL_BOSS } from './boss';
+import { CAVE } from './cave';
 import {
   BEACH,
   INLAND,
@@ -62,5 +63,5 @@ export const WORLD: WorldDef = {
   roads: ROADS,
   startTown: START_TOWN,
   rocks: ROCKS,
-  keepClear: [...MAP_ENEMIES, FINAL_BOSS],
+  keepClear: [...MAP_ENEMIES, FINAL_BOSS, CAVE],
 };

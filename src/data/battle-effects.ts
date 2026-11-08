@@ -110,6 +110,26 @@ export const PARTICLE_BURSTS = {
     gravity: -60,
     angle: { min: -150, max: -30 },
   },
+  /** Salama osuu: kirkkaat kipinät joka suuntaan. */
+  spark: {
+    count: 16,
+    colors: [0xffffff, 0xfff6a8, 0xffe14a],
+    speed: { min: 60, max: 160 },
+    lifeMs: 360,
+    size: 2,
+    gravity: 0,
+    angle: { min: 0, max: 360 },
+  },
+  /** Jäänuoli osuu: jääsirpaleet sinkoutuvat. */
+  frost: {
+    count: 14,
+    colors: [0xffffff, 0xcff4ff, 0x7ad0ff],
+    speed: { min: 40, max: 110 },
+    lifeMs: 600,
+    size: 2,
+    gravity: 60,
+    angle: { min: 0, max: 360 },
+  },
 } as const satisfies Record<string, ParticleBurstDef>;
 
 export type ParticleBurstId = keyof typeof PARTICLE_BURSTS;

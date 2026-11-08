@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { MAP_ENEMIES, TERRAINS, WORLD, getTown } from '../src/data';
 import { FINAL_BOSS } from '../src/data/boss';
+import { CAVE } from '../src/data/cave';
 import type { RockRule, TerrainId, WorldDef } from '../src/data/types';
 import { placeRocks } from '../src/logic/rocks';
 import type { Vec2 } from '../src/logic/vector';
@@ -45,7 +46,7 @@ function tilesAround(center: Vec2, r: number): Vec2[] {
   return tiles;
 }
 
-/** Tärkeät paikat: paikkakunnat, viholliset ja loppuboss. */
+/** Tärkeät paikat: paikkakunnat, viholliset, loppuboss ja luola. */
 const importantPlaces: readonly { readonly name: string; readonly tile: Vec2 }[] = [
   ...WORLD.towns.map((town) => ({ name: town.name, tile: townTile(town) })),
   ...MAP_ENEMIES.map((spawn, i) => ({
@@ -53,6 +54,7 @@ const importantPlaces: readonly { readonly name: string; readonly tile: Vec2 }[]
     tile: pointTile(spawn),
   })),
   { name: 'loppuboss', tile: pointTile(FINAL_BOSS) },
+  { name: 'Peikkokuninkaan luola', tile: pointTile(CAVE) },
 ];
 
 /** Jokainen ruutu, johon pääsi ilman kiviä, on yhä saavutettavissa (paitsi itse kivet). */

@@ -15,13 +15,13 @@ import {
 import { recordQuestVisit } from '../logic/quest-log';
 import { npcNearby, npcMarker } from '../logic/quests';
 import { isSlowTerrain, speedFactorAt } from '../logic/terrain-speed';
-import { isSailing } from '../logic/sailing';
-import { lastVisitedTown, visitTown } from '../logic/town-visits';
-import { length, type Vec2 } from '../logic/vector';
-import { terrainAt, townTile } from '../logic/world-grid';
+import { visitTown } from '../logic/town-visits';
+import { length } from '../logic/vector';
+import { terrainAt } from '../logic/world-grid';
 import { AmbushWatch } from '../systems/ambush-watch';
 import type { BoatColliders } from '../systems/boat-control';
 import { BoatDock } from '../systems/boat-dock';
+import { CaveEntrance } from '../systems/cave-entrance';
 import { heroTexture } from '../systems/hero-texture';
 import { Controls } from '../systems/controls';
 import { FishingControl } from '../systems/fishing-control';
@@ -31,15 +31,8 @@ import { NpcMarkers } from '../systems/npc-markers';
 import { VehicleControl } from '../systems/vehicle-control';
 import { placeTownMarkers, TownTracker } from '../systems/town-markers';
 import { playSound } from '../systems/sound-fx';
-import {
-  buildWorldMap,
-  getWorldGrid,
-  sailablePosition,
-  showStairs,
-  tileToWorld,
-  walkablePosition,
-  worldToTile,
-} from '../systems/world-map';
+import { buildWorldMap, getWorldGrid, showStairs, worldToTile } from '../systems/world-map';
+import { heroStartPosition } from '../systems/start-position';
 import { BOAT_SHOP } from '../data/boat-shop';
 import { MERCHANT } from '../data/merchant';
 import type { NpcDef, ShopKeeperDef, TownDef } from '../data/types';
@@ -57,6 +50,7 @@ import { TalkButton } from '../ui/talk-button';
 import { Toast } from '../ui/toast';
 import type { BackpackSceneData } from './backpack-scene';
 import type { BattleSceneData } from './battle-scene';
+import type { CaveSceneData } from './cave-scene';
 import type { QuestSceneData } from './quest-scene';
 import type { SavesSceneData } from './saves-scene';
 import type { ShopSceneData } from './shop-scene';
@@ -73,7 +67,8 @@ import type { VictorySceneData } from './victory-scene';
 // Kulkeva kauppias Kaapo kävelee teitä pitkin: hänen vieressään aukeaa kauppa KAUPPA-napista.
 // Ongen kanssa rannalla voi kalastaa KALASTA-napista (systems/fishing-control.ts).
 // Venesatamassa myydään venettä, jolla purjehditaan pienille saarille (systems/boat-dock.ts,
-// systems/boat-control.ts). Merellä ei taistella.
+// systems/boat-control.ts). Merellä ei taistella. Peikkokuninkaan voiton jälkeen tuntureilla
+// aukeaa luola (systems/cave-entrance.ts), jossa on Excalibur ja Noidan kauppa.
 // Tämä scene vain kokoaa osat.
 
 export interface WorldSceneData {
@@ -87,6 +82,9 @@ export interface WorldSceneData {
   /** true = loppuboss heräsi juuri: maa tärisee ja boss karjaisee. */
   readonly bossAwakened?: boolean;
 }
+
+/** Näkymät, jotka avautuvat kartan päälle kartan nukkuessa. */
+type OverlayData = BackpackSceneData | QuestSceneData | ShopSceneData | CaveSceneData;
 
 export class WorldScene extends Phaser.Scene {
   private state!: GameState;
@@ -105,6 +103,7 @@ export class WorldScene extends Phaser.Scene {
   private vehicle!: VehicleControl;
   private merchant!: MerchantWalker;
   private dock!: BoatDock;
+  private cave!: CaveEntrance;
   private fishing!: FishingControl;
   private toast!: Toast;
   private bossPointer: BossPointer | null = null;
@@ -125,7 +124,7 @@ export class WorldScene extends Phaser.Scene {
     const built = buildWorldMap(this, showStairs(this.state.stairSteps));
     placeTownMarkers(this);
     this.npcs = new NpcMarkers(this, (npc) => this.talkTo(npc));
-    const start = this.startPosition();
+    const start = heroStartPosition(this.state);
     const speed = playerStats(this.state).speed;
     this.player = new Player(this, start, speed, heroTexture(this.textures, this.state));
     const walk = this.physics.add.collider(this.player.sprite, built.layer);
@@ -149,6 +148,10 @@ export class WorldScene extends Phaser.Scene {
     this.merchant = new MerchantWalker(this, this.state, {
       onOpen: () => this.openShop(),
       onTooFar: () => this.toast.show(TEXT.shop.tooFar(MERCHANT.name)),
+    });
+    this.cave = new CaveEntrance(this, this.state, {
+      onOpen: () => this.sleepUnder(SCENES.cave, { state: this.state }),
+      message: (text) => this.toast.show(text),
     });
     this.fishing = new FishingControl(this, this.state, {
       message: (text) => this.toast.show(text),
@@ -185,6 +188,7 @@ export class WorldScene extends Phaser.Scene {
     const driveShown = this.vehicle.buttonShown;
     this.merchant.update(position, delta, driveShown);
     this.dock.update(this.towns.town?.id, driveShown);
+    this.cave.update(worldToTile(position));
     this.fishing.update(position, moving, delta, {
       driveShown,
       shopShown: this.merchant.shopShown || this.dock.shopShown,
@@ -236,23 +240,6 @@ export class WorldScene extends Phaser.Scene {
       onOpen: () => this.openShop(BOAT_SHOP),
       onTooFar: () => this.toast.show(TEXT.shop.tooFar(BOAT_SHOP.name)),
     });
-  }
-
-  /**
-   * Mistä sankari aloittaa: tallennettu paikka (veneessä merellä, muuten maalla), tai
-   * viimeisin paikkakunta (pelin alussa ja kaatumisen jälkeen, jolloin vene jää rantaan).
-   */
-  private startPosition(): Vec2 {
-    const saved = this.state.position;
-    const grid = getWorldGrid();
-    const sea = saved && isSailing(this.state) ? sailablePosition(grid, saved) : null;
-    if (sea) {
-      return sea;
-    }
-    this.state.sailing = false;
-    return saved
-      ? walkablePosition(grid, saved)
-      : tileToWorld(townTile(lastVisitedTown(this.state)));
   }
 
   /**
@@ -316,7 +303,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   /** Kartta nukkuu toisen näkymän alla ja herää samaan kohtaan (varusteet ehkä vaihtuneet). */
-  private sleepUnder(key: string, data: BackpackSceneData | QuestSceneData | ShopSceneData): void {
+  private sleepUnder(key: string, data: OverlayData): void {
     this.events.once(Phaser.Scenes.Events.WAKE, () => {
       this.encountersFrom = this.time.now + WORLD_VIEW.graceMs.afterBattle;
       this.vehicle.refreshLook();

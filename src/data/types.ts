@@ -1,4 +1,5 @@
 import type { BattleBackdropId } from './types-battle-look';
+import type { SpellId } from './types-magic';
 import type { MapPoint, TerrainId } from './types-world';
 
 // Pelisisällön tyypit. Kaikki sisältö (viholliset, esineet, paikkakunnat, spritet)
@@ -165,9 +166,10 @@ export interface DropDef {
  * tai voima (ostetaan kauppiaalta ja otetaan heti käyttöön, esim. kykypiste, logic/shop.ts).
  * Kalastus (data/fishing.ts): työkalu (onki, yksi riittää), syötti (madot, kuluvat) ja
  * ruoka (kala, syödään repusta elämän palauttamiseksi). Vene (logic/sailing.ts) vie merelle.
+ * Loitsukirja (Noidan kauppa, data/cave.ts): opettaa loitsun, joka näkyy taistelussa.
  */
 export type ItemKind =
-  'heal' | 'gear' | 'key' | 'vehicle' | 'power' | 'tool' | 'bait' | 'food' | 'boat';
+  'heal' | 'gear' | 'key' | 'vehicle' | 'power' | 'tool' | 'bait' | 'food' | 'boat' | 'spell';
 
 /** Varustepaikka: jokaisessa paikassa voi olla yksi varuste kerrallaan. */
 export type GearSlot = 'hand' | 'body' | 'neck';
@@ -265,7 +267,19 @@ export interface FoodItemDef extends ItemBase {
   readonly value: number;
 }
 
+/**
+ * Loitsukirja (Noidan kaupasta, data/cave.ts): kun kirja on repussa, sankari osaa loitsun ja
+ * voi käyttää sitä taistelussa (HYÖKKÄÄ → LOITSUT). Kauppiaat eivät osta loitsuja takaisin.
+ */
+export interface SpellItemDef extends ItemBase {
+  readonly kind: 'spell';
+  readonly price: number;
+  /** Loitsu, jonka kirja opettaa (data/spells.ts). */
+  readonly spell: SpellId;
+}
+
 export type ItemDef =
+  | SpellItemDef
   | HealItemDef
   | GearItemDef
   | KeyItemDef
@@ -389,30 +403,16 @@ export interface SkillDef {
   readonly max?: number;
 }
 
-// --- Maagia ---
+// --- Maagia (data/types-magic.ts) ---
 
-/** Loitsun tunniste. Loitsun nimi on i18n/fi.ts:ssä (TEXT.spells). */
-export type SpellId = 'fireball';
-
-/** Loitsu osuu heti ja sytyttää vihollisen palamaan. Puolustus ei auta loitsua vastaan. */
-export interface SpellDef {
-  readonly id: SpellId;
-  /** Osuman vahinko ilman tulivoimaa. */
-  readonly power: number;
-  /** Paljonko osuman vahinko kasvaa jokaisesta tulivoiman pisteestä. */
-  readonly powerPerMagic: number;
-  /** Palamisen vahinko (polttovoima) joka sekunti ilman tulivoimaa (MAGIC_RULES.burnTickMs). */
-  readonly burnDamage: number;
-  /**
-   * Paljonko polttovoima kasvaa jokaisesta tulivoiman pisteestä. Saa olla desimaaliluku
-   * (esim. 0.5): murto-osat kertyvät ja vähennetään elämästä kokonaisina (logic/magic.ts).
-   */
-  readonly burnDamagePerMagic: number;
-  /** Kuinka monta sekuntia vihollinen palaa ilman tulivoimaa. */
-  readonly burnSeconds: number;
-  /** Paljonko palamisaika pitenee jokaisesta tulivoiman pisteestä. */
-  readonly burnSecondsPerMagic: number;
-}
+export type {
+  BoltSpellDef,
+  FireSpellDef,
+  FreezeSpellDef,
+  HealSpellDef,
+  SpellDef,
+  SpellId,
+} from './types-magic';
 
 /** Aaltomuoto koodilla tehdylle äänelle (pixelart-pelin "piippaukset"). */
 export type SoundWave = 'square' | 'triangle' | 'sawtooth' | 'sine';
@@ -465,7 +465,14 @@ export type { NpcDef, QuestDef, QuestGoal, QuestRewardDef } from './types-quests
 
 // --- Kulkeva kauppias ja kolikot (data/types-shop.ts) ---
 
-export type { CoinRules, MerchantDef, ShopKeeperDef, ShopRules, TownShopDef } from './types-shop';
+export type {
+  CaveDef,
+  CoinRules,
+  MerchantDef,
+  ShopKeeperDef,
+  ShopRules,
+  TownShopDef,
+} from './types-shop';
 
 // --- Kalastus (data/types-fishing.ts) ---
 

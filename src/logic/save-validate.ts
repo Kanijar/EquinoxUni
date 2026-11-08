@@ -197,6 +197,7 @@ export function readGameState(value: unknown): GameState | null {
     look: readLook(value['look']),
     eyeColor: readEyeColor(value['eyeColor']),
     ...readBoss(value),
+    swordTaken: value['swordTaken'] === true,
     completed: value['completed'] === true,
     quests: readQuests(value['quests']),
     driving: value['driving'] === true,

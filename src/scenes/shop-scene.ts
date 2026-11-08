@@ -9,14 +9,12 @@ import {
 } from '../config/game-config';
 import { SHOP_VIEW } from '../config/shop-config';
 import { getItem } from '../data';
-import { BOAT_SHOP } from '../data/boat-shop';
 import { MERCHANT } from '../data/merchant';
 import type { ItemDef, ShopKeeperDef } from '../data/types';
 import { TEXT } from '../i18n/text';
 import { clampPage, pageCount, pageItems, turnPage } from '../logic/bag-pages';
-import type { GameState } from '../logic/game-state';
+import { playerStats, type GameState } from '../logic/game-state';
 import {
-  buyCount,
   buyItem,
   sellItem,
   shopEntries,
@@ -24,16 +22,17 @@ import {
   type ShopEntry,
   type ShopMode,
 } from '../logic/shop';
-import { findRod } from '../logic/fishing-gear';
 import { playSound } from '../systems/sound-fx';
 import { BagPager } from '../ui/bag-pager';
 import { ItemInfo, type ItemInfoContent } from '../ui/item-info';
 import { ItemTile } from '../ui/item-tile';
+import { boughtText, itemDetail, keeperGreeting, keeperTitle } from '../ui/shop-texts';
 import { TextButton } from '../ui/text-button';
 import { addLabel, addTitle } from '../ui/title-text';
 
 // Kulkevan kauppiaan kauppa. Avataan kartalta KAUPPA-napista tai kauppiasta napauttamalla.
-// Sama näkymä on Venesataman venekauppa (data/boat-shop.ts), kun keeper on annettu.
+// Sama näkymä on Venesataman venekauppa (data/boat-shop.ts) ja luolan Noita (data/cave.ts),
+// kun keeper on annettu.
 // Vasemmalla kauppias ja napit OSTA ja MYY, oikealla tavarat sivuittain (kuten repussa).
 // OSTA-puolella näkyvät kauppiaan tavarat hintoineen, MYY-puolella repun tavarat.
 // Tavaraa napauttamalla näkee, mitä se tekee, ja alareunan napista sen voi ostaa tai myydä.
@@ -44,11 +43,14 @@ export interface ShopSceneData {
   readonly state: GameState;
   /** Kenen kauppa: oletuksena kulkeva kauppias Kaapo, tai esim. Venesataman venekauppa. */
   readonly keeper?: ShopKeeperDef;
+  /** Näkymä, joka herää kaupan sulkeutuessa (oletuksena kartta; Noidan kaupasta luola). */
+  readonly returnTo?: string;
 }
 
 export class ShopScene extends Phaser.Scene {
   private state!: GameState;
   private keeper: ShopKeeperDef = MERCHANT;
+  private returnTo: string = SCENES.world;
   private mode: ShopMode = 'buy';
   private selected: string | null = null;
   /** Viimeisimmän kaupan viesti (esim. "Ostit: Rautamiekka!"). */
@@ -71,6 +73,7 @@ export class ShopScene extends Phaser.Scene {
   create(data: ShopSceneData): void {
     this.state = data.state;
     this.keeper = data.keeper ?? MERCHANT;
+    this.returnTo = data.returnTo ?? SCENES.world;
     this.mode = 'buy';
     this.selected = null;
     this.message = null;
@@ -78,7 +81,7 @@ export class ShopScene extends Phaser.Scene {
     this.page = 0;
     this.tiles = [];
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, COLORS.panel).setOrigin(0);
-    addTitle(this, BACKPACK_VIEW.titleY, this.titleText());
+    addTitle(this, BACKPACK_VIEW.titleY, keeperTitle(this.keeper));
     this.addDoneButton();
     this.addMerchant();
     this.addGrid();
@@ -189,11 +192,8 @@ export class ShopScene extends Phaser.Scene {
     if (!buyItem(this.state, item.id)) {
       return;
     }
-    playSound(item.kind === 'power' ? 'level-up' : 'coin');
-    const name = TEXT.names.item(item);
-    const count = buyCount(item);
-    const bought = count > 1 ? TEXT.shop.boughtMany(name, count) : TEXT.shop.bought(name);
-    this.message = item.kind === 'power' ? TEXT.shop.boughtPower : bought;
+    playSound(item.kind === 'power' || item.kind === 'spell' ? 'level-up' : 'coin');
+    this.message = boughtText(item);
   }
 
   /** Varusteen myynti kysyy ensin varmistuksen: toinen painallus myy. */
@@ -217,7 +217,7 @@ export class ShopScene extends Phaser.Scene {
     this.coinText.setText(String(this.state.coins));
     this.tabs.buy.setSelected(this.mode === 'buy');
     this.tabs.sell.setSelected(this.mode === 'sell');
-    this.speech.setText(this.greeting());
+    this.speech.setText(keeperGreeting(this.keeper, this.mode));
     const all = this.entries();
     this.page = clampPage(this.page, all.length, this.pageSize);
     this.pager.update(this.page, pageCount(all.length, this.pageSize));
@@ -254,7 +254,7 @@ export class ShopScene extends Phaser.Scene {
     return {
       name: TEXT.names.item(item),
       text: this.message ?? TEXT.names.itemDescription(item),
-      detail: block ? this.blockText(block, item) : this.bonusText(item),
+      detail: block ? this.blockText(block, item) : itemDetail(item, this.mode, this.magic()),
       action: this.armed === id ? TEXT.shop.confirm : label(price ?? 0),
       actionEnabled: block === null,
     };
@@ -276,42 +276,13 @@ export class ShopScene extends Phaser.Scene {
     }
   }
 
-  /** Varusteen lisäykset, voiman kykypisteet tai erän koko (madot) keltaisella. */
-  private bonusText(item: ItemDef): string {
-    if (item.kind === 'gear') {
-      return TEXT.backpack.bonus(item.bonus);
-    }
-    if (this.mode === 'buy' && buyCount(item) > 1) {
-      return TEXT.shop.pack(buyCount(item));
-    }
-    const rod = findRod(item.id);
-    if (rod) {
-      return TEXT.fishing.rodStats(rod.biteWindowMs, rod.rareMultiplier);
-    }
-    return item.kind === 'power' ? TEXT.shop.powerBonus(item.skillPoints) : '';
+  private magic(): number {
+    return playerStats(this.state).magic;
   }
 
-  private isBoatShop(): boolean {
-    return this.keeper.id === BOAT_SHOP.id;
-  }
-
-  private titleText(): string {
-    const name = this.keeper.name;
-    return this.isBoatShop() ? TEXT.boat.shopTitle : TEXT.shop.title(name);
-  }
-
-  /** Kauppiaan puhe: venekauppias kertoo saarista ostopuolella. */
-  private greeting(): string {
-    const name = this.keeper.name;
-    if (this.mode === 'sell') {
-      return TEXT.shop.greetSell(name);
-    }
-    return this.isBoatShop() ? TEXT.boat.shopGreet(name) : TEXT.shop.greetBuy(name);
-  }
-
-  /** Kauppa sulkeutuu ja kartta jatkuu siitä, mihin se jäi. */
+  /** Kauppa sulkeutuu, ja kartta (tai luola) jatkuu siitä, mihin se jäi. */
   private close(): void {
     this.scene.stop();
-    this.scene.wake(SCENES.world);
+    this.scene.wake(this.returnTo);
   }
 }
