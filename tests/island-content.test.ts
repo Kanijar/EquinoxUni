@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ENEMIES, ITEMS, QUESTS } from '../src/data';
 import { FINAL_BOSS } from '../src/data/boss';
 import { CAVE } from '../src/data/cave';
+import { DEV_GEAR_IDS } from '../src/data/dev-items';
 import { FISHING } from '../src/data/fishing';
 import { MERCHANT } from '../src/data/merchant';
 
@@ -29,16 +30,31 @@ const fished = new Set(
 /** Peikkokuninkaan luolan kivestä vedettävä miekka (data/cave.ts). */
 const fromCave = new Set([CAVE.sword]);
 
+/** Dev-varusteet saa vain alkuruudun salaisesta burgerista (data/dev-items.ts). */
+const fromBurger = new Set(DEV_GEAR_IDS);
+
 describe('saaren hirviöt ja varusteet', () => {
   it.each(ISLAND_MONSTERS)('%s pudottaa varusteen', (id) => {
     const enemy = ENEMIES.find((e) => e.id === id);
     expect(enemy?.drops?.some((drop) => gearIds.has(drop.item))).toBe(true);
   });
 
-  it('jokaisen varusteen voi saada viholliselta, palkintona, kauppiaalta, kalastamalla tai luolasta', () => {
+  it('jokaisen varusteen voi saada viholliselta, palkintona, kauppiaalta, kalastamalla, luolasta tai burgerista', () => {
+    const sources = [dropped, rewarded, sold, fished, fromCave, fromBurger];
     for (const id of gearIds) {
-      const found = [dropped, rewarded, sold, fished, fromCave].some((source) => source.has(id));
-      expect(found, id).toBe(true);
+      expect(
+        sources.some((source) => source.has(id)),
+        id,
+      ).toBe(true);
+    }
+  });
+
+  it('dev-varusteita saa vain burgerista', () => {
+    for (const id of fromBurger) {
+      const elsewhere = [dropped, rewarded, sold, fished, fromCave].some((source) =>
+        source.has(id),
+      );
+      expect(elsewhere, id).toBe(false);
     }
   });
 

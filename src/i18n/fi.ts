@@ -186,8 +186,8 @@ export const FI = {
     wolfBlessing: (level: number): string => `Susi siunasi sinut! Taso ${level}!`,
     /** Alkuruudun salainen burgeri (logic/burger-secret.ts): näkyy vasta kartalla. */
     burgerGift:
-      'Nam, salainen burgeri!\nSait parhaat varusteet, Bugattin avaimet\nja miljoona kultakolikkoa!',
-    burgerAgain: 'Nam, burgeri!\nSinulla on jo parhaat varusteet.',
+      'Nam, salainen burgeri!\nSait dev-varusteet, Bugattin avaimet\nja miljoona kultakolikkoa!',
+    burgerAgain: 'Nam, burgeri!\nSinulla on jo dev-varusteet.',
     rest: (town: TownDef): string => `Lepäsit ${town.nameAt}. Elämä palautui!`,
     revived: (town: TownDef): string => `Kaaduit... heräsit ${town.nameAt}. Elämä palautui!`,
     skillPointsWaiting: (points: number): string =>

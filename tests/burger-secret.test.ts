@@ -12,9 +12,9 @@ const BURGER = { ...NO_MENU_TAPS, burger: true };
 
 describe('alkuruudun salainen burgeri', () => {
   it('jokaiseen paikkaan valitaan pisteiltään paras varuste', () => {
-    expect(bestGear('hand')?.id).toBe('excalibur');
-    expect(bestGear('body')?.id).toBe('storm-cloak');
-    expect(bestGear('neck')?.id).toBe('storm-heart');
+    expect(bestGear('hand')?.id).toBe('dev-sword');
+    expect(bestGear('body')?.id).toBe('dev-armor');
+    expect(bestGear('neck')?.id).toBe('dev-amulet');
     for (const slot of GEAR_SLOTS) {
       const best = bestGear(slot);
       expect(best?.slot).toBe(slot);
@@ -27,16 +27,16 @@ describe('alkuruudun salainen burgeri', () => {
     }
   });
 
-  it('burgeri laittaa parhaat varusteet käyttöön ja antaa Bugattin avaimet', () => {
+  it('burgeri laittaa dev-varusteet käyttöön ja antaa Bugattin avaimet', () => {
     const state = createNewGame();
     const gained = eatBurger(state);
     expect(state.equipped).toEqual({
-      hand: 'excalibur',
-      body: 'storm-cloak',
-      neck: 'storm-heart',
+      hand: 'dev-sword',
+      body: 'dev-armor',
+      neck: 'dev-amulet',
     });
     expect(state.inventory['bugatti-keys']).toBe(1);
-    expect(gained.items).toEqual(['excalibur', 'storm-cloak', 'storm-heart', 'bugatti-keys']);
+    expect(gained.items).toEqual(['dev-sword', 'dev-armor', 'dev-amulet', 'bugatti-keys']);
     expect(gained.coins).toBe(1_000_000 - createNewGame().coins);
     expect(state.coins).toBe(1_000_000);
     expect(getItem('bugatti-keys').kind).toBe('vehicle');
@@ -61,20 +61,20 @@ describe('alkuruudun salainen burgeri', () => {
     const before = structuredClone(state);
     expect(eatBurger(state)).toEqual({ items: [], coins: 0 });
     expect(state).toEqual(before);
-    expect(burgerNews(state)).toBe('Nam, burgeri!\nSinulla on jo parhaat varusteet.');
+    expect(burgerNews(state)).toBe('Nam, burgeri!\nSinulla on jo dev-varusteet.');
   });
 
   it('aiemmat varusteet palaavat reppuun ja omistettu paras varuste otetaan käyttöön', () => {
     const state = createNewGame();
     state.equipped.hand = 'club';
-    state.inventory['storm-cloak'] = 1;
+    state.inventory['dev-armor'] = 1;
     state.inventory['bugatti-keys'] = 1;
     const gained = eatBurger(state);
     expect(state.inventory['club']).toBe(1);
-    expect(state.inventory['storm-cloak']).toBe(0);
-    expect(state.equipped.body).toBe('storm-cloak');
+    expect(state.inventory['dev-armor']).toBe(0);
+    expect(state.equipped.body).toBe('dev-armor');
     expect(state.inventory['bugatti-keys']).toBe(1);
-    expect(gained.items).toEqual(['excalibur', 'storm-heart']);
+    expect(gained.items).toEqual(['dev-sword', 'dev-amulet']);
   });
 
   it('ladatun pelin elämä kasvaa yhtä paljon kuin maksimielämä, ei yli', () => {
@@ -88,12 +88,12 @@ describe('alkuruudun salainen burgeri', () => {
 
   it('kartalla näkyy yllätysviesti, ja susi ja burgeri toimivat yhtä aikaa', () => {
     expect(startFromMenu(BURGER).message).toBe(
-      'Nam, salainen burgeri!\nSait parhaat varusteet, Bugattin avaimet\nja miljoona kultakolikkoa!',
+      'Nam, salainen burgeri!\nSait dev-varusteet, Bugattin avaimet\nja miljoona kultakolikkoa!',
     );
     const both = startFromMenu({ ...BURGER, wolf: true });
     expect(both.message).toContain('Susi siunasi sinut!');
     expect(both.message).toContain('salainen burgeri');
-    expect(both.state.equipped.hand).toBe('excalibur');
+    expect(both.state.equipped.hand).toBe('dev-sword');
     expect(startFromMenu(NO_MENU_TAPS).state.equipped).toEqual({});
   });
 
