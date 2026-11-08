@@ -226,15 +226,18 @@ export interface VehicleItemDef extends ItemBase {
 }
 
 /**
- * Vene (esim. Purjevene, Venesataman venekaupasta): rannalla VENEESEEN-napista (tai V) vesille,
- * ja merellä MAIHIN-napista rantaan (logic/sailing.ts). Veneellä pääsee pienille saarille.
+ * Vene (data/boat-items.ts, Venesataman venekaupasta): rannalla VENEESEEN-napista (tai V)
+ * vesille, ja merellä MAIHIN-napista rantaan (logic/sailing.ts). Veneellä pääsee pienille
+ * saarille. Kun veneitä on monta, käytössä on nopein.
  */
 export interface BoatItemDef extends ItemBase {
   readonly kind: 'boat';
-  /** Nopeus merellä kerrotaan tällä (1.6 = 60 % nopeammin kuin kävellen). */
+  /** Nopeus merellä kerrotaan tällä (2 = kaksi kertaa niin nopeasti kuin kävellen). */
   readonly speedMultiplier: number;
-  /** Sankari veneessä kartalla (data/sprites-isles.ts). */
+  /** Sankari veneessä kartalla (data/sprites-boats.ts). */
   readonly mapSprite: string;
+  /** Voiko veneestä kalastaa merellä (Luksusvene). Puuttuva = ei. */
+  readonly canFish?: boolean;
 }
 
 /**

@@ -27,6 +27,8 @@ export const FI_SHOP = {
   confirm: 'VARMA?',
   noMoney: 'Kolikot eivät riitä.',
   owned: 'Sinulla on jo tämä.',
+  /** Venekaupassa: repussa on jo yhtä nopea tai nopeampi vene. */
+  slowerBoat: 'Sinulla on jo nopeampi vene.',
   notBought: (merchant: string): string => `${merchant} ei osta tätä.`,
   powerBonus: (points: number): string => `+${points} kykypiste heti`,
   /** Monen kappaleen erä (esim. madot). */

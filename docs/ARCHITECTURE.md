@@ -299,14 +299,19 @@ scenes  →  systems / ui  →  entities  →  logic
   joten metsä hidastaa autoakin. Taisteluun auto ei vaikuta. Tila on `GameState.driving`
   (puuttuva = pois, joten `SAVE_VERSION`ia ei tarvinnut nostaa).
 - **Vene ja pienet saaret:** Venesatamassa (Kotirannan eteläpuolella rannalla) on
-  venekauppias Veikko (`data/boat-shop.ts`, `TownShopDef`), joka myy Purjeveneen
-  (`kind: 'boat'`, `data/isle-items.ts`) ja juomia. Kauppa on sama `ShopScene` kuin Kaapolla
+  venekauppias Veikko (`data/boat-shop.ts`, `TownShopDef`), joka myy neljää venettä
+  (`kind: 'boat'`, `data/boat-items.ts`, kuvat `data/sprites-boats.ts`) ja juomia: Soutuvene
+  (×0,8, 300 kolikkoa), Purjevene (×1,1, taso 30), Moottorivene (×2, taso 55) ja Luksusvene
+  (×2,8, taso 70, `canFish`: merellä voi kalastaa). Jos veneitä on monta, käytössä on nopein
+  (`ownedBoat`), eikä hitaampaa venettä kuin oma voi ostaa (`BuyBlock` `'slowerBoat'`).
+  Laiturissa keinuu seuraava myytävä vene (`nextBoat`). Vanhojen tallennusten entinen Purjevene
+  (`sailboat`, ×1,6) on nyt uusi Purjevene samalla tunnisteella, joten muunnosta ei tarvita. Kauppa on sama `ShopScene` kuin Kaapolla
   (`keeper`-parametri), ja kartalla laituri, Veikko ja kauppanappi piirretään
   `systems/boat-dock.ts`:ssä. Kun vene on repussa ja sankari seisoo meren vieressä, REPPU-napin
   vasemmalla oleva kulkuneuvonappi näyttää VENEESEEN (V-näppäin tekee saman): sankari siirtyy
-  viereiseen meriruutuun ja kulkee veneellä 1,6 kertaa nopeammin. Merellä rannan vieressä nappi
+  viereiseen meriruutuun ja kulkee veneen nopeuskertoimella (`speedMultiplier`). Merellä rannan vieressä nappi
   näyttää MAIHIN. Muualla nappi on BUGATTI, jos avaimet ovat repussa (`systems/vehicle-control.ts`,
-  `systems/boat-control.ts`). Merellä ei taistella eikä kalasteta, ja Bugatti sammuu. Kartalla
+  `systems/boat-control.ts`). Merellä ei taistella, kalastaa voi vain Luksusveneestä, ja Bugatti sammuu. Kartalla
   on toinen, näkymätön tilemap-kerros (`seaLayer`), jossa kaikki paitsi meri on estettä; veneessä
   käytetään sitä. Säännöt `logic/sailing.ts` + testi `tests/sailing.test.ts`.
   Pienet saaret ovat `data/isles.ts`:ssä (ympyröiden yhdiste, oma maasto ja suositustaso):

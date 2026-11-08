@@ -1,7 +1,7 @@
 import type { SpriteDef } from './types';
 
 // Pienten saarten (data/isles.ts) hahmot ja ruudut (16x16): venekauppias Veikko, saarten
-// tehtävänantajat, vene ja saarten maastot. Viholliset: sprites-isle-monsters.ts,
+// tehtävänantajat ja saarten maastot. Veneet: sprites-boats.ts. Viholliset: sprites-isle-monsters.ts,
 // esineet: sprites-isle-items.ts.
 
 const SKIN = '#f2c38f';
@@ -28,16 +28,6 @@ const PERSON_ROWS = [
   '....kkk..kkk....',
   '................',
 ];
-
-/** Veneen runko ja purje. Sankari istuu veneessä (h hiukset, s iho, data/items.ts mapSprite). */
-const BOAT_PALETTE = {
-  m: '#6b4a2a',
-  w: '#f4f4f4',
-  b: '#a8763e',
-  B: '#7a5230',
-  k: '#3b2a1a',
-  c: '#cfe8ff',
-};
 
 export const ISLE_SPRITES: readonly SpriteDef[] = [
   {
@@ -133,53 +123,6 @@ export const ISLE_SPRITES: readonly SpriteDef[] = [
       k: '#1a1a1a',
     },
     rows: PERSON_ROWS,
-  },
-  {
-    // Sankari purjeveneessä (kartalla merellä). Keula on oikealla: kuva peilataan vasemmalle.
-    // Hiukset ja iho vaihtuvat sankarin ulkonäön mukaan (logic/hero-look.ts driverSprite).
-    id: 'sailboat',
-    palette: { ...BOAT_PALETTE, h: '#5a3a1a', s: SKIN, e: '#1a1a1a' },
-    rows: [
-      '................',
-      '........m.......',
-      '........mw......',
-      '........mww.....',
-      '........mwww....',
-      '........mwwww...',
-      '...hhh..mwwwww..',
-      '..hhhhh.mwwwwww.',
-      '..hssss.m.......',
-      '..sssse.m.......',
-      'kbbbbbbbbbbbbbbk',
-      '.kBBBBBBBBBBBBk.',
-      '..kBBBBBBBBBBk..',
-      '...kkkkkkkkkk...',
-      '.cc...cc....cc..',
-      '................',
-    ],
-  },
-  {
-    // Tyhjä purjevene: repussa (Purjevene) ja laiturissa Venesatamassa.
-    id: 'boat',
-    palette: BOAT_PALETTE,
-    rows: [
-      '................',
-      '........m.......',
-      '........mw......',
-      '........mww.....',
-      '........mwww....',
-      '........mwwww...',
-      '........mwwwww..',
-      '........mwwwwww.',
-      '........m.......',
-      '........m.......',
-      'kbbbbbbbbbbbbbbk',
-      '.kBBBBBBBBBBBBk.',
-      '..kBBBBBBBBBBk..',
-      '...kkkkkkkkkk...',
-      '.cc...cc....cc..',
-      '................',
-    ],
   },
   // --- Saarten maastot (data/world.ts TERRAINS) ---
   {
