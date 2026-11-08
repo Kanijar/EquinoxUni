@@ -19,6 +19,12 @@ export interface TownDef extends MapPoint {
   readonly nameAt: string;
 }
 
+/** Sankarin oma talo kartalla (data/house.ts). Talossa on koko pelin 10 parhaan lista. */
+export interface HouseDef extends MapPoint {
+  /** Kuinka monen ruudun päästä talon ovesta pääsee sisään. */
+  readonly enterTiles: number;
+}
+
 /** Järvi (tai laavajärvi) kuvataan yhtenä tai useampana ympyränä. */
 export interface LakeDef {
   readonly name: string;

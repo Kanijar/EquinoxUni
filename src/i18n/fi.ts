@@ -16,11 +16,13 @@ import type {
 } from '../data/types';
 import { localDateParts, twoDigits, type DateParts } from './date-parts';
 import { FI_BOAT, FI_VEHICLE } from './fi-boat';
+import { FI_BOSS, FI_VICTORY } from './fi-boss';
 import { FI_CAVE, FI_MAGIC, FI_SPELL_BUTTONS, FI_SPELLS } from './fi-cave';
 import { FI_QUESTS } from './fi-quests';
 import { FI_SHOP } from './fi-shop';
 import { FI_STAIRS } from './fi-stairs';
 import { FI_FISHING } from './fi-fishing';
+import { FI_HOUSE } from './fi-house';
 import { FI_MAP } from './fi-map';
 import type { Language } from './language';
 
@@ -343,31 +345,14 @@ export const FI = {
   magic: FI_MAGIC,
   /** Peikkokuninkaan luola (data/cave.ts). */
   cave: FI_CAVE,
+  /** Sankarin talo ja 10 parhaan lista (data/house.ts, i18n/fi-house.ts). */
+  house: FI_HOUSE,
   /** Minikartta ja iso kartta (i18n/fi-map.ts). */
   map: FI_MAP,
-  /** Loppuboss (data/boss.ts): peikkolaskuri, herääminen ja voitto. */
-  boss: {
-    progress: (count: number, needed: number): string =>
-      `Tunturipeikkoja voitettu ${count}/${needed}.`,
-    awakenedBattle: (boss: string): string => `Maa jyrisee... ${boss} heräsi!`,
-    /** Kartalla, kun boss on juuri herännyt. */
-    awakenedMap: (boss: string): string => `${boss} heräsi!\nSe odottaa luoteisilla tuntureilla.`,
-    defeatedBattle: (boss: string): string => `${boss} kaatui!`,
-  },
+  /** Loppuboss (data/boss.ts): peikkolaskuri, herääminen ja voitto (i18n/fi-boss.ts). */
+  boss: FI_BOSS,
   /** Voittoruutu: loppuboss voitettu tai jokainen vihollinen voitettu. Peli jatkuu. */
-  victory: {
-    bossTitle: 'VOITIT LOPPUBOSSIN!',
-    bossText: (boss: string): string => `${boss} on kukistettu. Tunturit ovat vapaat!`,
-    completeTitle: 'Saari on pelastettu!',
-    completeText: 'Voitit jokaisen vihollisen ainakin kerran.',
-    bossWaiting: (boss: string): string => `Mutta ${boss} odottaa vielä tuntureilla...`,
-    bossHint: (count: number, needed: number): string =>
-      `Voita tunturipeikkoja (${count}/${needed}), niin jokin herää tuntureilla...`,
-    stats: (level: number, xp: number): string => `Taso ${level}   KP ${xp}`,
-    next: 'Kosketa jatkaaksesi seikkailua',
-    /** Kartalle palatessa. */
-    continues: 'Seikkailu jatkuu!',
-  },
+  victory: FI_VICTORY,
 };
 
 /** Kaikkien kielten tekstien muoto: samat avaimet kuin suomeksi. */

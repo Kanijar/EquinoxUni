@@ -445,6 +445,7 @@ export type {
 
 export type {
   CircleDef,
+  HouseDef,
   IsleDef,
   LakeDef,
   MapEnemyDef,
